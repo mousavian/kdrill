@@ -1,6 +1,6 @@
 # kdrill status
 
-Last updated: 2026-11-14
+Last updated: 2026-11-15
 
 ## Courses
 
@@ -11,7 +11,11 @@ Last updated: 2026-11-14
 | karpenter | 12 | karpenter-kwok (built from source, needs Go + helm) | first `course start` builds an image (~90 s) |
 | kyverno | 13 | kyverno (helm) | ~1 GB extra RAM while installed; lessons 08 and 12 need internet |
 
-Not built yet (see DESIGN.md §8): envoy, istio, inference, training, fine-tuning.
+Not built yet, each with a ready-to-use build brief (`courses/<name>/BUILD.md`):
+istio, inference, training, fine-tuning, kubeflow (the kubeflow brief produces
+several small courses). To build one, open a new session in this folder and say:
+"Build the course described in courses/<name>/BUILD.md". Suggested order:
+istio, training, inference, fine-tuning, kubeflow. The envoy course is being built.
 
 ## Decisions made without you — review these
 
