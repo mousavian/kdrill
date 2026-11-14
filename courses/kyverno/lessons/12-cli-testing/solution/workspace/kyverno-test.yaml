@@ -1,0 +1,29 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: gpu-product-required
+policies:
+- policy.yaml
+resources:
+- resources.yaml
+results:
+- policy: gpu-product-required
+  rule: require-gpu-product
+  kind: Pod
+  resources: [gpu-pod-ok]
+  result: pass
+- policy: gpu-product-required
+  rule: require-gpu-product
+  kind: Pod
+  resources: [gpu-pod-missing]
+  result: fail
+- policy: gpu-product-required
+  rule: require-gpu-product
+  kind: Pod
+  resources: [cpu-pod]
+  result: skip
+- policy: gpu-product-required
+  rule: require-gpu-product
+  kind: Pod
+  resources: [gpu-sidecar-missing]
+  result: fail

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-good}
+spec:
+  initContainers:
+  - name: fetch-model
+    image: ghcr.io/acme/model-fetcher:1.4.0
+    resources: {limits: {memory: 256Mi}}
+  containers:
+  - name: model
+    image: registry.acme.io/ml/ranker:3.2.1
+    resources: {limits: {memory: 2Gi}}

@@ -1,0 +1,47 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: gpu-access
+spec:
+  background: false
+  rules:
+  # Every newly approved team needs a policy change and a review...
+  - name: approved-namespace
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    preconditions:
+      all:
+      - key: "{{ request.object.spec.containers[].resources.limits.\"nvidia.com/gpu\" || `[]` | length(@) }}"
+        operator: GreaterThan
+        value: 0
+    validate:
+      failureAction: Enforce
+      message: "namespace {{ request.namespace }} is not approved for GPU workloads"
+      deny:
+        conditions:
+          any:
+          - key: "{{ request.namespace }}"
+            operator: AnyNotIn
+            value: [ml-team]
+  # ...and the limit is copied from platform/gpu-policy by hand (and is stale).
+  - name: max-gpus-per-pod
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    preconditions:
+      all:
+      - key: "{{ request.object.spec.containers[].resources.limits.\"nvidia.com/gpu\" || `[]` | length(@) }}"
+        operator: GreaterThan
+        value: 0
+    validate:
+      failureAction: Enforce
+      message: "at most 8 GPUs per Pod"
+      deny:
+        conditions:
+          any:
+          - key: "{{ sum(request.object.spec.containers[].to_number(resources.limits.\"nvidia.com/gpu\" || '0')) }}"
+            operator: GreaterThan
+            value: 8

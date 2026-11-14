@@ -1,0 +1,57 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: gpu-access
+spec:
+  background: false      # lookups of live state make no sense in background scans here
+  rules:
+  - name: approved-namespace
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    preconditions:
+      all:
+      - key: "{{ request.object.spec.containers[].resources.limits.\"nvidia.com/gpu\" || `[]` | length(@) }}"
+        operator: GreaterThan
+        value: 0
+    context:
+    # GET the Pod's Namespace from the API server and keep only the label.
+    - name: nsApproval
+      apiCall:
+        urlPath: "/api/v1/namespaces/{{ request.namespace }}"
+        jmesPath: "metadata.labels.\"gpu-access\" || ''"
+    validate:
+      failureAction: Enforce
+      message: "namespace {{ request.namespace }} is not approved for GPU workloads (label gpu-access=approved)"
+      deny:
+        conditions:
+          any:
+          - key: "{{ nsApproval }}"
+            operator: NotEquals
+            value: approved
+  - name: max-gpus-per-pod
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    preconditions:
+      all:
+      - key: "{{ request.object.spec.containers[].resources.limits.\"nvidia.com/gpu\" || `[]` | length(@) }}"
+        operator: GreaterThan
+        value: 0
+    context:
+    # The whole ConfigMap is available as gpuPolicy (data, metadata).
+    - name: gpuPolicy
+      configMap:
+        name: gpu-policy
+        namespace: platform
+    validate:
+      failureAction: Enforce
+      message: "at most {{ gpuPolicy.data.\"max-gpus-per-pod\" }} GPUs per Pod"
+      deny:
+        conditions:
+          any:
+          - key: "{{ sum(request.object.spec.containers[].to_number(resources.limits.\"nvidia.com/gpu\" || '0')) }}"
+            operator: GreaterThan
+            value: "{{ gpuPolicy.data.\"max-gpus-per-pod\" }}"

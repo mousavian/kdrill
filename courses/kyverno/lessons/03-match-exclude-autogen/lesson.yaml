@@ -1,0 +1,9 @@
+title: "Match and exclude precisely; autogen for Pod controllers"
+goal: >
+  Narrow the ClusterPolicy `require-run-as-nonroot` to namespaces labelled
+  `env=prod`, exempt the `backup-agent` ServiceAccount, turn autogen back on
+  so bad Deployments are rejected at apply time, and get the stuck `api`
+  Deployment running.
+kind: sim
+namespaces: [prod, dev]
+concepts: [match/exclude, any/all, namespaceSelector, subjects, background mode and userInfo, autogen rules, ReplicaSet FailedCreate]

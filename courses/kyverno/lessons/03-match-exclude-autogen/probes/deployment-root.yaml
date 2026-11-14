@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: probe-root
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: probe-root}
+  template:
+    metadata:
+      labels: {app: probe-root}
+    spec:
+      containers:
+      - {name: c, image: registry.acme.io/shop/api:2.8.0}

@@ -1,0 +1,8 @@
+# Owned by the GPU platform team. Changing it must not need a policy change.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gpu-policy
+  namespace: platform
+data:
+  max-gpus-per-pod: "4"

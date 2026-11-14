@@ -1,0 +1,10 @@
+title: "CEL policies: rewrite a rule as a ValidatingPolicy, run it as a native VAP"
+goal: >
+  Migrate the memory-limit rule from the ClusterPolicy `require-limits` to
+  the CEL-based ValidatingPolicy `require-memory-limits`: deny Pods and
+  Deployments in `ml-serving` whose containers or initContainers lack a
+  memory limit, enforced by a Kubernetes ValidatingAdmissionPolicy that
+  Kyverno generates; then delete the old ClusterPolicy.
+kind: sim
+namespaces: [ml-serving]
+concepts: [ValidatingPolicy, policies.kyverno.io/v1, CEL, matchConstraints, variables, messageExpression, ValidatingAdmissionPolicy, autogen]

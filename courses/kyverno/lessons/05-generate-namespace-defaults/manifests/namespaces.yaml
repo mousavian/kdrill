@@ -1,0 +1,11 @@
+# The platform's CA bundle: every tenant namespace needs a copy.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ca-bundle
+  namespace: platform
+data:
+  ca.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIBdzCCAR2gAwIBAgIUKDRILLROOTCAEXAMPLEONLY0000wCgYIKoZIzj0EAwIw
+    -----END CERTIFICATE-----

@@ -1,0 +1,20 @@
+title: Kyverno policy as code
+description: >
+  Admission policy with a real Kyverno (v1.19) running in the cluster:
+  validate, match/exclude and autogen, mutate (GPU scheduling defaults),
+  generate and mutate-existing, external data, image signature
+  verification, background scans and PolicyReports, PolicyExceptions, the
+  CEL-based ValidatingPolicy compiled to a native ValidatingAdmissionPolicy,
+  offline testing with the kyverno CLI, and a debugging capstone.
+  Lessons 01-10 and 13 use the classic ClusterPolicy (kyverno.io/v1): it is
+  what most clusters run and what existing repos contain, even though
+  Kyverno 1.19 prints a deprecation warning for it. Lesson 11 migrates a
+  rule to ValidatingPolicy (policies.kyverno.io/v1, CEL), the direction
+  Kyverno and Kubernetes are heading; write new rules that way. Workloads
+  run on fake nodes; lesson 08 needs internet access to ghcr.io and lesson
+  12 downloads the pinned kyverno CLI into the kdrill state directory.
+  Policies are cluster-scoped: every lesson's cleanup deletes ALL Kyverno
+  policies, exceptions and cluster reports in the cluster.
+kind: sim
+components: [kyverno]
+requires: [k8s-scheduling]

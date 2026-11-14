@@ -1,0 +1,9 @@
+title: "Test policies offline with the kyverno CLI"
+goal: >
+  In your workspace, add the missing test case (a Pod whose GPU is in the
+  second container) to the kyverno CLI test suite, fix the policy
+  `gpu-product-required` so that `kyverno test` passes, and apply the fixed
+  policy to the cluster.
+kind: sim
+namespaces: [ml]
+concepts: [kyverno CLI, kyverno test, kyverno apply, test results pass/fail/skip, policy CI, kyverno jp]

@@ -1,0 +1,7 @@
+# No owner, Docker Hub image, no securityContext: fine outside prod.
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-anything}
+spec:
+  containers:
+  - {name: c, image: docker.io/library/python:3.12}

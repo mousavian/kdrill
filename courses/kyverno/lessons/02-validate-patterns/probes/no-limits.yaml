@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-no-limits
+  namespace: ml-serving
+spec:
+  containers:
+  - name: main
+    image: registry.acme.io/ml/ranker:3.2.1
+    resources:
+      requests: {cpu: 100m, memory: 64Mi}

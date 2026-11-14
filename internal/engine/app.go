@@ -262,7 +262,8 @@ func (a *App) runScript(script, dir, phase string, extra []string, timeout time.
 		"KDRILL_HOME="+a.Home,
 		"KDRILL_PHASE="+phase,
 		"KDRILL_PROFILE="+a.st.Profile,
-		"KDRILL_CLUSTER="+a.Cluster)
+		"KDRILL_CLUSTER="+a.Cluster,
+		"KDRILL_STATE_DIR="+a.StateDir)
 	cmd.Env = append(cmd.Env, extra...)
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = nil, os.Stdout, os.Stderr
 	// Own process group so a timeout or Ctrl-C also kills kubectl children.

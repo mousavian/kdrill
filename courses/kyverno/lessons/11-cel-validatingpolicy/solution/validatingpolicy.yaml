@@ -1,0 +1,45 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-memory-limits
+spec:
+  validationActions: [Deny]                 # was Audit
+  autogen:
+    # Let Kyverno compile this into a Kubernetes ValidatingAdmissionPolicy
+    # (+ binding): the API server then evaluates it in-process.
+    validatingAdmissionPolicy:
+      enabled: true
+    # A VAP can't carry Kyverno's Pod-controller autogen rules, so Kyverno
+    # only generates one when autogen is off. We match Deployments ourselves
+    # (below) and say so explicitly here.
+    podControllers:
+      controllers: []
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [pods]
+    - apiGroups: [apps]
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [deployments]
+    namespaceSelector:
+      matchLabels: {kubernetes.io/metadata.name: ml-serving}
+  variables:
+  # The Pod spec, wherever it lives.
+  - name: podSpec
+    expression: "object.kind == 'Pod' ? object.spec : object.spec.template.spec"
+  - name: allContainers
+    expression: >-
+      variables.podSpec.containers +
+      (has(variables.podSpec.initContainers) ? variables.podSpec.initContainers : [])
+  # Names of the containers without a memory limit.
+  - name: missing
+    expression: >-
+      variables.allContainers.filter(c,
+        !has(c.resources) || !has(c.resources.limits) || !('memory' in c.resources.limits)
+      ).map(c, c.name)
+  validations:
+  - expression: "size(variables.missing) == 0"
+    messageExpression: "'every container needs a memory limit: ' + variables.missing.join(', ')"

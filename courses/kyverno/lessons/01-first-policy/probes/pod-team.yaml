@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-team
+  namespace: shop
+  labels: {app: probe, team: payments}
+spec:
+  containers:
+  - {name: c, image: nginx:1.27}

@@ -1,0 +1,31 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: propagate-cost-center
+spec:
+  # Also run the rule for existing triggers (namespaces) when the policy is
+  # created or changed, not only on future namespace updates.
+  mutateExistingOnPolicyUpdate: true
+  rules:
+  - name: label-deployments
+    match:
+      any:
+      - resources:
+          kinds: [Namespace]
+          selector:
+            matchExpressions:
+            - {key: cost-center, operator: Exists}
+    mutate:
+      targets:
+      - apiVersion: apps/v1
+        kind: Deployment
+        namespace: "{{ request.object.metadata.name }}"   # the trigger is the Namespace
+      - apiVersion: apps/v1                                  # StatefulSets too
+        kind: StatefulSet
+        namespace: "{{ request.object.metadata.name }}"
+      patchStrategicMerge:
+        metadata:
+          labels:
+            # request.object = the trigger (Namespace); the target is patched.
+            # JMESPath: a key with "-" must be quoted ("cost-center").
+            cost-center: "{{ request.object.metadata.labels.\"cost-center\" }}"

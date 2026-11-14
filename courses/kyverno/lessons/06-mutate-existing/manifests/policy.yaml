@@ -1,0 +1,25 @@
+# Finance wants GPU spend per cost center: every Deployment should carry its
+# namespace's cost-center label.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: propagate-cost-center
+spec:
+  rules:
+  - name: label-deployments
+    match:
+      any:
+      - resources:
+          kinds: [Namespace]
+          selector:
+            matchExpressions:
+            - {key: cost-center, operator: Exists}
+    mutate:
+      targets:
+      - apiVersion: apps/v1
+        kind: Deployment
+        namespace: "{{ request.object.metadata.name }}"
+      patchStrategicMerge:
+        metadata:
+          labels:
+            cost-center: "{{ request.object.metadata.labels.\"cost-center\" }}"

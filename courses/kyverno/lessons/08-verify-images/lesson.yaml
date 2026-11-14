@@ -1,0 +1,10 @@
+title: "Verify image signatures (supply chain)"
+goal: >
+  Make the ClusterPolicy `verify-model-server` enforce that every
+  `ghcr.io/kyverno/test-verify-image` image is signed with the team's cosign
+  key: unsigned images are rejected, signed ones are admitted and pinned to
+  their digest, other images are not affected.
+kind: sim
+namespaces: [prod-ml]
+timeout: 240s
+concepts: [verifyImages, cosign, public keys, imageReferences, transparency log (Rekor), mutateDigest, image digests]

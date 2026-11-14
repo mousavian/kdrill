@@ -1,0 +1,28 @@
+# The model-server images are signed with cosign by CI (key pair, signature
+# stored next to the image in the registry; not uploaded to Rekor).
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-model-server
+spec:
+  webhookTimeoutSeconds: 20          # signature checks call the registry
+  background: false
+  rules:
+  - name: check-signature
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    verifyImages:
+    - imageReferences:
+      - "ghcr.io/kyverno/test-verify-image"
+      failureAction: Audit
+      mutateDigest: false              # Kyverno requires this in Audit mode
+      attestors:
+      - entries:
+        - keys:
+            publicKeys: |-
+              -----BEGIN PUBLIC KEY-----
+              MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+              5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+              -----END PUBLIC KEY-----

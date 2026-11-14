@@ -1,0 +1,9 @@
+title: "Generate: default NetworkPolicy, GPU quota and CA bundle per tenant namespace"
+goal: >
+  Extend the ClusterPolicy `tenant-defaults` so that every namespace labelled
+  `tenant` (existing and new) gets a default-deny NetworkPolicy, a GPU
+  ResourceQuota and a copy of the platform CA bundle, all kept in sync.
+kind: sim
+namespaces: [platform, team-a, team-b]
+timeout: 240s
+concepts: [generate, data vs clone, synchronize, generateExisting, background controller, UpdateRequests, downstream resources]

@@ -1,0 +1,8 @@
+# No securityContext: may run as root. (Namespace given by verify.)
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-root
+spec:
+  containers:
+  - {name: c, image: registry.acme.io/shop/api:2.8.0}

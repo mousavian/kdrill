@@ -1,0 +1,14 @@
+# kdrill's own test suite for your policy (verify copies your policy.yaml
+# next to these files and runs: kyverno test).
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: kdrill-reference
+policies:
+- policy.yaml
+resources:
+- resources.yaml
+results:
+- {policy: gpu-product-required, rule: require-gpu-product, kind: Pod, resources: [gpu-pod-ok, gpu-sidecar-ok], result: pass}
+- {policy: gpu-product-required, rule: require-gpu-product, kind: Pod, resources: [gpu-pod-missing, gpu-sidecar-missing, gpu-empty-product], result: fail}
+- {policy: gpu-product-required, rule: require-gpu-product, kind: Pod, resources: [cpu-pod, cpu-pod-with-selector], result: skip}

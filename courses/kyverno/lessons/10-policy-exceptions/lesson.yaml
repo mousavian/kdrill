@@ -1,0 +1,10 @@
+title: "PolicyExceptions: a narrow, reviewed exemption"
+goal: >
+  The GPU metrics exporter DaemonSet `dcgm-exporter` needs a hostPath volume,
+  which the Enforce policy `pod-security-baseline` forbids. Grant a
+  PolicyException (in the `policy-exceptions` namespace) that exempts only
+  that DaemonSet and its Pods, only from the hostPath rule, and get it
+  running, without changing the policy.
+kind: sim
+namespaces: [gpu-operator, policy-exceptions]
+concepts: [PolicyException, exception namespace, ruleNames and autogen rule names, negation anchor, least privilege]

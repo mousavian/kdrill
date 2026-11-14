@@ -1,0 +1,10 @@
+title: "Background scans and PolicyReports: find existing violations"
+goal: >
+  Turn on background scanning for the ClusterPolicy `best-practices`, use
+  the PolicyReports to find the workloads in `team-a` and `team-b` that
+  violate it, fix them until the reports show no failures, then switch the
+  policy to Enforce.
+kind: sim
+namespaces: [team-a, team-b]
+timeout: 240s
+concepts: [background scans, PolicyReport, ClusterPolicyReport, report summary, Audit-then-Enforce rollout, kubectl get polr]

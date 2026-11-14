@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-init-latest
+  namespace: ml-serving
+spec:
+  initContainers:
+  - name: init
+    image: ghcr.io/acme/model-fetcher:latest
+    resources:
+      requests: {cpu: 100m, memory: 64Mi}
+      limits: {memory: 64Mi}
+  containers:
+  - name: main
+    image: registry.acme.io/ml/ranker:3.2.1
+    resources:
+      requests: {cpu: 100m, memory: 64Mi}
+      limits: {memory: 64Mi}

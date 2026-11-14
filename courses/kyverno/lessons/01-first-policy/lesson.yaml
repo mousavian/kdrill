@@ -1,0 +1,9 @@
+title: "How Kyverno works: your first policy, Audit vs Enforce"
+goal: >
+  The ClusterPolicy `require-team-label` only audits and lets Pods with an
+  empty `team` label through. Make it reject (Enforce) every Pod without a
+  non-empty `team` label with a clear message, and keep the `web` Deployment
+  in `shop` running by fixing its Pods.
+kind: sim
+namespaces: [shop]
+concepts: [admission webhooks, ClusterPolicy, rules, match, validate pattern, Audit vs Enforce, failureAction]

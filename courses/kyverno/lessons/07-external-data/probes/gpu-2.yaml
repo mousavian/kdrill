@@ -1,0 +1,11 @@
+# 2 GPUs in the first container, a sidecar without (namespace given by verify)
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-gpu-2}
+spec:
+  containers:
+  - name: model
+    image: vllm/vllm-openai:v0.11.0
+    resources:
+      limits: {nvidia.com/gpu: 2}
+  - {name: metrics, image: prom/statsd-exporter:v0.28.0}

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-latest}
+spec:
+  containers:
+  - name: c
+    image: registry.acme.io/worker:latest
+    resources: {limits: {memory: 128Mi}}

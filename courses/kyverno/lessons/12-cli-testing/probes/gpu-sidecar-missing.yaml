@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-gpu-sidecar, namespace: ml}
+spec:
+  containers:
+  - {name: proxy, image: envoyproxy/envoy:v1.34.0}
+  - name: model
+    image: vllm/vllm-openai:v0.11.0
+    resources: {limits: {nvidia.com/gpu: 1}}

@@ -1,0 +1,26 @@
+# GPU Pods must say which GPU type they need, so they don't land on (and
+# block) the wrong, expensive nodes.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: gpu-product-required
+spec:
+  background: true
+  rules:
+  - name: require-gpu-product
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    preconditions:
+      all:
+      - key: "{{ request.object.spec.containers[0].resources.limits.\"nvidia.com/gpu\" || '' }}"
+        operator: NotEquals
+        value: ""
+    validate:
+      failureAction: Enforce
+      message: "GPU Pods must set nodeSelector nvidia.com/gpu.product"
+      pattern:
+        spec:
+          nodeSelector:
+            nvidia.com/gpu.product: "?*"

@@ -1,0 +1,27 @@
+# The rule as it runs today (lesson 02 style).
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-limits
+spec:
+  rules:
+  - name: memory-limit
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ml-serving}
+    validate:
+      failureAction: Enforce
+      message: "every container needs a memory limit"
+      pattern:
+        spec:
+          =(initContainers):
+          - resources:
+              limits:
+                memory: "?*"
+          containers:
+          - resources:
+              limits:
+                memory: "?*"

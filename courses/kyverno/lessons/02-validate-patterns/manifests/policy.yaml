@@ -1,0 +1,40 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: pod-standards
+spec:
+  background: true
+  rules:
+  # Works: every container sets cpu+memory requests and a memory limit.
+  - name: require-resources
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    validate:
+      failureAction: Enforce
+      message: "every container needs cpu and memory requests and a memory limit"
+      pattern:
+        spec:
+          containers:
+          - resources:
+              requests:
+                cpu: "?*"
+                memory: "?*"
+              limits:
+                memory: "?*"
+  # Half done: initContainers are not checked, and an image without any tag
+  # (which means :latest) passes.
+  - name: disallow-latest
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    validate:
+      failureAction: Enforce
+      message: "use a pinned image tag, not latest or no tag"
+      pattern:
+        spec:
+          containers:
+          - image: "!*:latest"
+  # TODO restrict-registries: only registry.acme.io/ and ghcr.io/acme/

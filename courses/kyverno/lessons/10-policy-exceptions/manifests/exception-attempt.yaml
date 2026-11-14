@@ -1,0 +1,15 @@
+# A first attempt, committed next to the workload. Kyverno ignores it.
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: dcgm-exporter
+  namespace: gpu-operator
+spec:
+  exceptions:
+  - policyName: pod-security-baseline
+    ruleNames: [disallow-host-path]
+  match:
+    any:
+    - resources:
+        kinds: [Pod]
+        namespaces: [gpu-operator]

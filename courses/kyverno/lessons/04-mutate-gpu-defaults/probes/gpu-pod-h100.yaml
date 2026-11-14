@@ -1,0 +1,15 @@
+# GPU Pod that already has the GPU toleration and chose H100s (and a zone).
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-gpu-h100, namespace: ml-team}
+spec:
+  nodeSelector:
+    nvidia.com/gpu.product: NVIDIA-H100-80GB-HBM3
+    topology.kubernetes.io/zone: us-east-1a
+  tolerations:
+  - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+  containers:
+  - name: model
+    image: vllm/vllm-openai:v0.11.0
+    resources:
+      limits: {nvidia.com/gpu: 8}

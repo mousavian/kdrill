@@ -1,0 +1,33 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: verify-model-server
+spec:
+  webhookTimeoutSeconds: 20
+  background: false
+  rules:
+  - name: check-signature
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    verifyImages:
+    - imageReferences:
+      - "ghcr.io/kyverno/test-verify-image*"   # a pattern: matches every tag and digest
+      failureAction: Enforce                    # was Audit
+      mutateDigest: true                        # rewrite tag -> @sha256 digest (only allowed with Enforce)
+      attestors:
+      - entries:
+        - keys:
+            publicKeys: |-
+              -----BEGIN PUBLIC KEY-----
+              MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE8nXRh950IZbRj8Ra/N9sbqOPZrfM
+              5/KAQN0/KjHcorm/J5yctVd7iEcnessRQjU917hmKO6JWVGHpDguIyakZA==
+              -----END PUBLIC KEY-----
+            # CI signs with a key pair and doesn't upload to the public
+            # transparency log, so don't look the signature up there.
+            rekor:
+              ignoreTlog: true
+              url: https://rekor.sigstore.dev
+            ctlog:
+              ignoreSCT: true

@@ -1,0 +1,39 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: best-practices
+spec:
+  background: false          # admission only: existing workloads are never looked at
+  rules:
+  - name: require-memory-limit
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchExpressions:
+            - {key: kubernetes.io/metadata.name, operator: In, values: [team-a, team-b]}
+    validate:
+      failureAction: Audit
+      message: "every container needs a memory limit"
+      pattern:
+        spec:
+          containers:
+          - resources:
+              limits:
+                memory: "?*"
+  - name: pin-image-tag
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchExpressions:
+            - {key: kubernetes.io/metadata.name, operator: In, values: [team-a, team-b]}
+    validate:
+      failureAction: Audit
+      message: "use a pinned image tag, not latest or no tag"
+      pattern:
+        spec:
+          containers:
+          - image: "*:* & !*:latest"

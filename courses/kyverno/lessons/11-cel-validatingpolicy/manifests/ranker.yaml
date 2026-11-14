@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ranker
+  namespace: ml-serving
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: ranker}
+  template:
+    metadata:
+      labels: {app: ranker}
+    spec:
+      initContainers:
+      - name: fetch-model
+        image: ghcr.io/acme/model-fetcher:1.4.0
+        resources:
+          limits: {memory: 256Mi}
+      containers:
+      - name: ranker
+        image: registry.acme.io/ml/ranker:3.2.1
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+          limits: {memory: 2Gi}
