@@ -9,6 +9,7 @@
 #   KDRILL_LESSON_DIR  directory of the active lesson
 #   KDRILL_NS          the lesson's main namespace (also kubectl's default)
 #   KDRILL_PROFILE     lite | full
+#   KDRILL_CLUSTER     k3d cluster name (for e.g. k3d image import)
 
 if [[ "${KDRILL_PHASE:-}" != "verify" ]]; then
   set -euo pipefail
