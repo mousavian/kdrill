@@ -1,0 +1,6 @@
+title: Put the database on SSD
+goal: >
+  Every `db` pod runs on a node labelled `disktype=ssd` (a hard requirement),
+  and `cache` prefers zone `a` without being forced into it.
+kind: sim
+concepts: [nodeSelector, node affinity, required vs preferred, node labels]

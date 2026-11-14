@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+spec:
+  replicas: 3
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm}
+    spec:
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+      containers:
+      - name: server
+        image: nginx:1.27
+        resources:
+          requests:
+            cpu: "1"
+            memory: 2Gi
+          limits:
+            nvidia.com/gpu: 2

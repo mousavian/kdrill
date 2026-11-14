@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: critical
+spec:
+  replicas: 2
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: critical}
+  template:
+    metadata:
+      labels: {app: critical}
+    spec:
+      containers:
+      - name: critical
+        image: nginx:1.27
+        resources:
+          requests:
+            cpu: "2"
+            memory: 1Gi

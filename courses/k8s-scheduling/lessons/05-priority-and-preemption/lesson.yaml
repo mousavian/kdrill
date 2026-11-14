@@ -1,0 +1,6 @@
+title: Let critical work preempt batch work
+goal: >
+  The `critical` Deployment runs by preempting `batch` pods, using a
+  PriorityClass named `critical-priority` that you create.
+kind: sim
+concepts: [PriorityClass, preemption, pod priority, preemptionPolicy]

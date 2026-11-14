@@ -1,0 +1,6 @@
+title: Why is my pod Pending?
+goal: >
+  All 3 replicas of the `web` Deployment are Running, on the 2 existing nodes,
+  with each pod still requesting at least 1 CPU.
+kind: sim
+concepts: [resource requests, allocatable, FailedScheduling events]

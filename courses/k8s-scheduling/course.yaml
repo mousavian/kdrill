@@ -1,0 +1,6 @@
+title: Kubernetes scheduling fundamentals
+description: >
+  How the scheduler decides where a pod runs: resource requests, node
+  selection, taints, spreading, priority and extended resources (fake GPUs).
+kind: sim
+components: []
