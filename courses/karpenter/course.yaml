@@ -1,0 +1,9 @@
+title: Karpenter node autoscaling
+description: >
+  Real Karpenter (KWOK cloud provider) launching fake nodes from a catalogue of
+  CPU and GPU instance types: NodePools, instance selection, zones, spot vs
+  on-demand, limits, dedicated GPU pools, consolidation, disruption controls,
+  drift and expiration. Builds on k8s-scheduling and gpu-scheduling.
+kind: sim
+components: [karpenter-kwok]
+requires: [k8s-scheduling, gpu-scheduling]

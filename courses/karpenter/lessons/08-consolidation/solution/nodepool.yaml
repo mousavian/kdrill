@@ -1,0 +1,17 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default
+spec:
+  template:
+    spec:
+      nodeClassRef: {group: karpenter.kwok.sh, kind: KWOKNodeClass, name: default}
+      requirements:
+      - {key: kubernetes.io/arch, operator: In, values: [amd64]}
+      - {key: karpenter.sh/capacity-type, operator: In, values: [on-demand]}
+      - {key: karpenter.k8s.aws/instance-category, operator: In, values: [c, m, r]}
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized   # also repack half-empty nodes
+    consolidateAfter: 15s                           # how long a node must be stable first
+  limits:
+    cpu: "64"

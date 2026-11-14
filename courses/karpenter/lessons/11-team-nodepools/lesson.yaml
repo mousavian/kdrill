@@ -1,0 +1,10 @@
+title: Team NodePools that don't overlap
+goal: >
+  Give team-a (on-demand) and team-b (spot) their own NodePools with taints,
+  labels and CPU budgets, and point each team's workload at its pool, so no
+  team's pods land on another team's nodes and the platform namespace stays
+  on the shared pool.
+kind: sim
+namespaces: [team-a, team-b, platform]
+timeout: 240s
+concepts: [multiple NodePools, mutually exclusive pools, tenant isolation, taints and labels per pool, per-team limits]

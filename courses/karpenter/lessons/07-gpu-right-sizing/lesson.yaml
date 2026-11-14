@@ -1,0 +1,10 @@
+title: Right-size GPU instances
+goal: >
+  `chat` waits forever on a GPU label Karpenter can't provision for, and
+  `eval` (1 GPU) is burning an 8-GPU A100 node. Select GPUs by labels
+  Karpenter knows and size each pod's instance so the fleet has zero idle
+  GPUs.
+kind: sim
+namespaces: [ai]
+timeout: 240s
+concepts: [GPU instance selection, karpenter.k8s.aws/instance-gpu-name, instance-gpu-count, provisioning-time vs runtime labels, idle GPU cost]

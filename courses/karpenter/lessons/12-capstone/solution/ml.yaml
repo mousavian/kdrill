@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: embed, namespace: ml}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: embed}}
+  template:
+    metadata: {labels: {app: embed}}
+    spec:
+      nodeSelector:
+        karpenter.k8s.aws/instance-gpu-name: l4
+        karpenter.k8s.aws/instance-gpu-count: "1"     # FIX 4b: don't share a multi-GPU box
+      tolerations:                                    # FIX 3: GPU pool nodes are tainted
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: tei
+        image: ghcr.io/huggingface/text-embeddings-inference:1.8
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: rerank, namespace: ml}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: rerank}}
+  template:
+    metadata: {labels: {app: rerank}}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - {key: karpenter.k8s.aws/instance-gpu-name, operator: In, values: [l4, a10g]}   # FIX 4: 16 GB is enough
+              - {key: karpenter.k8s.aws/instance-gpu-count, operator: In, values: ["1"]}
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: rerank
+        image: ghcr.io/example/reranker:0.4
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits: {nvidia.com/gpu: 1}

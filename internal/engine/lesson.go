@@ -419,7 +419,7 @@ func (a *App) cleanup() error {
 				names = append(names, k)
 			}
 		}
-		a.k("delete", strings.Join(names, ","), "-l", course.LabelKey, "--ignore-not-found")
+		a.k("delete", strings.Join(names, ","), "-l", course.LabelKey, "--ignore-not-found", "--timeout=60s")
 	}
 	a.st.Active = nil
 	if err := a.save(); err != nil {
@@ -487,9 +487,13 @@ func (a *App) solution(ref string) error {
 func (a *App) setSimTaint(on bool) error {
 	const taint = "node-role.kubernetes.io/control-plane"
 	if on {
-		_, err := a.k("taint", "node", "-l", "!type", taint+"=:NoSchedule", "--overwrite")
+		_, err := a.k("taint", "node", "-l", realNodes, taint+"=:NoSchedule", "--overwrite")
 		return err
 	}
-	a.k("taint", "node", "-l", "!type", taint+":NoSchedule-") // fails when absent; fine
+	a.k("taint", "node", "-l", realNodes, taint+":NoSchedule-") // fails when absent; fine
 	return nil
 }
+
+// realNodes selects nodes that are not fake: kdrill's fake_node sets type=kwok
+// and Karpenter's KWOK provider sets kwok.x-k8s.io/node=fake.
+const realNodes = "!type,kwok.x-k8s.io/node!=fake"

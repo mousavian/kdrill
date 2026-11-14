@@ -1,0 +1,9 @@
+title: Cap a NodePool with limits
+goal: >
+  Half of `web` is Pending because NodePool `default` hit its CPU limit, and
+  an unapproved GPU job is waiting to grab a GPU instance as soon as there's
+  room. Set the approved budget (16 CPU, 64 GiB, no GPUs) so `web` runs and
+  the GPU job can't buy a GPU node from this pool.
+kind: sim
+namespaces: [web]
+concepts: [NodePool limits, status.resources, exceeds limits, extended resources in limits]

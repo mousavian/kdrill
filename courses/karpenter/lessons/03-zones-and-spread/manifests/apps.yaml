@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: store
+spec:
+  replicas: 6
+  selector:
+    matchLabels: {app: checkout}
+  template:
+    metadata:
+      labels: {app: checkout}
+    spec:
+      containers:
+      - name: checkout
+        image: ghcr.io/example/checkout:5.1
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reports
+  namespace: store
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: reports}
+  template:
+    metadata:
+      labels: {app: reports}
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: us-west-2d     # next to the reporting database
+      containers:
+      - name: reports
+        image: ghcr.io/example/reports:1.4
+        resources:
+          requests: {cpu: 500m, memory: 1Gi}

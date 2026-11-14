@@ -143,7 +143,7 @@ func (a *App) clusterUp() error {
 	// On a brand-new cluster the node may not have registered yet, in which
 	// case kubectl wait fails immediately with "no matching resources".
 	for i := 0; ; i++ {
-		_, err := a.k("wait", "node", "-l", "!type", "--for=condition=Ready", "--timeout=120s")
+		_, err := a.k("wait", "node", "-l", realNodes, "--for=condition=Ready", "--timeout=120s")
 		if err == nil {
 			break
 		}
@@ -235,7 +235,7 @@ func (a *App) doctor() error {
 		row(err == nil, false, t+" installed", "brew install "+t)
 	}
 	_, err := exec.LookPath("helm")
-	row(err == nil, true, "helm installed (needed by later courses)", "brew install helm")
+	row(err == nil, true, "helm installed (needed by the kyverno and karpenter courses)", "brew install helm")
 
 	if _, err := exec.LookPath("k3d"); err == nil && dockerOK {
 		exists, running, err := a.clusterState()

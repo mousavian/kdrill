@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: batch
+spec:
+  replicas: 4
+  selector:
+    matchLabels: {app: api}
+  template:
+    metadata:
+      labels: {app: api}
+    spec:
+      nodeSelector:
+        karpenter.sh/capacity-type: on-demand     # never on spot
+      containers:
+      - name: api
+        image: ghcr.io/example/api:3.2
+        resources:
+          requests: {cpu: "1", memory: 2Gi}

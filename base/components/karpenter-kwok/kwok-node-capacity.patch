@@ -1,0 +1,13 @@
+diff --git a/kwok/cloudprovider/cloudprovider.go b/kwok/cloudprovider/cloudprovider.go
+index f070b48..4334b76 100644
+--- a/kwok/cloudprovider/cloudprovider.go
++++ b/kwok/cloudprovider/cloudprovider.go
+@@ -289,7 +289,7 @@ func (c CloudProvider) toNode(nodeClaim *v1.NodeClaim) (*corev1.Node, error) {
+ 			// KWOK nodes don't support overriding Karpenter's WellKnownResources,
+ 			// so we only apply resource requests, since NodeOverlay will not apply.
+ 			// If this changes in the future, we'll need to update capacity and allocatable values for KWOK nodes.
+-			Capacity:    nodeClaim.Spec.Resources.Requests,
++			Capacity:    instanceType.Capacity,
+ 			Allocatable: lo.Assign(nodeClaim.Spec.Resources.Requests, instanceType.Allocatable()),
+ 			Phase:       corev1.NodePending,
+ 		},

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: checkout
+  namespace: store
+spec:
+  replicas: 6
+  selector:
+    matchLabels: {app: checkout}
+  template:
+    metadata:
+      labels: {app: checkout}
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule      # a hard rule: Karpenter must provide every zone
+        minDomains: 3                         # expect 3 zones even before nodes exist in them
+        labelSelector:
+          matchLabels: {app: checkout}
+        matchLabelKeys: [pod-template-hash]   # count only this rollout's pods
+      containers:
+      - name: checkout
+        image: ghcr.io/example/checkout:5.1
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reports
+  namespace: store
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: reports}
+  template:
+    metadata:
+      labels: {app: reports}
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: us-west-2a     # a zone that exists
+      containers:
+      - name: reports
+        image: ghcr.io/example/reports:1.4
+        resources:
+          requests: {cpu: 500m, memory: 1Gi}

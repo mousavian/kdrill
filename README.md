@@ -10,7 +10,8 @@ topics), sized for an 8 GB laptop. See [DESIGN.md](DESIGN.md) for the full plan.
 
 - Docker (Docker Desktop, OrbStack or Colima), with the VM given at least 3-4 GB
 - [k3d](https://k3d.io) and `kubectl`: `brew install k3d kubectl`
-- Go (to build the CLI); `helm` is only needed by later courses
+- Go (to build the CLI, and to build Karpenter for the karpenter course)
+- `helm` (needed by the kyverno and karpenter courses)
 
 ## Quick start
 

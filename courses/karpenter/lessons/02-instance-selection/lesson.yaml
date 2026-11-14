@@ -1,0 +1,9 @@
+title: Pick instance types with NodePool requirements
+goal: >
+  NodePool `general` asks for instance types that don't exist, so nothing
+  launches. Rewrite its requirements to the platform policy (on-demand
+  Graviton general-purpose instances, xlarge or bigger) and watch Karpenter
+  right-size the fleet for `api` and `worker`.
+kind: sim
+namespaces: [apps]
+concepts: [NodePool requirements, well-known labels, instance category and size, Gt/Lt operators, right-sizing, bin-packing]

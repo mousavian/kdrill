@@ -13,7 +13,7 @@ export KDRILL_LESSON_DIR="$KDRILL_HOME/courses/$course/lessons/$lesson"
 [[ -d "$KDRILL_LESSON_DIR" ]] || { echo "no such lesson: $KDRILL_LESSON_DIR" >&2; exit 2; }
 run() { KDRILL_PHASE="$1" bash -c 'cd "$KDRILL_LESSON_DIR"; source "$KDRILL_HOME/base/lib/common.sh"; source "$1"' _ "$2"; }
 do_setup() {
-  kubectl taint node -l '!type' node-role.kubernetes.io/control-plane=:NoSchedule --overwrite >/dev/null
+  kubectl taint node -l '!type,kwok.x-k8s.io/node!=fake' node-role.kubernetes.io/control-plane=:NoSchedule --overwrite >/dev/null
   kubectl create ns drill >/dev/null 2>&1; kubectl label ns drill "kdrill.dev/lesson=$KDRILL_LESSON" --overwrite >/dev/null
   kubectl config set-context --current --namespace=drill >/dev/null
   run setup "$KDRILL_LESSON_DIR/setup.sh"

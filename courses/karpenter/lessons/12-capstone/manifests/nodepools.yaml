@@ -1,0 +1,60 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: general
+spec:
+  template:
+    metadata:
+      labels:
+        cost-center: shop-v1
+    spec:
+      nodeClassRef: {group: karpenter.kwok.sh, kind: KWOKNodeClass, name: default}
+      requirements:
+      - {key: kubernetes.io/arch, operator: In, values: [amd64]}
+      - {key: karpenter.sh/capacity-type, operator: In, values: [on-demand]}
+      - {key: karpenter.k8s.aws/instance-category, operator: In, values: [c, m, r]}
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 15s
+  limits:
+    cpu: "48"
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: spot
+spec:
+  weight: 50
+  template:
+    spec:
+      nodeClassRef: {group: karpenter.kwok.sh, kind: KWOKNodeClass, name: default}
+      requirements:
+      - {key: kubernetes.io/arch, operator: In, values: [amd64]}
+      - {key: karpenter.sh/capacity-type, operator: In, values: [spot]}
+      - {key: karpenter.k8s.aws/instance-category, operator: In, values: [c, m, r]}
+      taints:
+      - {key: spot, value: "true", effect: NoSchedule}
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 15s
+  limits:
+    cpu: "8"
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gpu
+spec:
+  template:
+    spec:
+      nodeClassRef: {group: karpenter.kwok.sh, kind: KWOKNodeClass, name: default}
+      requirements:
+      - {key: karpenter.sh/capacity-type, operator: In, values: [on-demand]}
+      - {key: karpenter.k8s.aws/instance-category, operator: In, values: [g, p]}
+      taints:
+      - {key: nvidia.com/gpu, value: "true", effect: NoSchedule}
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 15s
+  limits:
+    nvidia.com/gpu: "16"

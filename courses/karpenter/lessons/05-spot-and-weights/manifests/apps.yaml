@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: batch
+spec:
+  replicas: 4
+  selector:
+    matchLabels: {app: api}
+  template:
+    metadata:
+      labels: {app: api}
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/example/api:3.2
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+# Frame rendering: each pod checkpoints often, so losing one to a spot
+# interruption only costs a few minutes of work.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: render
+  namespace: batch
+spec:
+  replicas: 0
+  selector:
+    matchLabels: {app: render}
+  template:
+    metadata:
+      labels: {app: render}
+    spec:
+      containers:
+      - name: render
+        image: ghcr.io/example/render:2.0
+        resources:
+          requests: {cpu: "2", memory: 4Gi}

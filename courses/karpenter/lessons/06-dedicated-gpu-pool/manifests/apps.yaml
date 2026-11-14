@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: ml
+spec:
+  replicas: 3
+  selector:
+    matchLabels: {app: web}
+  template:
+    metadata:
+      labels: {app: web}
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/example/chat-frontend:1.9
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: inference
+  namespace: ml
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: inference}
+  template:
+    metadata:
+      labels: {app: inference}
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: ["--model", "Qwen/Qwen2.5-7B-Instruct"]
+        resources:
+          requests: {cpu: "2", memory: 12Gi}
+          limits: {nvidia.com/gpu: 1}

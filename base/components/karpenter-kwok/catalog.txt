@@ -1,0 +1,47 @@
+# kdrill's fake cloud: the instance types Karpenter (KWOK provider) can launch.
+# Names, shapes and on-demand prices are modelled on AWS EC2 (us-west-2, late
+# 2025), rounded: realistic ratios, not a price list. Every type is offered in
+# zones us-west-2a/b/c. Spot prices are derived from the on-demand price
+# (60-69 % off, varying by zone and family). "od" = no spot offering.
+#
+# type           arch   cpu  memGi  gpus  gpu-model  on-demand$/h  offers
+# --- compute optimised (2 GiB per vCPU)
+c6i.large        amd64    2      4     0  -               0.085  spot,od
+c6i.xlarge       amd64    4      8     0  -               0.170  spot,od
+c6i.2xlarge      amd64    8     16     0  -               0.340  spot,od
+c6i.4xlarge      amd64   16     32     0  -               0.680  spot,od
+c6i.8xlarge      amd64   32     64     0  -               1.360  spot,od
+c7g.large        arm64    2      4     0  -               0.072  spot,od
+c7g.xlarge       arm64    4      8     0  -               0.145  spot,od
+c7g.2xlarge      arm64    8     16     0  -               0.290  spot,od
+c7g.4xlarge      arm64   16     32     0  -               0.580  spot,od
+c7g.8xlarge      arm64   32     64     0  -               1.160  spot,od
+# --- general purpose (4 GiB per vCPU)
+m6i.large        amd64    2      8     0  -               0.096  spot,od
+m6i.xlarge       amd64    4     16     0  -               0.192  spot,od
+m6i.2xlarge      amd64    8     32     0  -               0.384  spot,od
+m6i.4xlarge      amd64   16     64     0  -               0.768  spot,od
+m6i.8xlarge      amd64   32    128     0  -               1.536  spot,od
+m7g.large        arm64    2      8     0  -               0.082  spot,od
+m7g.xlarge       arm64    4     16     0  -               0.163  spot,od
+m7g.2xlarge      arm64    8     32     0  -               0.326  spot,od
+m7g.4xlarge      arm64   16     64     0  -               0.653  spot,od
+m7g.8xlarge      arm64   32    128     0  -               1.306  spot,od
+# --- memory optimised (8 GiB per vCPU)
+r6i.large        amd64    2     16     0  -               0.126  spot,od
+r6i.xlarge       amd64    4     32     0  -               0.252  spot,od
+r6i.2xlarge      amd64    8     64     0  -               0.504  spot,od
+r6i.4xlarge      amd64   16    128     0  -               1.008  spot,od
+r6i.8xlarge      amd64   32    256     0  -               2.016  spot,od
+# --- GPU: NVIDIA A10G 24 GB (g5), L4 24 GB (g6), A100 40 GB (p4d), H100 80 GB (p5)
+g5.xlarge        amd64    4     16     1  A10G            1.006  spot,od
+g5.2xlarge       amd64    8     32     1  A10G            1.212  spot,od
+g5.12xlarge      amd64   48    192     4  A10G            5.672  spot,od
+g5.48xlarge      amd64  192    768     8  A10G           16.288  spot,od
+g6.xlarge        amd64    4     16     1  L4              0.805  spot,od
+g6.2xlarge       amd64    8     32     1  L4              0.978  spot,od
+g6.12xlarge      amd64   48    192     4  L4              4.602  spot,od
+g6.48xlarge      amd64  192    768     8  L4             13.350  spot,od
+p4d.24xlarge     amd64   96   1152     8  A100           21.960  spot,od
+p5.4xlarge       amd64   16    256     1  H100            6.880  od
+p5.48xlarge      amd64  192   2048     8  H100           55.040  od

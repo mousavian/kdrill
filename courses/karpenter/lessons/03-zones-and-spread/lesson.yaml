@@ -1,0 +1,8 @@
+title: Zones and topology spread drive where nodes appear
+goal: >
+  `checkout` runs in one zone and `reports` waits for a zone that doesn't
+  exist. Spread `checkout` evenly over the three zones and pin `reports` to
+  us-west-2a, so Karpenter launches nodes in the zones the pods ask for.
+kind: sim
+namespaces: [store]
+concepts: [topology.kubernetes.io/zone, topologySpreadConstraints, matchLabelKeys, nodeSelector, zonal provisioning]
