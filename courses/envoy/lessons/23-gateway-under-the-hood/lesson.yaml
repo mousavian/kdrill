@@ -1,0 +1,9 @@
+title: "Under the hood: from Gateway API objects to Envoy xDS"
+goal: >
+  /cart on shop.lab fails. Find out why from the HTTPRoute status and the
+  Gateway's Envoy admin interface, fix the route, and record in a ConfigMap
+  `answers` how Envoy Gateway translated the objects: listener, port,
+  virtual host, cluster and endpoints.
+namespaces: [lab]
+timeout: 300s
+concepts: [translation, xDS, LDS RDS CDS EDS, config_dump via port-forward, listener naming, port mapping 80->10080, virtual hosts per hostname, cluster per rule, EDS pod endpoints, ResolvedRefs, egctl]

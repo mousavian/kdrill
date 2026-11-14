@@ -1,0 +1,35 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge
+spec:
+  gatewayClassName: eg
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+  - name: tls
+    protocol: TLS
+    port: 443
+    tls:
+      mode: Passthrough            # no certificate on the Gateway
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: TLSRoute
+metadata:
+  name: site-a
+spec:
+  parentRefs: [{name: edge, sectionName: tls}]
+  hostnames: ["a.lab"]
+  rules:
+  - backendRefs: [{name: site-a, port: 443}]
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: TLSRoute
+metadata:
+  name: site-b
+spec:
+  parentRefs: [{name: edge, sectionName: tls}]
+  hostnames: ["b.lab"]
+  rules:
+  - backendRefs: [{name: site-b, port: 443}]

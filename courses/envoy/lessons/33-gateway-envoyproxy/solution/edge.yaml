@@ -1,0 +1,61 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: edge-proxy
+spec:
+  # Merge with the defaults from the EnvoyGateway config (ClusterIP Service,
+  # 1 replica, drain settings, ...) instead of replacing them.
+  mergeType: StrategicMerge
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        pod:
+          labels:
+            team: platform
+        container:
+          resources:
+            requests: {cpu: 10m, memory: 40Mi}
+  telemetry:
+    accessLog:
+      settings:
+      - format:
+          type: JSON
+          json:
+            status: "%RESPONSE_CODE%"
+            method: "%REQ(:METHOD)%"
+            path: "%REQ(X-ENVOY-ORIGINAL-PATH?:PATH)%"
+            upstream: "%UPSTREAM_HOST%"
+            flags: "%RESPONSE_FLAGS%"
+            duration_ms: "%DURATION%"
+            request_id: "%REQ(X-REQUEST-ID)%"
+        sinks:
+        - type: File
+          file:
+            path: /dev/stdout
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge
+spec:
+  gatewayClassName: eg
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: edge-proxy
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["www.lab"]
+  rules:
+  - backendRefs: [{name: web, port: 80}]

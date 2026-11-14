@@ -1,0 +1,7 @@
+title: "Canary releases with HTTPRoute weights"
+goal: >
+  Roll out web-v2 as a canary: 10% of www.lab traffic by weight, 100% for
+  requests with the header x-canary: always, using only the HTTPRoute.
+namespaces: [lab]
+timeout: 300s
+concepts: [backendRefs weight, traffic splitting, header-based canary, weighted_clusters, progressive delivery, Argo Rollouts, Flagger]

@@ -1,0 +1,9 @@
+title: "Capstone: five sites, five different failures"
+goal: >
+  Five sites behind the Gateway edge all fail, each in a different way.
+  Diagnose them with resource status, the Gateway Envoy's admin interface
+  (/clusters, /config_dump, /stats) and its access log, and fix the
+  configuration (routes, Services, policies, grants), not the workloads.
+namespaces: [lab, payments]
+timeout: 300s
+concepts: [debugging, route status, NoMatchingParent, ResolvedRefs, RefNotPermitted, ReferenceGrant, Service selectors, EDS, active health checks, failed_active_hc, response flags, access logs, admin interface]

@@ -1,0 +1,9 @@
+title: "Retries: hide a bad host from users, safely"
+goal: >
+  One of the three echo pods fails every request with 503. Make Envoy retry
+  failed GET requests on a different host (at most 2 retries) so users see
+  no errors, while POST requests, which aren't safe to repeat, are never
+  retried.
+namespaces: [lab]
+timeout: 300s
+concepts: [retry_policy, retry_on, num_retries, retry_host_predicate, previous_hosts, per_try_timeout, idempotency, x-envoy-attempt-count, retry budgets]

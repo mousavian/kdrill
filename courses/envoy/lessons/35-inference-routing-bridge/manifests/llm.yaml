@@ -1,0 +1,23 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge
+spec:
+  gatewayClassName: eg
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: llm
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["llm.lab"]
+  rules:
+  - matches:
+    - path: {type: PathPrefix, value: /v1}
+    backendRefs:
+    - {name: llama, port: 80}

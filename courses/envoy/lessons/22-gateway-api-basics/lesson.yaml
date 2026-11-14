@@ -1,0 +1,8 @@
+title: "Envoy Gateway and the Gateway API: GatewayClass, Gateway, HTTPRoute"
+goal: >
+  The Gateway edge and its HTTPRoute don't work. Fix them so Envoy Gateway
+  accepts the Gateway, starts an Envoy for it, and routes www.lab to web and
+  (with a new HTTPRoute) api.lab to api.
+namespaces: [lab]
+timeout: 300s
+concepts: [Gateway API, GatewayClass, Gateway, listeners, HTTPRoute, parentRefs, hostnames, backendRefs, status conditions, Accepted, Programmed, ResolvedRefs, Envoy Gateway]

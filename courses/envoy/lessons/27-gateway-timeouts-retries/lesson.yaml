@@ -1,0 +1,8 @@
+title: "Timeouts on HTTPRoutes, retries with a BackendTrafficPolicy"
+goal: >
+  Give the /api rule a 1 s request timeout and /reports 10 s on the HTTPRoute,
+  and attach a BackendTrafficPolicy to the route that retries 503s (up to 2
+  times) so the sick pod behind the echo Service no longer causes errors.
+namespaces: [lab]
+timeout: 300s
+concepts: [HTTPRoute timeouts, request vs backendRequest, BackendTrafficPolicy, policy attachment, targetRefs, retry, retryOn, numRetries, perRetry, policy status, HTTPRoute retry (experimental)]

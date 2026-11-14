@@ -1,0 +1,8 @@
+title: "TLS on the Gateway: HTTPS listeners, redirects, ClientTrafficPolicy"
+goal: >
+  Serve shop.lab and api.lab over HTTPS on the Gateway with their own
+  certificates, redirect plain HTTP to HTTPS, and require TLS 1.3 from
+  clients with a ClientTrafficPolicy.
+namespaces: [lab]
+timeout: 300s
+concepts: [HTTPS listener, certificateRefs, kubernetes.io/tls Secret, listener hostname, sectionName, RequestRedirect, ClientTrafficPolicy, tls.minVersion, SDS, cert-manager]

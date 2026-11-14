@@ -1,0 +1,9 @@
+title: "HTTPRoute filters: rewrites, header modifiers, redirects, mirroring"
+goal: >
+  Use HTTPRoute filters so that api.lab/api/... reaches the api backend
+  rewritten (no /api prefix, Host api.internal, trusted x-env, no
+  x-debug-token), is tagged on the way back and mirrored to api-shadow,
+  while old.lab permanently redirects to https://new.lab.
+namespaces: [lab]
+timeout: 300s
+concepts: [HTTPRoute filters, URLRewrite, ReplacePrefixMatch, RequestHeaderModifier set/add/remove, ResponseHeaderModifier, RequestRedirect, RequestMirror, shadow traffic]

@@ -1,0 +1,19 @@
+title: Envoy, from proxy to Kubernetes gateway
+description: >
+  Envoy with real traffic. Part A (lessons 01-21) runs Envoy as a plain
+  Deployment with a static config in a ConfigMap: listeners, the HTTP
+  connection manager, routes and virtual hosts, clusters and service
+  discovery, load balancing, health checks and outlier detection, timeouts,
+  retries, circuit breaking, traffic splitting, header rewrites, direct
+  responses, access logs, local rate limiting, TLS termination, upstream
+  mTLS, TCP/SNI passthrough, JWT and RBAC, and file-based xDS, debugging
+  everything through the admin interface. Part B (lessons 22-34) drives the
+  same Envoy through Envoy Gateway (v1.9) and the Gateway API: Gateways,
+  HTTPRoutes, how they become xDS, canaries, filters, BackendTrafficPolicy,
+  ClientTrafficPolicy, SecurityPolicy, EnvoyProxy, TLS and TLSRoute. Lesson
+  35 bridges to AI inference routing and lesson 36 is a debugging capstone.
+  Pods run as real containers on the k3s node; all traffic is sent from an
+  in-cluster client pod.
+kind: real-light
+components: [envoy-gateway]
+requires: [k8s-scheduling]

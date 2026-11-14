@@ -1,0 +1,60 @@
+#!/bin/sh
+# hits - send HTTP requests from inside the cluster and summarise the answers.
+# Installed in the kdrill "client" pod of the envoy course:
+#
+#   kubectl exec client -- hits [options] URL [curl options...]
+#
+#   -n N      number of requests (default 20)
+#   -c C      run C requests at a time (default 1, sequential)
+#   -p        report the pod (Hostname) that answered instead of the app name
+#   -r HDR    report the value of response header HDR instead of the app name
+#   -v        print one line per request instead of the summary
+#
+# Every answer is reduced to "STATUS WHO", where WHO is what the backend says
+# about itself (the "Name:" line the course's echo backends print), or "-".
+# The summary counts identical lines, most frequent first:
+#
+#      15 200 v1
+#       5 200 v2
+#
+# STATUS 000 means curl got no HTTP answer at all (connection refused, reset, timeout).
+n=20; c=1; who=name; hdr=""; verbose=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -n) n="$2"; shift 2 ;;
+    -c) c="$2"; shift 2 ;;
+    -p) who=pod; shift ;;
+    -r) who=header; hdr="$2"; shift 2 ;;
+    -v) verbose=1; shift ;;
+    -h|--help) sed -n '2,20p' "$0"; exit 0 ;;
+    *) break ;;
+  esac
+done
+[ $# -ge 1 ] || { echo "usage: hits [-n N] [-c C] [-p] [-r HEADER] [-v] URL [curl options...]" >&2; exit 2; }
+url="$1"; shift
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+per=$(( (n + c - 1) / c ))
+w=0; left="$n"
+while [ "$w" -lt "$c" ] && [ "$left" -gt 0 ]; do
+  k="$per"; [ "$k" -gt "$left" ] && k="$left"
+  left=$((left - k))
+  (
+    i=0
+    while [ "$i" -lt "$k" ]; do
+      code="$(curl -s -o "$tmp/b$w" -D "$tmp/h$w" -w '%{http_code}' --max-time 15 "$@" "$url" 2>/dev/null)"
+      [ -n "$code" ] || code=000
+      case "$who" in
+        name)   v="$(sed -n 's/^Name: //p' "$tmp/b$w" 2>/dev/null | head -n 1 | tr -d '\r')" ;;
+        pod)    v="$(sed -n 's/^Hostname: //p' "$tmp/b$w" 2>/dev/null | head -n 1 | tr -d '\r')" ;;
+        header) v="$(grep -i "^$hdr:" "$tmp/h$w" 2>/dev/null | tail -n 1 | cut -d: -f2- | sed 's/^ *//' | tr -d '\r')" ;;
+      esac
+      echo "$code ${v:--}"
+      : > "$tmp/b$w"; : > "$tmp/h$w"
+      i=$((i + 1))
+    done > "$tmp/out$w"
+  ) &
+  w=$((w + 1))
+done
+wait
+if [ -n "$verbose" ]; then cat "$tmp"/out*; else cat "$tmp"/out* | sort | uniq -c | sort -rn; fi

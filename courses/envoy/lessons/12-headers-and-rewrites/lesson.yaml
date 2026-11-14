@@ -1,0 +1,9 @@
+title: "Header manipulation and URL rewrites"
+goal: >
+  The api backend expects paths without the /api prefix, the Host
+  api.internal, and an x-env header it can trust, and must never see the
+  client's x-debug-token. Rewrite and edit requests (and tag responses) in
+  Envoy so the backend gets exactly that.
+namespaces: [lab]
+timeout: 300s
+concepts: [prefix_rewrite, regex_rewrite, host_rewrite_literal, request_headers_to_add, append_action, request_headers_to_remove, response_headers_to_add, x-forwarded-for, x-request-id]

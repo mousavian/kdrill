@@ -1,0 +1,57 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge
+spec:
+  gatewayClassName: eg
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: api
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["api.lab"]
+  rules:
+  - matches:
+    - path: {type: PathPrefix, value: /api}
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        hostname: api.internal
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /          # /api/v1/users -> /v1/users
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        set:                             # set = overwrite; add would append
+        - {name: x-env, value: lab}
+        remove: [x-debug-token]
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - {name: x-served-by, value: envoy-gateway}
+    - type: RequestMirror
+      requestMirror:
+        backendRef: {name: api-shadow, port: 80}
+    backendRefs:
+    - {name: api, port: 80}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: old
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["old.lab"]
+  rules:
+  - filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: https
+        hostname: new.lab
+        statusCode: 301

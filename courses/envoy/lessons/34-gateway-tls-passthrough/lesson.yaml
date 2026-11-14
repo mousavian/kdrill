@@ -1,0 +1,8 @@
+title: "TLS passthrough with TLSRoute"
+goal: >
+  site-a and site-b terminate TLS themselves. Add a TLS passthrough listener
+  on port 443 of the Gateway and TLSRoutes that send a.lab and b.lab to the
+  right backend by SNI, without the Gateway decrypting anything.
+namespaces: [lab]
+timeout: 300s
+concepts: [TLSRoute, TLS listener, tls.mode Passthrough, SNI routing, allowedRoutes kinds, NotAllowedByListeners, TCPRoute, tcp_proxy]

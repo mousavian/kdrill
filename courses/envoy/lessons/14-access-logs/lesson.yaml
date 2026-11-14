@@ -1,0 +1,9 @@
+title: "Access logs: structured, filtered, with response flags"
+goal: >
+  Envoy logs nothing about requests. Add a JSON access log on stdout with
+  the fields the on-call team needs (status, method, path, upstream host,
+  response flags, duration, request id) and log only failed requests
+  (status 400 and above).
+namespaces: [lab]
+timeout: 300s
+concepts: [access_log, stdout access logger, json_format, command operators, RESPONSE_FLAGS, UPSTREAM_HOST, status_code_filter, NR, UH, UT]

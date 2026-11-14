@@ -1,0 +1,25 @@
+source "$KDRILL_HOME/courses/envoy/lib.sh"
+gw_settle edge
+btp="$(kubectl get backendtrafficpolicy -o jsonpath='{range .items[*]}{.spec.targetRefs[*].kind}/{.spec.targetRefs[*].name}:{.spec.loadBalancer.type}:{.status.ancestors[0].conditions[?(@.type=="Accepted")].status}{" "}{end}' 2>/dev/null)"
+check "A BackendTrafficPolicy with loadBalancer LeastRequest targets HTTPRoute llm and is Accepted (got: ${btp:-none})" eval '[[ "$btp" == *"HTTPRoute/llm:LeastRequest:True"* ]]'
+eo="$(kubectl get backendtrafficpolicy -o jsonpath='{.items[*].spec.loadBalancer.endpointOverride}' 2>/dev/null)"
+[[ "$btp" == *":True"* && -n "$eo" ]] && gw_wait_config edge dynamic_active_clusters override_host 25
+U=http://edge/v1/chat/completions
+pods="$(kubectl get pods -l app=llama --field-selector=status.phase=Running --no-headers -o custom-columns=N:.metadata.name,IP:.status.podIP | awk '{print $1, $2}' | sort)"
+p2="$(echo "$pods" | sed -n 2p)"; n2="${p2% *}"; ip2="${p2#* }"
+p3="$(echo "$pods" | sed -n 3p)"; n3="${p3% *}"; ip3="${p3#* }"
+echo "the picker names a pod (verify plays the endpoint picker)"
+out="$(hits_out -p -n 20 $U -X POST -H 'Host: llm.lab' -H "x-gateway-destination-endpoint: $ip2:80")"
+check_eq "x-gateway-destination-endpoint: $ip2:80 -> 20 of 20 answered by $n2" 20 "$(count_of "200 $n2" "$out")"
+why "loadBalancer.endpointOverride.extractFrom: [{header: x-gateway-destination-endpoint}]"
+out="$(hits_out -p -n 20 $U -X POST -H 'Host: llm.lab' -H "x-gateway-destination-endpoint: $ip3:80")"
+check_eq "... and $ip3:80 -> 20 of 20 answered by $n3" 20 "$(count_of "200 $n3" "$out")"
+echo "the header names something outside the pool"
+adm="$(pod_ips app=admin)"
+out="$(hits_out -n 10 $U -X POST -H 'Host: llm.lab' -H "x-gateway-destination-endpoint: $adm:80")"
+check_eq "x-gateway-destination-endpoint: <the admin pod> -> still served by the llama pool (10 of 10)" 10 "$(count_of "200 llama-3-8b" "$out")"
+why "An override is only honoured for endpoints of the route's own backend; anything else falls back to the load balancer."
+echo "no header"
+out="$(hits_out -p -n 30 $U -X POST -H 'Host: llm.lab')"
+check_eq "30 requests without the header all succeed" 30 "$(count_of "200 *" "$out")"
+check_ge "... spread over the pool by the fallback policy" 2 "$(whos "$out" | wc -w | tr -d ' ')"

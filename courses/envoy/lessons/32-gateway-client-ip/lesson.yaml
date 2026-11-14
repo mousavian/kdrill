@@ -1,0 +1,10 @@
+title: "ClientTrafficPolicy: who is the client? (X-Forwarded-For and IP allow-lists)"
+goal: >
+  The Gateway sits behind one trusted L7 load balancer that appends the
+  real client address to X-Forwarded-For. Make Envoy derive the client IP
+  from it correctly (ClientTrafficPolicy), then allow /admin only from the
+  office network 203.0.113.0/24 (SecurityPolicy), without letting clients
+  spoof their address.
+namespaces: [lab]
+timeout: 300s
+concepts: [ClientTrafficPolicy, clientIPDetection, xForwardedFor numTrustedHops, X-Forwarded-For, X-Envoy-External-Address, use_remote_address, xff_num_trusted_hops, SecurityPolicy clientCIDRs, IP spoofing]

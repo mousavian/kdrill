@@ -1,0 +1,9 @@
+title: "Upstream TLS and mTLS: Envoy as a TLS client"
+goal: >
+  The payments backend only accepts HTTPS connections with a client
+  certificate from the lab CA. Configure Envoy's cluster to originate mTLS:
+  present its client certificate, verify the server's certificate against
+  the lab CA and its name, and send SNI.
+namespaces: [lab]
+timeout: 300s
+concepts: [UpstreamTlsContext, transport_socket on clusters, client certificate, validation_context, trusted_ca, match_typed_subject_alt_names, sni, mTLS, SDS]

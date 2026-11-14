@@ -1,0 +1,9 @@
+title: "Circuit breaking: protect a fragile backend from bursts"
+goal: >
+  The reports backend falls over when it gets more than 4 requests at once.
+  Configure circuit breakers on its cluster so Envoy sends it at most 4
+  concurrent requests, lets at most 2 more wait, and rejects the rest
+  immediately with 503 instead of piling them up.
+namespaces: [lab]
+timeout: 300s
+concepts: [circuit_breakers, thresholds, max_connections, max_pending_requests, max_requests, max_retries, x-envoy-overloaded, upstream_rq_pending_overflow, UO]

@@ -1,0 +1,9 @@
+title: "JWT authentication at the proxy"
+goal: >
+  Requests to /api/ must carry a valid JWT from the lab issuer for the
+  audience shop. Add Envoy's jwt_authn filter so invalid, expired, forged or
+  missing tokens are rejected at the edge, and the backend gets the caller's
+  identity in x-user instead of the raw token.
+namespaces: [lab]
+timeout: 300s
+concepts: [jwt_authn filter, providers, issuer, audiences, local_jwks, remote_jwks, rules, requires, claim_to_headers, forward, payload_in_metadata, 401 vs 403]
