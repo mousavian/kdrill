@@ -1,0 +1,8 @@
+title: Read the GPU labels, pick the right GPU
+goal: >
+  In a mixed T4 / A10G / L40S / H100 fleet, `llm-serve` runs on 80 GB GPUs
+  (selected by GPU memory), `whisper` runs on Turing or Ampere GPUs only, and
+  the CPU-only `etl` stays off GPU nodes - all with hard node rules based on
+  the GPU discovery labels.
+kind: sim
+concepts: [GPU Feature Discovery labels, NFD, nvidia.com/gpu.product, nvidia.com/gpu.memory, node affinity Gt / DoesNotExist]

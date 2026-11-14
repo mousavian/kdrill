@@ -1,0 +1,7 @@
+title: Pick devices with CEL, claim several, share one
+goal: >
+  With DRA: `llm` gets a GPU with at least 40Gi of memory, `trainer` gets two
+  H100s in one claim, and `encoder` + `decoder` share a single L4 through the
+  ResourceClaim `shared-l4`.
+kind: sim
+concepts: [DRA CEL selectors, device attributes and capacity, count, shared ResourceClaim, reservedFor]

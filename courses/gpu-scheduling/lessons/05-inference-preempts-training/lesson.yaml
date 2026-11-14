@@ -1,0 +1,7 @@
+title: Inference preempts training, eval waits its turn
+goal: >
+  On a full GPU fleet, `chat-inference` preempts low-priority training pods via
+  a PriorityClass `inference-critical`, while `nightly-eval` gets queue
+  priority over training through a non-preempting class `eval-no-preempt`.
+kind: sim
+concepts: [PriorityClass, preemption of GPU training, preemptionPolicy Never, priority tiers]

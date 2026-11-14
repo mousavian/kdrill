@@ -1,0 +1,8 @@
+title: Borrow idle GPUs across teams, reclaim them on demand
+goal: >
+  Put team-a's and team-b's ClusterQueues in cohort `research` so team-a can
+  borrow team-b's idle GPUs, and let team-b reclaim them: when team-b submits
+  its job, Kueue preempts the borrowing team-a job and team-b's job runs.
+kind: sim
+namespaces: [team-a, team-b]
+concepts: [Kueue cohort, borrowing, lending, reclaimWithinCohort, preemption of workloads]

@@ -1,0 +1,24 @@
+# What the NVIDIA DRA driver would install: "a GPU from driver gpu.nvidia.com".
+apiVersion: resource.k8s.io/v1
+kind: DeviceClass
+metadata:
+  name: gpu.nvidia.com
+spec:
+  selectors:
+  - cel:
+      expression: device.driver == "gpu.nvidia.com"
+---
+# A per-pod claim: exactly one device of that class.
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: one-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          allocationMode: ExactCount   # the default
+          count: 1                     # the default

@@ -1,0 +1,25 @@
+# team-b's job: submit it once borrowing works
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: eval-b
+  namespace: team-b
+  labels:
+    kueue.x-k8s.io/queue-name: team-b
+spec:
+  parallelism: 1
+  completions: 1
+  template:
+    metadata:
+      annotations:
+        pod-complete.stage.kwok.x-k8s.io/delay: "6h"   # simulation only: how long the fake run lasts
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: trainer
+        image: nvcr.io/nvidia/pytorch:25.01-py3
+        command: ["torchrun", "--nproc-per-node=4", "eval.py"]
+        resources:
+          requests: {cpu: "32", memory: 256Gi}
+          limits:
+            nvidia.com/gpu: 4

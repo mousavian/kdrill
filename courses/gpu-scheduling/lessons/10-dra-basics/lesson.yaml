@@ -1,0 +1,7 @@
+title: Dynamic Resource Allocation (DRA) fundamentals
+goal: >
+  Create the DeviceClass `gpu.nvidia.com` and the ResourceClaimTemplate
+  `one-gpu`, so each `vllm` pod gets its own GPU allocated by the scheduler
+  from the nodes' ResourceSlices.
+kind: sim
+concepts: [DRA, DeviceClass, ResourceSlice, ResourceClaim, ResourceClaimTemplate, allocation result]

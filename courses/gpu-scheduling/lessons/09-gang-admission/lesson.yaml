@@ -1,0 +1,8 @@
+title: All-or-nothing admission for distributed training
+goal: >
+  Two 4-worker training Jobs deadlocked with 2 of 4 workers each. Resubmit
+  them through the Kueue queue `training` so one runs with all 4 workers and
+  the other waits as a whole, holding no GPUs.
+kind: sim
+namespaces: [training]
+concepts: [gang scheduling, partial allocation deadlock, Kueue admission as a unit, Indexed Jobs, waitForPodsReady]

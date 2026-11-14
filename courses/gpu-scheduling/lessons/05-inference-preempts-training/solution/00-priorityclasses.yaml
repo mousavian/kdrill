@@ -1,0 +1,16 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: inference-critical
+value: 100000
+globalDefault: false
+description: Online inference. Preempts training when GPUs run out.
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: eval-no-preempt
+value: 5000
+globalDefault: false
+preemptionPolicy: Never
+description: Batch evaluation. Scheduled before training, never evicts anyone.

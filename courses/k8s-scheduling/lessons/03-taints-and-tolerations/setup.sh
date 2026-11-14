@@ -4,6 +4,6 @@ fake_node ml-1 --cpu 8 --mem 32Gi --label pool=ml --taint dedicated=ml:NoSchedul
 fake_node ml-2 --cpu 8 --mem 32Gi --label pool=ml --taint dedicated=ml:NoSchedule
 wait_nodes_ready
 apply_lesson manifests/web.yaml
-wait_until 30 test "$(running_count app=web)" = 2 || true
+wait_running_count app=web 2 30
 apply_lesson manifests/trainer.yaml
 sleep 3

@@ -112,7 +112,9 @@ wait_rollout() {
   kubectl rollout status "$1" --timeout="${2:-90s}" ${3:+-n "$3"} >/dev/null
 }
 
-# wait_until TIMEOUT_SECONDS COMMAND...  - poll until the command succeeds
+# wait_until TIMEOUT_SECONDS COMMAND...  - poll until the command succeeds.
+# Arguments are expanded once by the caller, so pass a function or command to
+# re-run - not a "$(...)" substitution.
 wait_until() {
   local timeout="$1"; shift
   local end=$((SECONDS + timeout))
@@ -120,6 +122,18 @@ wait_until() {
     (( SECONDS >= end )) && return 1
     sleep 1
   done
+}
+
+# wait_running_count SELECTOR COUNT [TIMEOUT_SECONDS]
+#   Poll until exactly COUNT pods matching SELECTOR are Running. Never fails
+#   the script: on timeout it just returns, so the learner sees the real state.
+wait_running_count() {
+  local end=$((SECONDS + ${3:-30}))
+  until [[ "$(running_count "$1")" == "$2" ]]; do
+    (( SECONDS >= end )) && break
+    sleep 1
+  done
+  return 0
 }
 
 # apply_lesson FILE...  - kubectl apply files relative to the lesson directory

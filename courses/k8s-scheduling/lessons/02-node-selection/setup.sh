@@ -4,4 +4,4 @@ fake_node node-3 --cpu 4 --mem 8Gi --label topology.kubernetes.io/zone=b --label
 fake_node node-4 --cpu 4 --mem 8Gi --label topology.kubernetes.io/zone=b --label disktype=hdd
 wait_nodes_ready
 apply_lesson manifests/db.yaml manifests/cache.yaml
-wait_until 30 test "$(running_count 'app in (db,cache)')" = 4 || true
+wait_running_count 'app in (db,cache)' 4 30

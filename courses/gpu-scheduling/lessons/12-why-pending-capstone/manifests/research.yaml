@@ -1,0 +1,43 @@
+# --- sweep: a batch Job that should go through the team's Kueue queue
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sweep
+  namespace: research
+  labels: {kueue.x-k8s.io/queue-name: research}
+spec:
+  parallelism: 2
+  completions: 2
+  template:
+    metadata:
+      annotations: {pod-complete.stage.kwok.x-k8s.io/delay: "6h"}   # simulation only
+    spec:
+      restartPolicy: Never
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: trial
+        image: ghcr.io/example/sweep-trial:2.3
+        resources:
+          requests: {cpu: "8", memory: 32Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+# --- notebook: an interactive notebook on an L4
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: notebook, namespace: research}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: notebook}}
+  template:
+    metadata: {labels: {app: notebook}}
+    spec:
+      nodeSelector: {nvidia.com/gpu.product: NVIDIA-L4}
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: jupyter
+        image: quay.io/jupyter/pytorch-notebook:cuda12-2025-01-20
+        resources:
+          limits: {nvidia.com/gpu: 1}

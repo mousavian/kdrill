@@ -140,8 +140,17 @@ func (a *App) clusterUp() error {
 		return err
 	}
 	fmt.Println("waiting for the node to be Ready...")
-	if _, err := a.k("wait", "node", "-l", "!type", "--for=condition=Ready", "--timeout=120s"); err != nil {
-		return err
+	// On a brand-new cluster the node may not have registered yet, in which
+	// case kubectl wait fails immediately with "no matching resources".
+	for i := 0; ; i++ {
+		_, err := a.k("wait", "node", "-l", "!type", "--for=condition=Ready", "--timeout=120s")
+		if err == nil {
+			break
+		}
+		if i >= 20 {
+			return err
+		}
+		time.Sleep(3 * time.Second)
 	}
 	// System pods must be able to come back after a restart, so lift the sim
 	// taint while they start, then restore it if a sim lesson is active.

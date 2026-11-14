@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notebooks
+spec:
+  replicas: 8
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: notebooks}
+  template:
+    metadata:
+      labels: {app: notebooks}
+    spec:
+      containers:
+      - name: jupyter
+        image: quay.io/jupyter/pytorch-notebook:cuda12-2025-01-20
+        resources:
+          requests: {cpu: "1", memory: 4Gi}
+          limits:
+            nvidia.com/gpu: 1

@@ -5,4 +5,4 @@ for z in a b c; do
 done
 wait_nodes_ready
 apply_lesson manifests/api.yaml
-wait_until 30 test "$(running_count app=api)" = 6 || true
+wait_running_count app=api 6 30

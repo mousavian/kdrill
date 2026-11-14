@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nightly-eval
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: nightly-eval}
+  template:
+    metadata:
+      labels: {app: nightly-eval}
+    spec:
+      priorityClassName: eval-no-preempt
+      containers:
+      - name: eval
+        image: ghcr.io/example/lm-eval-harness:0.4
+        resources:
+          requests: {cpu: "16", memory: 128Gi}
+          limits:
+            nvidia.com/gpu: 4

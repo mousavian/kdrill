@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-inference
+spec:
+  replicas: 2
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: chat-inference}
+  template:
+    metadata:
+      labels: {app: chat-inference}
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: ["--model", "meta-llama/Llama-3.3-70B-Instruct", "--tensor-parallel-size", "4"]
+        resources:
+          requests: {cpu: "16", memory: 128Gi}
+          limits:
+            nvidia.com/gpu: 4

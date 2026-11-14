@@ -8,4 +8,4 @@ for i in 1 2; do
 done
 wait_nodes_ready
 apply_lesson manifests/llm.yaml
-wait_until 30 test "$(running_count app=llm)" = 3 || true
+wait_running_count app=llm 3 30

@@ -1,0 +1,6 @@
+title: Right-size inference onto MIG slices
+goal: >
+  `embed` runs on 1g.10gb MIG slices and `rerank` on 2g.20gb slices instead
+  of whole H100s, which frees the full GPUs so the 8-GPU `pretrain` pod runs.
+kind: sim
+concepts: [MIG, mixed strategy, nvidia.com/mig-1g.10gb, right-sizing, MIG labels]
