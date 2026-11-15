@@ -1,0 +1,10 @@
+title: "Shared Gateways: cross-namespace routes and ReferenceGrant"
+goal: >
+  The platform's Gateway public (namespace infra) ignores the shop team's
+  HTTPRoute in lab, and that route may not use the reviews team's Service.
+  Let namespaces labelled gateway-access=public attach routes, label lab,
+  and let lab's routes reach Service reviews with a ReferenceGrant, without
+  letting sandbox in.
+namespaces: [lab, infra, reviews, sandbox]
+timeout: 300s
+concepts: [allowedRoutes, namespace selectors, cross-namespace parentRefs, ReferenceGrant, NotAllowedByListeners, RefNotPermitted, listener hostname, GatewayNamespace]

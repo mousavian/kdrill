@@ -1,0 +1,13 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: admin-auth
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: admin
+  basicAuth:
+    users:
+      name: admin-users            # Secret with the key .htpasswd
+    forwardUsernameHeader: x-user  # the backend learns who logged in

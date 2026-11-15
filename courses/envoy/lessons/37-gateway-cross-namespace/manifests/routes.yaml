@@ -1,0 +1,30 @@
+# The shop team's route (namespace lab): the storefront on web, product
+# reviews from the reviews team's Service in namespace reviews.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: storefront
+  namespace: lab
+spec:
+  parentRefs:
+  - {name: public, namespace: infra}
+  hostnames: ["shop.lab"]
+  rules:
+  - backendRefs: [{name: web, port: 80}]
+  - matches: [{path: {type: PathPrefix, value: /reviews}}]
+    backendRefs: [{name: reviews, namespace: reviews, port: 80}]
+---
+# Someone's experiment in namespace sandbox, trying to grab a path on the
+# shop's host name.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: sneaky
+  namespace: sandbox
+spec:
+  parentRefs:
+  - {name: public, namespace: infra}
+  hostnames: ["shop.lab"]
+  rules:
+  - matches: [{path: {type: PathPrefix, value: /admin}}]
+    backendRefs: [{name: experiment, port: 80}]

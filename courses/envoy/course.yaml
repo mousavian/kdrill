@@ -12,6 +12,8 @@ description: >
   HTTPRoutes, how they become xDS, canaries, filters, BackendTrafficPolicy,
   ClientTrafficPolicy, SecurityPolicy, EnvoyProxy, TLS and TLSRoute. Lesson
   35 bridges to AI inference routing and lesson 36 is a debugging capstone.
+  Lessons 37-38 are extras for Envoy Gateway: shared Gateways across
+  namespaces with ReferenceGrant, and basic auth with a SecurityPolicy.
   Pods run as real containers on the k3s node; all traffic is sent from an
   in-cluster client pod.
 kind: real-light

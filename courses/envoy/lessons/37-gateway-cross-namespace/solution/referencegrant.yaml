@@ -1,0 +1,16 @@
+# Lives in the namespace of the thing being referenced (the Service), so
+# the reviews team decides who may send traffic to it.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: lab-routes-to-reviews
+  namespace: reviews
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: lab
+  to:
+  - group: ""                       # core API group: Service
+    kind: Service
+    name: reviews                   # optional: omit to allow every Service here

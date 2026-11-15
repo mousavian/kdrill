@@ -10,7 +10,7 @@ Last updated: 2026-11-15
 | gpu-scheduling | 12 | kueue, gpu-binpack-scheduler, kwok-job-runtime | all simulated on fake nodes |
 | karpenter | 12 | karpenter-kwok (built from source, needs Go + helm) | first `course start` builds an image (~90 s) |
 | kyverno | 13 | kyverno (helm) | ~1 GB extra RAM while installed; lessons 08 and 12 need internet |
-| envoy | 36 | envoy-gateway v1.9.3 (helm) | real containers; 01–21 plain Envoy, 22–34 Envoy Gateway, 35 inference bridge, 36 capstone; ~130 MB of images pulled on first start |
+| envoy | 38 | envoy-gateway v1.9.3 (helm) | real containers; 01–21 plain Envoy, 22–34 Envoy Gateway, 35 inference bridge, 36 capstone, 37–38 extras (cross-namespace routes, basic auth); ~130 MB of images pulled on first start |
 | istio | 14 | istio (istioctl 1.31.4 + Gateway API v1.6.3 CRDs) | real-light: real containers and traffic on the k3d node; about 120 MB for istiod + CNI agent + ztunnel, about 30 MB per sidecar |
 
 Not built yet, each with a ready-to-use build brief (`courses/<name>/BUILD.md`):
@@ -29,7 +29,7 @@ training, inference, fine-tuning, kubeflow.
 6. **Kueue's visibility API is removed at install**, because it makes `kubectl api-resources` fail while the controller restarts and the engine's cleanup depends on that command.
 7. **Lesson cleanup in the kyverno and karpenter courses deletes every policy / NodePool in the cluster**, not only the lesson's.
 8. **Fake Job pods**: KWOK normally completes Job pods instantly; the `kwok-job-runtime` component makes them honour a delay annotation so training Jobs appear to run.
-9. **Envoy is one course of 36 lessons** rather than two courses. Left out: global (Redis) rate limiting, GRPCRoute, hands-on ext_authz, a gRPC xDS control plane in Part A.
+9. **Envoy is one course of 38 lessons** (36, plus 37 cross-namespace routes and 38 basic auth, which came from an earlier 14-lesson draft) rather than two courses. Left out: global (Redis) rate limiting, GRPCRoute, hands-on ext_authz, a gRPC xDS control plane in Part A.
 10. **Envoy lesson 35 (inference bridge) is a light stand-in**: a real InferencePool with an endpoint picker was judged too heavy, so the lesson uses Envoy Gateway's endpoint override (the mechanism a picker drives) and `verify` plays the picker.
 11. **Envoy Gateway runs each Gateway's proxy in the lesson namespace** with a ClusterIP Service (no load balancer in the lab); traffic is sent from an in-cluster client pod.
 12. **Remaining courses are not built**; each has a brief at `courses/<name>/BUILD.md` for a fresh session.
@@ -67,6 +67,7 @@ ztunnel 5 MiB; each sidecar, gateway or waypoint 27-30 MiB. The biggest lesson
 - istio: `hack/lesson.sh setup` always taints the real node (it was written for sim lessons), so it cannot run real-light lessons; use `kdrill start` for them.
 - istio: on an untouched lesson, verify can take 10-20 s (requests that time out, a short wait for istiod to push new config).
 - `kdrill course stop` does not clean up an active lesson first.
+- envoy 37 and 38 were ported from an earlier draft onto this course's helpers and checked only with `bash -n` and a YAML parse; they have not been run end to end on a cluster.
 - Lesson cleanup takes 20–30 s (namespace deletion), so `reset` is slow.
 - Envoy lessons 15, 28, 32, 33, 35 take 10–18 s to verify (Envoy cluster warm-up, log flush, token refill); each README says so.
 - Shared traffic/TLS helpers live in `courses/envoy/lib.sh`; later real-traffic courses should promote them to `base/lib/common.sh`.
