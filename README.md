@@ -15,6 +15,9 @@ an 8 GB laptop. See [DESIGN.md](DESIGN.md) for the full plan.
 - `helm` (needed by the kyverno and karpenter courses)
 - `curl` and internet access for the istio course: it downloads the pinned
   `istioctl` into `~/.kdrill/bin` and the Gateway API CRDs, and pulls Istio's images
+- internet access (once) for the inference course: its first `course start`
+  downloads a 105 MB model file into `~/.kdrill/models` (checksum-verified) and
+  pulls about 600 MB of images; `docker` must be able to build a `FROM scratch` image
 
 ## Quick start
 

@@ -1,0 +1,10 @@
+title: "Graceful shutdown: zero dropped requests during a rollout"
+goal: >
+  Restarting the model Deployment under load drops requests: replicas are killed
+  one second after SIGTERM while they are still generating, and Service traffic
+  keeps arriving for a moment after a pod starts terminating. Add a preStop delay
+  and a long enough termination grace period so that a rollout during traffic
+  fails nothing.
+namespaces: [lab]
+timeout: 300s
+concepts: [terminationGracePeriodSeconds, preStop hook, SIGTERM, endpoint removal race, in-flight requests, rollout restart, zero-downtime rollouts]

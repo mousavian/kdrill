@@ -1,0 +1,10 @@
+title: "Rolling a model when every GPU is in use"
+kind: sim
+goal: >
+  The chat model runs on all 4 GPUs of the main pool and every rollout takes one
+  replica away (capacity dips to 3 of 4). The business wants no dip: use the 2 spare
+  GPUs of the tainted spare pool as surge capacity, so that a rollout never has
+  fewer than 4 ready replicas, and protect the floor with a PodDisruptionBudget.
+namespaces: [lab]
+timeout: 180s
+concepts: [maxSurge, maxUnavailable, tolerations, taints, spare capacity pool, PodDisruptionBudget, rolling update on GPUs, capacity during rollout]

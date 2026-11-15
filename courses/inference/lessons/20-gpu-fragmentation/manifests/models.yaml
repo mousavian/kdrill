@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-8b
+  labels: {app: llm-8b}
+spec:
+  replicas: 6
+  selector:
+    matchLabels: {app: llm-8b}
+  template:
+    metadata:
+      labels: {app: llm-8b}
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: [--model, meta-llama/Llama-3.1-8B-Instruct, --max-model-len, "8192"]
+        resources:
+          requests: {cpu: "8", memory: 32Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-70b
+  labels: {app: llm-70b}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: llm-70b}
+  template:
+    metadata:
+      labels: {app: llm-70b}
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        # tensor parallelism: the weights are split over 4 GPUs of the SAME node
+        args: [--model, meta-llama/Llama-3.1-70B-Instruct, --tensor-parallel-size, "4", --max-model-len, "8192"]
+        resources:
+          requests: {cpu: "32", memory: 256Gi}
+          limits: {nvidia.com/gpu: 4}

@@ -1,0 +1,28 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: HTTPRouteFilter
+metadata:
+  name: model-not-found
+spec:
+  directResponse:
+    statusCode: 404
+    contentType: application/json
+    body:
+      type: Inline
+      inline: '{"error":{"message":"model not found","type":"invalid_request_error"}}'
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: llm
+spec:
+  parentRefs: [{name: edge}]
+  rules:
+  - matches: [{headers: [{name: x-model, value: small}]}]
+    backendRefs: [{name: small, port: 80}]
+  - matches: [{headers: [{name: x-model, value: large}]}]
+    backendRefs: [{name: large, port: 80}]
+  # catch-all: any other model. It also makes every request match a route, which is what
+  # lets Envoy Gateway run the Lua filter (it is enabled per route) before the header rules are evaluated.
+  - filters:
+    - type: ExtensionRef
+      extensionRef: {group: gateway.envoyproxy.io, kind: HTTPRouteFilter, name: model-not-found}

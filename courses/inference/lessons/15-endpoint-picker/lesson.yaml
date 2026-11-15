@@ -1,0 +1,11 @@
+title: "Load-aware routing: the Inference Extension endpoint picker"
+goal: >
+  A pool of three model replicas sits behind the Gateway edge, one of them
+  saturated (queue and KV cache full). Wire the llm-d endpoint picker (the
+  Gateway API Inference Extension's ext_proc server) into the route so that each
+  request is sent to the replica with the shortest queue and most free cache:
+  the saturated replica must (almost) stop receiving traffic, and receive it again
+  as soon as it recovers.
+namespaces: [lab]
+timeout: 360s
+concepts: [Gateway API Inference Extension, InferencePool, endpoint picker (EPP), ext_proc, FULL_DUPLEX_STREAMED, x-gateway-destination-endpoint, EnvoyExtensionPolicy, endpointOverride, queue depth, KV-cache utilisation, llm-d router]

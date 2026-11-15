@@ -1,0 +1,18 @@
+title: Serving LLMs on Kubernetes
+description: >
+  Put a language model behind an API and operate it. Part A (lessons 01-07)
+  serves a real tiny model (SmolLM2-135M on llama.cpp's server, on CPU): weights
+  on the node, honest startup probes, sizing, streaming through a gateway,
+  the metrics that matter, and slot concurrency. Part B (08-12) scales it with
+  KEDA on queue depth instead of CPU, then covers cold starts, graceful
+  shutdown and rollouts when capacity is scarce, using llm-d's vLLM simulator
+  for load-dependent behaviour. Part C (13-19) routes it with Envoy Gateway:
+  by model name from the request body, least-request vs round-robin, the
+  llm-d endpoint picker (Gateway API Inference Extension), LoRA adapters,
+  priorities, rate limits and canary model versions. Part D (20-25) is the
+  fleet at GPU scale on fake GPU nodes: GPU types, fractional GPUs, serving vs
+  training, rolling a model when every GPU is busy, zones and node loss,
+  capacity math. Lesson 26 is a capstone with planted faults.
+kind: real-compute
+components: [inference-models, metrics-server, keda, envoy-gateway, inference-gateway]
+requires: [envoy, gpu-scheduling]

@@ -1,0 +1,10 @@
+title: "Why round-robin is bad for LLMs: least-request balancing"
+goal: >
+  One of three model replicas is slow (3 s to the first token) and round-robin
+  keeps sending it a third of the traffic, so a third of the users wait. Switch
+  the Gateway's load balancing policy to least-request so that, under concurrent
+  load, the slow replica receives at most a fifth of the requests, while staying
+  in the pool.
+namespaces: [lab]
+timeout: 300s
+concepts: [RoundRobin, LeastRequest, power of two choices, BackendTrafficPolicy, loadBalancer, in-flight requests, heterogeneous latency, outliers]

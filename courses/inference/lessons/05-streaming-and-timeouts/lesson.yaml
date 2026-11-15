@@ -1,0 +1,9 @@
+title: "Streaming and timeouts: do not cut long generations"
+goal: >
+  Streamed completions through the Gateway edge are cut off: one timeout fires on
+  the whole response, another on the silence before the first token. Fix the
+  gateway configuration so a 30-token streamed answer from a model with a 3 s time
+  to first token arrives complete, token by token.
+namespaces: [lab]
+timeout: 300s
+concepts: [Server-Sent Events, "stream: true", time to first token, HTTPRoute timeouts, ClientTrafficPolicy, streamIdleTimeout, request timeout, buffering]

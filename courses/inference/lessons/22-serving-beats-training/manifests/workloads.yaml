@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finetune
+  labels: {app: finetune}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: finetune}
+  template:
+    metadata:
+      labels: {app: finetune}
+    spec:
+      containers:
+      - name: trainer
+        image: nvcr.io/nvidia/pytorch:25.01-py3
+        command: [torchrun, --nproc-per-node=2, finetune.py, --resume-from, /ckpt/latest]
+        resources:
+          requests: {cpu: "16", memory: 128Gi}
+          limits: {nvidia.com/gpu: 2}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat
+  labels: {app: chat}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: chat}
+  template:
+    metadata:
+      labels: {app: chat}
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: [--model, meta-llama/Llama-3.1-70B-Instruct, --tensor-parallel-size, "2", --quantization, fp8]
+        resources:
+          requests: {cpu: "16", memory: 128Gi}
+          limits: {nvidia.com/gpu: 2}

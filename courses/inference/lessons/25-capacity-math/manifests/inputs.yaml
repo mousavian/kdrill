@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: inputs
+data:
+  peak-requests-per-second: "40"
+  avg-output-tokens: "500"
+  headroom-percent: "30"
+  zones: "3"
+  gpus-per-replica: "1"
+  gpus-per-node: "4"
+  offpeak-fraction-percent: "25"
+  # measured with the production engine at the latency target (generated tokens/s per replica, one GPU each)
+  l40s-tokens-per-second: "1400"
+  l40s-price-per-hour: "2.00"
+  h100-tokens-per-second: "3200"
+  h100-price-per-hour: "4.50"

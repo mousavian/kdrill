@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+  labels: {app: llm}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm}
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: llama
+        image: ghcr.io/ggml-org/llama.cpp@sha256:c7d58273d753d33a352e5c41ab300c5ae040a16fa4b202231bb606478065c124
+        args:
+        - -m
+        - /models/smollm2-135m-instruct-q4_k_m.gguf
+        - --alias
+        - tiny
+        - -c
+        - "2048"
+        - --metrics
+        - --parallel
+        - "1"
+        - -t
+        - "2"
+        ports:
+        - {name: http, containerPort: 8080}
+        readinessProbe:
+          httpGet: {path: /health, port: http}
+          periodSeconds: 2
+        resources:
+          requests: {cpu: 100m, memory: 300Mi}
+          limits: {cpu: "2", memory: 400Mi}
+        volumeMounts:
+        - {name: models, mountPath: /models, readOnly: true}
+      volumes:
+      - name: models
+        hostPath: {path: /var/lib/kdrill/models, type: Directory}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm
+spec:
+  selector: {app: llm}
+  ports:
+  - {name: http, port: 80, targetPort: http}

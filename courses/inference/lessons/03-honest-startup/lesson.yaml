@@ -1,0 +1,10 @@
+title: "Honest startup: startup, liveness and readiness probes"
+goal: >
+  Two model-server replicas take 15 seconds to load their model. Right now the
+  liveness probe kills them in the middle of loading (a restart loop) and the
+  readiness probe only checks that the port is open. Make the probes tell the
+  truth: a startup probe that gives loading time, liveness that only detects a
+  hung server, readiness that waits for the model.
+namespaces: [lab]
+timeout: 240s
+concepts: [startupProbe, livenessProbe, readinessProbe, /health vs /health/ready, model load time, CrashLoopBackOff, restartCount, Service endpoints]

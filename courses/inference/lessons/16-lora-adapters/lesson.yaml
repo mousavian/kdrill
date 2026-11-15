@@ -1,0 +1,10 @@
+title: "LoRA adapters as models: route to the replicas that have them loaded"
+goal: >
+  One base model serves several fine-tuned adapters ("sql-lora", "chat-lora"),
+  each loaded on only some replicas. Requests that name an adapter fail on the
+  replicas without it. Teach the endpoint picker about adapter affinity (a scorer
+  in its configuration) so that each adapter's traffic reaches only replicas that
+  have it.
+namespaces: [lab]
+timeout: 300s
+concepts: [LoRA, adapters, multi-LoRA serving, model name = adapter name, lora-affinity-scorer, EndpointPickerConfig, scheduling profile, scorer weights, "vllm:lora_requests_info"]

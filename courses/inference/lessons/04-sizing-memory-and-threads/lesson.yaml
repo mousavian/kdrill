@@ -1,0 +1,9 @@
+title: "Sizing: weights plus KV cache, and threads vs CPU"
+goal: >
+  The model server is OOMKilled every time it starts. Size it: keep 4 parallel
+  conversations of at least 1024 tokens each, fit the pod in a memory limit of at
+  most 450Mi (with headroom over what the server really uses), and match the
+  server's thread count to its CPU limit.
+namespaces: [lab]
+timeout: 240s
+concepts: [OOMKilled, KV cache, context length, parallel slots, memory limit and requests, threads vs CPU limit, CFS throttling, GPU memory sizing]

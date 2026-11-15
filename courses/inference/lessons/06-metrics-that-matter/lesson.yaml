@@ -1,0 +1,9 @@
+title: "The metrics that matter: queue, throughput, cache"
+goal: >
+  Three users keep a one-slot model server busy. Turn on its Prometheus metrics,
+  find the numbers that describe the situation (requests running, requests waiting,
+  generation tokens per second), and report them in a ConfigMap `findings`; verify
+  compares your numbers with what the server is doing right now.
+namespaces: [lab]
+timeout: 240s
+concepts: [Prometheus metrics, requests running, requests waiting, queue depth, tokens per second, TTFT, KV-cache usage, counters vs gauges, rate]

@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+  labels: {app: llm}
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm}
+    spec:
+      tolerations:
+      - {key: capacity, operator: Equal, value: spare, effect: NoSchedule}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: [--model, meta-llama/Llama-3.1-8B-Instruct]
+        env:
+        - {name: MODEL_VERSION, value: v1}
+        resources:
+          requests: {cpu: "8", memory: 32Gi}
+          limits: {nvidia.com/gpu: 1}

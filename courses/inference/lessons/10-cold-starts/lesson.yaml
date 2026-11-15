@@ -1,0 +1,9 @@
+title: "Cold starts: what scale-to-zero costs"
+goal: >
+  The model `llm` is scaled to zero and a request arriving now gets nothing; when
+  a replica does start it takes 30 seconds to become ready although loading takes
+  20. Keep one warm replica, remove the avoidable seconds from every start
+  (probe timing, image pull policy), and see what is left: the load time itself.
+namespaces: [lab]
+timeout: 300s
+concepts: [scale to zero, cold start, warm minimum, minReplicaCount, startupProbe period, imagePullPolicy, image cache, activator, time to ready]

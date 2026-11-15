@@ -1,0 +1,10 @@
+title: "Serving and training on shared GPUs: priority and preemption"
+kind: sim
+goal: >
+  Traffic grew and the chat model was scaled from 2 to 3 replicas, but the node's
+  8 GPUs are held by two fine-tuning replicas and the third chat pod is Pending.
+  Give serving a higher priority than training so that the scheduler evicts one
+  training pod to make room, and keep training from ever evicting serving.
+namespaces: [lab]
+timeout: 120s
+concepts: [PriorityClass, preemption, preemptionPolicy, scheduler priority, Pending, Preempted events, serving vs training, checkpoints, Kueue]

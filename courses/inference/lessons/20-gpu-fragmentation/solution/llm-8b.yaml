@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-8b
+  labels: {app: llm-8b}
+spec:
+  replicas: 4
+  selector:
+    matchLabels: {app: llm-8b}
+  template:
+    metadata:
+      labels: {app: llm-8b}
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: a100-2
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: [--model, meta-llama/Llama-3.1-8B-Instruct, --max-model-len, "8192"]
+        resources:
+          requests: {cpu: "8", memory: 32Gi}
+          limits: {nvidia.com/gpu: 1}

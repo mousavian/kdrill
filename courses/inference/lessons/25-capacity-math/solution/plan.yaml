@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: plan
+data:
+  gpu-type: h100
+  replicas: "9"
+  replicas-zone-safe: "14"
+  nodes: "6"
+  min-replicas: "3"
+  max-replicas: "14"

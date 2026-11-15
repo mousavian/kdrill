@@ -1,0 +1,9 @@
+title: "One endpoint, several models: route by the model in the request body"
+goal: >
+  Clients call one URL and name the model in the JSON body ("model": "small" or
+  "large"), as in the OpenAI API. Make the Gateway edge send each request to the
+  server that hosts that model, using the body, not a client-supplied header;
+  unknown models must get a 404 from the gateway and streaming must keep working.
+namespaces: [lab]
+timeout: 300s
+concepts: [body-based routing, EnvoyExtensionPolicy, Lua filter, HTTPRoute header match, request body buffering, model name, header spoofing, Gateway API Inference Extension BBR]

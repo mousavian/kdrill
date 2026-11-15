@@ -1,0 +1,9 @@
+title: "Why a CPU-based HPA is blind to a model server"
+goal: >
+  Eight users overload a model server that can run two requests at a time; a
+  CPU-based HorizontalPodAutoscaler watches it and does nothing. See why, then
+  take control: remove the HPA (it would fight any manual scaling) and give the
+  Deployment enough replicas that the queue drains.
+namespaces: [lab]
+timeout: 300s
+concepts: [HorizontalPodAutoscaler, resource metrics, metrics-server, CPU utilisation vs requests, saturation signals, requests waiting, in-flight requests, scale subresource]

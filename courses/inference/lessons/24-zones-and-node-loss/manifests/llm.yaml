@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+  labels: {app: llm}
+spec:
+  replicas: 6
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm}
+    spec:
+      affinity:
+        nodeAffinity:
+          # "keep the model next to its weights cache" (left over from an old incident)
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            preference:
+              matchExpressions:
+              - {key: topology.kubernetes.io/zone, operator: In, values: [zone-a]}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: [--model, meta-llama/Llama-3.1-8B-Instruct]
+        resources:
+          requests: {cpu: "8", memory: 32Gi}
+          limits: {nvidia.com/gpu: 1}
