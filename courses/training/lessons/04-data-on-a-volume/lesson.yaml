@@ -1,0 +1,8 @@
+title: "Data in: a prepared dataset on a volume"
+goal: >
+  The training Job reads its data from a ConfigMap, which can only hold a
+  slice of the corpus. Prepare the full dataset onto a PersistentVolumeClaim
+  `dataset` with an init container and train on it.
+namespaces: [train]
+timeout: 240s
+concepts: [ConfigMap size limit, PersistentVolumeClaim, local-path StorageClass, WaitForFirstConsumer, init containers, data preparation]

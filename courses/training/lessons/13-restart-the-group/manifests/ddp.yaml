@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ddp
+spec:
+  completionMode: Indexed
+  completions: 2
+  parallelism: 2
+  backoffLimit: 0          # a crash in a 2-worker run should not be retried blindly
+  template:
+    spec:
+      restartPolicy: Never
+      subdomain: workers
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "50"]
+        env:
+        - {name: WORLD_SIZE, value: "2"}
+        - {name: MASTER_ADDR, value: ddp-0.workers}
+        - {name: MASTER_PORT, value: "29500"}
+        - {name: DIST_TIMEOUT, value: "120"}
+        - {name: STEPS, value: "1500"}
+        - {name: BATCH_SIZE, value: "16"}
+        - {name: CKPT_DIR, value: /ckpt}
+        - {name: CKPT_EVERY, value: "100"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 250m, memory: 450Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        volumeMounts:
+        - {name: ckpt, mountPath: /ckpt}
+      volumes:
+      - name: ckpt
+        persistentVolumeClaim: {claimName: checkpoints}

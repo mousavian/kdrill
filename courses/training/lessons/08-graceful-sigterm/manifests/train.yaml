@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: Never
+      terminationGracePeriodSeconds: 3
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [sh, -c]
+        args: ['echo "train starting on $(hostname)"; train --seed 1 --log-every 25']
+        env:
+        - {name: STEPS, value: "1200"}
+        - {name: CKPT_DIR, value: /ckpt}
+        - {name: CKPT_EVERY, value: "400"}           # checkpoints are expensive...
+        - {name: CKPT_WRITE_SECONDS, value: "5"}     # ...each takes 5 s to write (slow storage)
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        volumeMounts:
+        - {name: ckpt, mountPath: /ckpt}
+      volumes:
+      - name: ckpt
+        persistentVolumeClaim: {claimName: checkpoints}

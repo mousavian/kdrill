@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "300", --seed, "1", --log-every, "50"]
+        env:
+        - {name: BATCH_SIZE, value: "512"}     # "bigger batches train faster"
+        resources:
+          limits: {memory: 768Mi}

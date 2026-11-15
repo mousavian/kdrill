@@ -1,0 +1,8 @@
+title: "Kill and resume"
+goal: >
+  When the training pod dies, the Job starts a new one, which trains from step
+  0 again. Make the Job resumable, then delete its pod mid-run: the
+  replacement must continue from the last checkpoint and finish the run.
+namespaces: [train]
+timeout: 240s
+concepts: [resume from checkpoint, pod deletion, Job pod replacement, emptyDir lifetime, idempotent restarts]

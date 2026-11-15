@@ -1,0 +1,24 @@
+# How someone first tried to run the training script: as a Deployment.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: train
+  labels: {app: train}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: train}
+  template:
+    metadata:
+      labels: {app: train}
+    spec:
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "400", --seed, "1", --log-every, "50"]
+        env:
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}

@@ -1,0 +1,9 @@
+title: "Capstone: a queued, resumable two-worker run with a planted fault"
+goal: >
+  Train the course's model for real: a two-worker JobSet, admitted through the
+  Kueue queue, that survives a worker crash by restarting from its shared
+  checkpoint, ends with a model artifact, and is sampled by a Job. The starting
+  manifests have several faults; find and fix them.
+namespaces: [train]
+timeout: 300s
+concepts: [JobSet, Kueue, failurePolicy, shared checkpoints, resume, model artifact, sampling Job, debugging a training setup]

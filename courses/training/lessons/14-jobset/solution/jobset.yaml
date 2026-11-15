@@ -1,0 +1,48 @@
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: ddp
+spec:
+  failurePolicy:
+    maxRestarts: 3                  # a failed child Job restarts the whole set, at most 3 times
+  successPolicy:
+    operator: All                   # done when every Job of "workers" has completed
+    targetReplicatedJobs: [workers]
+  network:
+    enableDNSHostnames: true        # a headless Service named like the JobSet, pods get DNS names
+    publishNotReadyAddresses: true
+  replicatedJobs:
+  - name: workers
+    replicas: 1                     # one Job ...
+    template:
+      spec:
+        completionMode: Indexed     # ... with two indexed pods = two ranks
+        completions: 2
+        parallelism: 2
+        backoffLimit: 0
+        template:
+          spec:
+            restartPolicy: Never
+            containers:
+            - name: train
+              image: kdrill.local/ml-tiny:0.1.0
+              command: [train]
+              args: [--seed, "1", --log-every, "50"]
+              env:
+              - {name: WORLD_SIZE, value: "2"}
+              - {name: MASTER_ADDR, value: ddp-workers-0-0.ddp}   # <jobset>-<replicatedJob>-<job index>-<pod index>.<jobset>
+              - {name: MASTER_PORT, value: "29500"}
+              - {name: DIST_TIMEOUT, value: "120"}
+              - {name: STEPS, value: "1500"}
+              - {name: BATCH_SIZE, value: "16"}
+              - {name: CKPT_DIR, value: /ckpt}
+              - {name: CKPT_EVERY, value: "100"}
+              - {name: OMP_NUM_THREADS, value: "1"}
+              resources:
+                requests: {cpu: 250m, memory: 450Mi}
+                limits: {cpu: "1", memory: 768Mi}
+              volumeMounts:
+              - {name: ckpt, mountPath: /ckpt}
+            volumes:
+            - name: ckpt
+              persistentVolumeClaim: {claimName: checkpoints}

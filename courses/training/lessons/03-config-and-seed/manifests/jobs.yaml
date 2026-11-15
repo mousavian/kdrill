@@ -1,0 +1,40 @@
+# The same experiment, run twice (for example by two people, or a rerun).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-a
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "300", --lr, "0.003", --batch-size, "32", --log-every, "50"]
+        env:
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: run-b
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "300", --lr, "0.003", --batch-size, "32", --log-every, "50"]
+        env:
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}

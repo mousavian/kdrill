@@ -1,0 +1,8 @@
+title: "Queue real training jobs with Kueue"
+goal: >
+  Two experiments run at once and squeeze each other on a quota meant for one.
+  Submit both through the Kueue LocalQueue `training`: one runs, the other waits
+  suspended, and starts by itself when the first has finished.
+namespaces: [train]
+timeout: 240s
+concepts: [Kueue, ClusterQueue, LocalQueue, ResourceFlavor, Workload, queue-name label, Job suspend, admission]

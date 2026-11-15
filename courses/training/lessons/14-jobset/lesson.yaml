@@ -1,0 +1,9 @@
+title: "JobSet: the worker group as one object"
+goal: >
+  The two-worker run is now a JobSet, but its workers look for the old
+  hand-made DNS name and nobody told it to restart. Point MASTER_ADDR at the
+  name JobSet gives rank 0 and add a failure policy, so an evicted worker
+  restarts the whole set from the checkpoint.
+namespaces: [train]
+timeout: 240s
+concepts: [JobSet, replicatedJobs, JobSet DNS names, failurePolicy maxRestarts, successPolicy, group restart]

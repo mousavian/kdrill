@@ -1,0 +1,8 @@
+title: "Size it: memory, CPU and threads"
+goal: >
+  The training Job `train` is killed again and again. Find out why, make it fit
+  in a 768 MiB memory limit, give it proper requests and limits, and match
+  PyTorch's thread count to its CPU limit.
+namespaces: [train]
+timeout: 240s
+concepts: [OOMKilled, exit code 137, requests vs limits, batch size and memory, OMP_NUM_THREADS, resourceFieldRef, CPU throttling]

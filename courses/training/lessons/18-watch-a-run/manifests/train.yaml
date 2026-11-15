@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels: {app: train}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "50"]
+        env:
+        - {name: STEPS, value: "3000"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 250m, memory: 512Mi}
+          limits: {cpu: 250m, memory: 768Mi}     # "training is a background job, keep it small"

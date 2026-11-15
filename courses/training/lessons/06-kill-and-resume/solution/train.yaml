@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "50"]
+        env:
+        - {name: STEPS, value: "1000"}
+        - {name: CKPT_DIR, value: /ckpt}
+        - {name: CKPT_EVERY, value: "100"}
+        - {name: RESUME, value: auto}         # continue from the newest checkpoint
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        volumeMounts:
+        - {name: ckpt, mountPath: /ckpt}
+      volumes:
+      - name: ckpt
+        persistentVolumeClaim: {claimName: checkpoints}

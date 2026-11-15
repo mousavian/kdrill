@@ -1,0 +1,9 @@
+title: "Checkpoints in object storage (MinIO)"
+goal: >
+  A previous run left its checkpoint in the MinIO bucket `checkpoints`. The
+  new training Job cannot reach the bucket: give it the endpoint and the
+  credentials from the Secret `s3-credentials`, so it resumes from that
+  checkpoint and finishes the run in object storage.
+namespaces: [train]
+timeout: 300s
+concepts: [object storage, S3 API, MinIO, Secrets, secretKeyRef, AWS_ENDPOINT_URL, resume from a bucket]

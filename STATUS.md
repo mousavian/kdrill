@@ -13,12 +13,14 @@ Last updated: 2026-11-15
 | envoy | 38 | envoy-gateway v1.9.3 (helm) | real containers; 01–21 plain Envoy, 22–34 Envoy Gateway, 35 inference bridge, 36 capstone, 37–38 extras (cross-namespace routes, basic auth); ~130 MB of images pulled on first start |
 | inference | 26 | inference-models (SmolLM2-135M GGUF + images), metrics-server v0.9.1, keda v2.21.0, envoy-gateway v1.9.3 (shared with envoy), inference-gateway (CRDs + Lua) | real-compute for Parts A-C and the capstone (llama.cpp on CPU; llm-d-inference-sim; llm-d router endpoint picker), sim for Part D (fake GPU nodes); first `course start` downloads 105 MB + about 600 MB of images |
 | istio | 14 | istio (istioctl 1.31.4 + Gateway API v1.6.3 CRDs) | real-light: real containers and traffic on the k3d node; about 120 MB for istiod + CNI agent + ztunnel, about 30 MB per sidecar |
+| training | 20 | ml-tiny-image (builds `kdrill.local/ml-tiny:0.1.0`, PyTorch 2.15.0 CPU), jobset v0.13.0, kueue v0.20.4 (shared with gpu-scheduling) | real-compute: real PyTorch training (a 354k-parameter char GPT) in Jobs, Indexed Jobs, JobSets and Kueue queues; MinIO (Chainguard build, pinned by digest) as a lesson workload in 09; first `course start` builds the image (about 250 MB download, 1-3 min); tested only in a Linux container, not on the Mac (see Known gaps) |
 
 Not built yet, each with a ready-to-use build brief (`courses/<name>/BUILD.md`):
-training, fine-tuning, kubeflow (the kubeflow brief produces
+fine-tuning, kubeflow (the kubeflow brief produces
 several small courses). To build one, open a new session in this folder and say:
 "Build the course described in courses/<name>/BUILD.md". Suggested order:
-training, fine-tuning, kubeflow.
+fine-tuning, kubeflow. Both reuse the shared image `base/images/ml-tiny`
+(see `base/images/README.md`).
 
 ## Decisions made without you — review these
 
@@ -54,6 +56,14 @@ training, fine-tuning, kubeflow.
 29. **Lesson cleanup in inference lesson 22 deletes every PriorityClass that is not `system-*`.**
 30. **Several verify scripts act on the cluster**: 09 and 18 scale their load Deployments, 11/12/23/26 run `rollout restart` or set env vars to start a rollout, 24 deletes and recreates a fake node, 15/17 change simulator metrics through the admin API and restore them. Each README says so and gives the duration (up to 2-3 minutes for 09 and the capstone).
 
+31. **Training: one shared image, built locally.** `base/images/ml-tiny` (new) holds a 354k-parameter character-level GPT, an instrumented `train` (flags and env for steps, checkpoint location/interval/retention, resume, seed, fail-at-step/rank/once, slow-checkpoint simulation, SIGTERM checkpoint, Prometheus endpoint, `metrics.json` with a per-attempt `runs` history), `sample`, `prepare`, `serve` (unused yet, for later courses), `mlt` (verify's inspection tool) and Tiny Shakespeare. PyTorch comes from PyTorch's CPU index for **both** architectures: the brief said arm64 wheels come from PyPI, but PyPI's Linux aarch64 torch 2.15 wheel (483 MB) now depends on the CUDA packages, while the CPU index has `+cpu` wheels for amd64 and arm64. `KDRILL_BUILD_CA` lets the build trust a TLS-inspecting proxy.
+32. **MinIO is Chainguard's build** (`docker.io/chainguard/minio`, pinned by digest, MinIO RELEASE.2026-11-12T01-15-23Z, amd64+arm64): `minio/minio` on Docker Hub answered "repository does not exist" and `quay.io/minio/minio` 401 from the build environment, consistent with MinIO having stopped publishing images. Chainguard's free tier only tags `latest`, so the digest may eventually stop being pullable; `bitnamilegacy/minio:2025.7.23` is a frozen fallback. MinIO runs as a lesson workload (lesson 09 only, about 70 MB), not a component.
+33. **Lesson order differs from the brief in Part C**: 12 is "one checkpoint volume for all workers" (the brief's 14), 13 "restart the whole group" (brief's 12), 14 JobSet (brief's 13). Shared storage had to come before group restarts, which resume from it.
+34. **Several training verify scripts act on the cluster**: 07, 08, 13 and 14 evict a pod once per Job/JobSet (Eviction API, as a drain would) and then wait up to 30-100 s for the replacement; 18 scrapes the metrics endpoint twice. Each README says so. Runs take 20 s to 2 minutes; verify reports "still running, at step N" instead of failing silently.
+35. **Lesson 18's speed check is skipped on nodes that do not enforce CPU limits.** Setup checks whether the trainer saw its 250m quota; if not (as on the nested cgroup v1 test host, where CPU limits were not enforced at all), verify prints a note instead of requiring the 2.5x speed-up. On Docker Desktop (cgroup v2) the check applies; it was not run there.
+36. **Training cleanup deletes the lesson's Kueue objects** (ClusterQueue `training-cq`, ResourceFlavor `default-flavor`, WorkloadPriorityClasses `low`/`urgent`), all labelled with the lesson; `course stop training` also removes any left with a `training.*` lesson label. These names would clash with a gpu-scheduling lesson started at the same time (only one lesson is active at a time).
+37. **No KubeRay lesson** (optional in the brief): not attempted; a Ray head plus a worker would add roughly 1 GB of images and several hundred MB of RAM next to the training pods. Lesson 14's "On a real cluster" mentions RayJob.
+
 ## Installed on this machine
 
 - Homebrew: `k3d`, `helm`
@@ -61,6 +71,7 @@ training, fine-tuning, kubeflow.
 - `~/.kdrill/` (state, kubeconfig), `~/.cache/kdrill/` (Karpenter source, 21 MB)
 - istio course: `~/.kdrill/bin/istioctl` (1.31.4, downloaded on `course start`)
 - inference course: `~/.kdrill/models/SmolLM2-135M-Instruct-Q4_K_M.gguf` (105 MB, kept by `course stop`); in the k3d node `/var/lib/kdrill/models` (105 MB), the image `kdrill.local/smollm2-135m:q4km` (105 MB; also in the host Docker, built on `course start`), and the pulled images llama.cpp server (292 MB unpacked), llm-d-inference-sim (45 MB), llm-d router endpoint picker, python:3.13-alpine, curl (about 600 MB in all, removed with the cluster; the model image and file are removed by `course stop`)
+- training course: the image `kdrill.local/ml-tiny:0.1.0` in the host Docker (232 MB compressed, about 810 MB unpacked; built on the first `course start`, kept by `course stop`, remove with `docker rmi`) and imported into the k3d node (removed from the node by `course stop`); the MinIO image (64 MB) pulled into the node on `course start` (removed with the cluster)
 
 ## Memory
 
@@ -79,6 +90,8 @@ ztunnel 5 MiB; each sidecar, gateway or waypoint 27-30 MiB. The biggest lesson
 (14: 6 meshed Pods plus a gateway) adds about 180 MiB; the whole k3s node was
 1.7 GiB at that point.
 
+training, measured on the Linux test cluster (crictl working sets): a training pod 280-400 MiB (PyTorch alone is about 230 MiB; batch 512 would need 1.1 GiB), two DDP workers about 300 MiB each, kueue-controller-manager 50-60 MiB, jobset-controller-manager 21-23 MiB, MinIO 68 MiB (lesson 09 only). The sum of all container working sets peaked at 712 MiB (lesson 13/14, two workers); the k3s node container peaked at 2.07 GiB over the whole 20-lesson run. The default run (2000 steps) takes 93 s on 2 CPUs; lessons use 300-1500 steps (20 s to 2 minutes).
+
 ## Known gaps
 
 - Only spot-checked by the orchestrating session: k8s-scheduling 05/06, gpu-scheduling 07/10, karpenter 01, kyverno 01, envoy 01/25, istio 05/13/14, inference 01/09/13/15/16/17/20/22/24/26 (inference on a fresh `kdrill-dev` cluster, not on the main cluster, which was in use). Every lesson was run end to end by the agent that wrote it, on a separate test cluster.
@@ -94,6 +107,12 @@ ztunnel 5 MiB; each sidecar, gateway or waypoint 27-30 MiB. The biggest lesson
 - inference: real batching gains cannot be shown on two CPU threads (lesson 07 says so); on a GPU they are large.
 - inference: the Docker Desktop VM (3.8 GB) was shared with a running `kdrill` cluster during the build; the course was not tried on a machine with the main cluster stopped, and `course start` pulls about 600 MB of images the first time.
 - inference: Kueue is installed by gpu-scheduling only; the inference course no longer installs it (decision 27).
+- training: **tested only on a Linux x86_64 cloud container, not on the Mac.** Every lesson was run end to end through `bin/kdrill` on a `kdrill-dev` cluster (k3d v5.9.0, k3s v1.35.5, Docker 29.9.2 on cgroup v1, 4 CPUs): untouched state fails, the reference solution passes, one cheat per lesson is rejected, and a final in-order regression of all 20 lessons passed after the last code change; `course stop` / `course start` and a gpu-scheduling lesson afterwards were also run. That host needed the same extra k3d flags as the istio entry above plus `--kubelet-arg=image-gc-high-threshold=100` (the sandbox disk looked 92% full, and the kubelet garbage-collected the imported ml-tiny image, so lesson setups now re-import it when it is missing) and a relay for the outbound proxy; the cluster was created by hand with the engine's flags plus those.
+- training: the image was built for amd64 only. The arm64 build was not run (no emulation allowed on the test host); what was checked: PyTorch's CPU index resolves `torch==2.15.0+cpu` to a 171 MB `manylinux_2_28_aarch64` wheel without CUDA dependencies, numpy/boto3 have aarch64 wheels, and the base image and MinIO are pinned by multi-arch index digests. Build time, image size, run time and RSS on the Mac are therefore unmeasured; the 1-3 minute default run and the step counts of the lessons are based on the x86 numbers.
+- training: CPU limits were **not enforced** on the test host (nested cgroup v1: a pod limited to 250m used a whole core), so lesson 02's thread check was only checked against the spec, and lesson 18's 2.5x speed check was skipped by its own fallback; on Docker Desktop (cgroup v2) the speed check applies but has never been run. The trainer's `cpu_limit` and throttling metrics read cgroup v2 (and v1 where the container's own cgroup is visible); on the test host they showed nothing.
+- training: verify scripts that evict (07, 08, 13, 14) need the run to be past a certain step and not too close to its end; a learner who verifies too early or too late gets a message to wait or to re-create the Job. Re-created Jobs in 08/13/14 continue from the checkpoints already on the PVC, which shortens the window (README 08 says so).
+- training: lesson setups take 20-40 s (namespace cleanup of the previous lesson), 09 and 19 about 70 s (they run a short "previous run" first), 18 about 30-50 s (it measures the starting throughput); after lesson 16 the cleanup once took 2 minutes.
+- training: GitHub HTML pages could not be fetched from the test host (proxy 403), so four read-more links (`github.com/krallin/tini`, `minio/minio`, `rancher/local-path-provisioner` and an earlier JobSet release link, since replaced) were checked through raw.githubusercontent.com instead; every other link returned 200.
 - `kdrill course stop` does not clean up an active lesson first.
 - envoy 37 and 38 were ported from an earlier draft onto this course's helpers and checked only with `bash -n` and a YAML parse; they have not been run end to end on a cluster.
 - Lesson cleanup takes 20–30 s (namespace deletion), so `reset` is slow.

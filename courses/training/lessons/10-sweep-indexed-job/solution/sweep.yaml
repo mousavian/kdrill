@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sweep
+spec:
+  completionMode: Indexed # pod i gets JOB_COMPLETION_INDEX=i (0, 1, 2)
+  completions: 3          # three runs in all: indexes 0..2
+  parallelism: 2          # at most two at a time
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [sh, -c]
+        args:
+        - |
+          set -- 0.0003 0.003 0.03          # the learning rates to try
+          i=${JOB_COMPLETION_INDEX:-0}
+          shift "$i"
+          export LR="$1" OUT_DIR="/results/run-$i"
+          echo "run $i: learning rate $LR, results in $OUT_DIR"
+          exec train --seed 1 --log-every 50
+        env:
+        - {name: STEPS, value: "300"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 250m, memory: 450Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        volumeMounts:
+        - {name: results, mountPath: /results}
+      volumes:
+      - name: results
+        persistentVolumeClaim: {claimName: results}

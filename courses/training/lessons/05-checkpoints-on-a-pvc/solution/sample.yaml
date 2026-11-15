@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sample
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: sample
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [sample, --model, /ckpt, --chars, "200"]
+        resources:
+          requests: {cpu: 100m, memory: 256Mi}
+          limits: {cpu: "1", memory: 512Mi}
+        volumeMounts:
+        - {name: ckpt, mountPath: /ckpt, readOnly: true}
+      volumes:
+      - name: ckpt
+        persistentVolumeClaim: {claimName: checkpoints}

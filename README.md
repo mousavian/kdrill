@@ -4,8 +4,9 @@ A local, hands-on Kubernetes practice lab. Topics are **courses**, each a
 sequence of **lessons**: you get a goal and a prepared cluster, work with your
 own `kubectl`, and `kdrill verify` tells you exactly what is still wrong.
 Runs on one small k3d cluster (fake KWOK nodes for scheduling and scale
-topics, real containers and traffic for the service-mesh course), sized for
-an 8 GB laptop. See [DESIGN.md](DESIGN.md) for the full plan.
+topics, real containers and traffic for the gateway and service-mesh courses,
+real tiny models for the inference and training courses), sized for an 8 GB
+laptop. See [DESIGN.md](DESIGN.md) for the full plan.
 
 ## Prerequisites
 
@@ -18,6 +19,11 @@ an 8 GB laptop. See [DESIGN.md](DESIGN.md) for the full plan.
 - internet access (once) for the inference course: its first `course start`
   downloads a 105 MB model file into `~/.kdrill/models` (checksum-verified) and
   pulls about 600 MB of images; `docker` must be able to build a `FROM scratch` image
+- internet access (once) and `docker build` for the training course: its first
+  `course start` builds the shared image `kdrill.local/ml-tiny` (CPU-only
+  PyTorch, about 250 MB download, 1-3 minutes) for your machine's architecture
+  and imports it into the cluster; behind a TLS-inspecting proxy, point
+  `KDRILL_BUILD_CA` at the proxy's CA bundle
 
 ## Quick start
 

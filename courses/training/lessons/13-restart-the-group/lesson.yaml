@@ -1,0 +1,9 @@
+title: "When one worker goes: restart the whole group"
+goal: >
+  The two-worker Job fails for good the moment one of its pods is evicted.
+  Keep backoffLimit 0 for real crashes, but let the Job replace an evicted
+  worker and the peer it stopped, so the group restarts together and resumes
+  from the shared checkpoint.
+namespaces: [train]
+timeout: 240s
+concepts: [all-or-nothing workers, collective failure, podFailurePolicy, DisruptionTarget, exit codes, group restart, resume]

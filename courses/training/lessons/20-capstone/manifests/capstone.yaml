@@ -1,0 +1,54 @@
+# The final run: two DDP workers, 900 steps. Worker 1 crashes once at step 300
+# (FAIL_* below): that is the planted, transient fault the setup must survive.
+# Do not remove it.
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: capstone
+spec:
+  network:
+    enableDNSHostnames: true
+    publishNotReadyAddresses: true
+  replicatedJobs:
+  - name: workers
+    replicas: 1
+    template:
+      spec:
+        completionMode: Indexed
+        completions: 2
+        parallelism: 2
+        backoffLimit: 0
+        template:
+          spec:
+            restartPolicy: Never
+            containers:
+            - name: train
+              image: kdrill.local/ml-tiny:0.1.0
+              command: [train]
+              args: [--seed, "1", --log-every, "50"]
+              env:
+              - {name: WORLD_SIZE, value: "2"}
+              - {name: MASTER_ADDR, value: capstone-workers-0-0.capstone}
+              - {name: MASTER_PORT, value: "29500"}
+              - {name: DIST_TIMEOUT, value: "120"}
+              - {name: STEPS, value: "900"}
+              - {name: BATCH_SIZE, value: "16"}
+              - {name: CKPT_DIR, value: /ckpt}
+              - {name: CKPT_EVERY, value: "100"}
+              - {name: RUN_NAME, value: capstone}
+              - {name: FAIL_AT_STEP, value: "300"}    # planted fault: worker 1 crashes once at step 300
+              - {name: FAIL_RANK, value: "1"}
+              - {name: FAIL_ONCE, value: "true"}
+              - {name: FAIL_EXIT_CODE, value: "1"}
+              - {name: OMP_NUM_THREADS, value: "1"}
+              resources:
+                requests: {cpu: "1", memory: 450Mi}
+                limits: {cpu: "1", memory: 768Mi}
+              volumeMounts:
+              - {name: ckpt, mountPath: /ckpt}
+              - {name: models, mountPath: /models}
+            volumes:
+            - name: ckpt
+              emptyDir: {}
+            - name: models
+              persistentVolumeClaim: {claimName: models}

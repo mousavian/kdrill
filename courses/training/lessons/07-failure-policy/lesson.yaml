@@ -1,0 +1,8 @@
+title: "Failure policy: retry disruptions, fail fast on bugs"
+goal: >
+  One Job has a bug and retries it for minutes; another would fail for good if
+  its node were drained. Give both a podFailurePolicy that fails immediately on
+  the bug's exit code and ignores disruptions, plus a deadline and a TTL.
+namespaces: [train]
+timeout: 240s
+concepts: [backoffLimit, podFailurePolicy, FailJob, Ignore, DisruptionTarget, Eviction API, activeDeadlineSeconds, ttlSecondsAfterFinished]

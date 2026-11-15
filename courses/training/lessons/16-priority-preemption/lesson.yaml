@@ -1,0 +1,9 @@
+title: "Priority: an urgent job preempts a long run, which resumes"
+goal: >
+  A long low-priority pretraining run holds the only training slot, and an
+  urgent evaluation must run now. Let Kueue preempt the long run for the
+  urgent job; afterwards the long run must be re-admitted and continue from
+  its checkpoint.
+namespaces: [train]
+timeout: 240s
+concepts: [WorkloadPriorityClass, Kueue preemption, withinClusterQueue, Workload eviction, suspend, resume after preemption]

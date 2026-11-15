@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "300", --seed, "1", --log-every, "50"]
+        env:
+        - {name: DATA, value: /data/input.txt}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        volumeMounts:
+        - {name: data, mountPath: /data, readOnly: true}
+      volumes:
+      - name: data
+        configMap: {name: corpus}

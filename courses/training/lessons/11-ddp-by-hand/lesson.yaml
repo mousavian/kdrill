@@ -1,0 +1,8 @@
+title: "Distributed training by hand: two pods, one model"
+goal: >
+  A two-worker PyTorch DDP Job hangs: the workers cannot find each other.
+  Give the Indexed Job's pods stable DNS names with a headless Service and a
+  matching subdomain so the two ranks rendezvous and train together.
+namespaces: [train]
+timeout: 240s
+concepts: [PyTorch DDP, gloo, rank and world size, MASTER_ADDR, headless Service, pod hostname and subdomain, Indexed Job]
