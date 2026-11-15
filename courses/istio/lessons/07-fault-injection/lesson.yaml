@@ -1,0 +1,9 @@
+title: "Chaos testing: fault injection"
+goal: >
+  Give the `web` team in namespace `shop` a way to test how they cope with a
+  failing `ratings` service: requests carrying the header `x-chaos` get an
+  injected abort (503), a 2 s delay, or a 50% chance of a 500 from the mesh,
+  while all other traffic to ratings is untouched.
+kind: real-light
+namespaces: [shop]
+concepts: [fault injection, abort, delay, percentage, chaos engineering, header-scoped faults, response flags]

@@ -4,7 +4,8 @@ A local, hands-on Kubernetes practice lab. Topics are **courses**, each a
 sequence of **lessons**: you get a goal and a prepared cluster, work with your
 own `kubectl`, and `kdrill verify` tells you exactly what is still wrong.
 Runs on one small k3d cluster (fake KWOK nodes for scheduling and scale
-topics), sized for an 8 GB laptop. See [DESIGN.md](DESIGN.md) for the full plan.
+topics, real containers and traffic for the service-mesh course), sized for
+an 8 GB laptop. See [DESIGN.md](DESIGN.md) for the full plan.
 
 ## Prerequisites
 
@@ -12,6 +13,8 @@ topics), sized for an 8 GB laptop. See [DESIGN.md](DESIGN.md) for the full plan.
 - [k3d](https://k3d.io) and `kubectl`: `brew install k3d kubectl`
 - Go (to build the CLI, and to build Karpenter for the karpenter course)
 - `helm` (needed by the kyverno and karpenter courses)
+- `curl` and internet access for the istio course: it downloads the pinned
+  `istioctl` into `~/.kdrill/bin` and the Gateway API CRDs, and pulls Istio's images
 
 ## Quick start
 

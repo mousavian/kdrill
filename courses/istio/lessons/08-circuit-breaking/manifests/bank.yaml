@@ -1,0 +1,101 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: teller
+  namespace: bank
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ledger
+  namespace: bank
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teller
+  namespace: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: teller}
+  template:
+    metadata:
+      labels: {app: teller}
+      annotations:
+        # Istio trims Envoy stats by default; keep the circuit-breaker and outlier counters.
+        proxy.istio.io/config: |
+          proxyStatsMatcher:
+            inclusionRegexps:
+            - ".*outlier_detection.*"
+            - ".*upstream_rq_pending.*"
+            - ".*upstream_cx_overflow.*"
+    spec:
+      serviceAccountName: teller
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: curl
+        image: curlimages/curl:8.23.0
+        command: [sleep, infinity]
+        resources:
+          requests: {cpu: 5m, memory: 8Mi}
+          limits: {memory: 32Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ledger
+  namespace: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: ledger, version: stable}
+  template:
+    metadata:
+      labels: {app: ledger, version: stable}
+    spec:
+      serviceAccountName: ledger
+      terminationGracePeriodSeconds: 2
+      containers:
+      - name: ledger
+        image: mccutchen/go-httpbin:2.26.0
+        env: [{name: USE_REAL_HOSTNAME, value: "true"}]
+        ports: [{containerPort: 8080, name: http}]
+        resources:
+          requests: {cpu: 5m, memory: 16Mi}
+          limits: {memory: 64Mi}
+---
+# A bad canary: its server listens on 9999 instead of 8080, so every request fails with 503 - but nothing makes the Pod unready.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ledger-canary
+  namespace: bank
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: ledger, version: canary}
+  template:
+    metadata:
+      labels: {app: ledger, version: canary}
+    spec:
+      serviceAccountName: ledger
+      terminationGracePeriodSeconds: 2
+      containers:
+      - name: ledger
+        image: mccutchen/go-httpbin:2.26.0
+        env: [{name: USE_REAL_HOSTNAME, value: "true"}, {name: PORT, value: "9999"}]
+        ports: [{containerPort: 8080, name: http}]
+        resources:
+          requests: {cpu: 5m, memory: 16Mi}
+          limits: {memory: 64Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ledger
+  namespace: bank
+spec:
+  selector: {app: ledger}
+  ports:
+  - {name: http, port: 8000, targetPort: 8080}

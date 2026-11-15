@@ -1,0 +1,9 @@
+title: "Observability: access logs and metrics with the Telemetry API"
+goal: >
+  Turn on Envoy access logs for every sidecar in namespace `shop`, but only
+  for failed requests (status 400 and above), and add a `tenant` label,
+  taken from the request header `x-tenant`, to the request metrics that
+  `catalog` reports.
+kind: real-light
+namespaces: [shop]
+concepts: [Telemetry API, access logs, log filter expressions, response flags, istio_requests_total, metric labels, tagOverrides, reporter source vs destination, proxy stats endpoint]

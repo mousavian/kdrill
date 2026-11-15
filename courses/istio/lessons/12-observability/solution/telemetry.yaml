@@ -1,0 +1,33 @@
+# Namespace-wide (no selector): access logs for failed requests only, from
+# every sidecar in shop.
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: shop-logs
+  namespace: shop
+spec:
+  accessLogging:
+  - providers:
+    - name: envoy
+    filter:
+      expression: response.code >= 400
+---
+# catalog's standard request metrics get an extra label: the tenant.
+apiVersion: telemetry.istio.io/v1
+kind: Telemetry
+metadata:
+  name: catalog-metrics
+  namespace: shop
+spec:
+  selector:
+    matchLabels: {app: catalog}
+  metrics:
+  - providers:
+    - name: prometheus
+    overrides:
+    - match:
+        metric: REQUEST_COUNT
+        mode: SERVER
+      tagOverrides:
+        tenant:
+          value: request.headers['x-tenant']

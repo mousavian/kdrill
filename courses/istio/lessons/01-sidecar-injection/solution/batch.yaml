@@ -1,0 +1,23 @@
+# Nightly batch job runner: must stay out of the mesh.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: batch
+  namespace: shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: batch}
+  template:
+    metadata:
+      labels: {app: batch, sidecar.istio.io/inject: "false"}
+    spec:
+      serviceAccountName: batch
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: curl
+        image: curlimages/curl:8.23.0
+        command: [sleep, infinity]
+        resources:
+          requests: {cpu: 5m, memory: 8Mi}
+          limits: {memory: 32Mi}

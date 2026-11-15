@@ -1,0 +1,8 @@
+title: "Canary releases: weighted routing and traffic mirroring"
+goal: >
+  Start the canary of `catalog` v2 in namespace `shop`: 80% of requests to
+  v1, 20% to v2. At the same time dark-launch v3: it must receive a copy of
+  every request without ever answering a client.
+kind: real-light
+namespaces: [shop]
+concepts: [canary, weighted routes, progressive delivery, traffic mirroring, shadow traffic, dark launch]

@@ -1,0 +1,58 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  namespace: shop
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: web}
+  template:
+    metadata:
+      labels: {app: web}
+    spec:
+      serviceAccountName: web
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: curl
+        image: curlimages/curl:8.23.0
+        command: [sleep, infinity]
+        resources:
+          requests: {cpu: 5m, memory: 8Mi}
+          limits: {memory: 32Mi}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cron
+  namespace: legacy
+---
+# An old cron job outside the mesh (namespace legacy has no sidecar injection).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cron
+  namespace: legacy
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: cron}
+  template:
+    metadata:
+      labels: {app: cron}
+    spec:
+      serviceAccountName: cron
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: curl
+        image: curlimages/curl:8.23.0
+        command: [sleep, infinity]
+        resources:
+          requests: {cpu: 5m, memory: 8Mi}
+          limits: {memory: 32Mi}

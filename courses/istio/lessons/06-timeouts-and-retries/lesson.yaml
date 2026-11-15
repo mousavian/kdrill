@@ -1,0 +1,9 @@
+title: "Resilience: timeouts and retries"
+goal: >
+  `web` in namespace `shop` hangs when `inventory` is slow and shows errors
+  when inventory fails intermittently. Configure the VirtualService
+  `inventory` so that no request takes longer than 2 seconds and failed
+  requests (5xx) are retried up to 3 times.
+kind: real-light
+namespaces: [shop]
+concepts: [timeouts, retries, retryOn, attempts, perTryTimeout, 504, x-envoy-attempt-count, retry storms, idempotency]

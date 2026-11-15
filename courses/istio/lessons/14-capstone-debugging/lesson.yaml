@@ -1,0 +1,11 @@
+title: "Capstone: a mesh that doesn't do what it says"
+goal: >
+  The shop in namespace `shop` is configured on paper (gateway, version
+  routing, strict mTLS, authorization) but users can't pay, beta users
+  don't get the beta, and in-mesh calls to payments fail. Find and fix
+  every configuration bug, without weakening the security policies or
+  changing the workloads, so that everything behaves as documented.
+kind: real-light
+namespaces: [shop, outside]
+timeout: 240s
+concepts: [debugging, istioctl analyze, proxy-config, route status, protocol selection, auto mTLS vs DestinationRule tls, PeerAuthentication, AuthorizationPolicy principals, response flags]

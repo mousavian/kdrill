@@ -1,0 +1,60 @@
+# Lean Istio for kdrill, installed by base/components/istio/install.sh with
+# the pinned istioctl (istioctl install -f). Measured on a k3d node:
+# istiod ~60 MiB, istio-cni ~45 MiB, ztunnel ~5 MiB, each sidecar ~30 MiB.
+#
+# Profile "ambient" installs istiod + the istio-cni node agent + ztunnel.
+# It serves BOTH data planes: namespaces labelled istio-injection=enabled get
+# sidecars (most lessons), namespaces labelled istio.io/dataplane-mode=ambient
+# use ztunnel and waypoints (lesson 13). Because istio-cni is present,
+# sidecar pods get a tiny istio-validation init container instead of the
+# privileged istio-init iptables container.
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  profile: ambient
+  meshConfig:
+    # Access logs are off; lesson 12 turns them on with the Telemetry API.
+    accessLogFile: ""
+    defaultConfig:
+      # One Envoy worker thread per sidecar (default 2): less memory, plenty for a lab.
+      concurrency: 1
+  components:
+    pilot:
+      k8s:
+        resources:
+          requests: {cpu: 50m, memory: 128Mi}
+          limits: {memory: 512Mi}
+        # Sim lessons (other courses) taint the real node and add KWOK fake
+        # nodes: istiod must stay on the real node and never land on a fake one.
+        nodeSelector: {node-role.kubernetes.io/control-plane: "true"}
+        tolerations:
+        - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+    cni:
+      k8s:
+        nodeSelector: {node-role.kubernetes.io/control-plane: "true"}
+    ztunnel:
+      k8s:
+        nodeSelector: {node-role.kubernetes.io/control-plane: "true"}
+  values:
+    global:
+      # k3s keeps its CNI config and binaries in non-standard paths.
+      platform: k3s
+      # Sidecars, ingress gateways and waypoints Istio deploys for lessons.
+      proxy:
+        resources:
+          requests: {cpu: 10m, memory: 40Mi}
+          limits: {memory: 256Mi}
+    pilot:
+      autoscaleEnabled: false
+      replicaCount: 1
+    cni:
+      ambient:
+        # The cluster is IPv4-only; IPv6 rules fail on hosts without IPv6.
+        ipv6: false
+      resources:
+        requests: {cpu: 10m, memory: 32Mi}
+    ztunnel:
+      env:
+        IPV6_ENABLED: "false"
+      resources:
+        requests: {cpu: 10m, memory: 32Mi}

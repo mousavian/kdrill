@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+  namespace: store
+spec:
+  selector: {app: catalog}
+  ports:
+  - {name: tcp-web, port: 8000, targetPort: 8080}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews
+  namespace: store
+spec:
+  selector: {app: reviews}
+  ports:
+  - {name: web, port: 8000, targetPort: 8080, appProtocol: tcp}

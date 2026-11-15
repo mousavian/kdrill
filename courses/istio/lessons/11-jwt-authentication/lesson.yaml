@@ -1,0 +1,11 @@
+title: "End-user authentication: JWT at the ingress gateway"
+goal: >
+  The shop's ingress gateway lets everybody in. Make it validate JSON Web
+  Tokens from the issuer https://auth.kdrill.local: public paths stay open,
+  orders need a valid token, the admin API needs a token with the group
+  `admins`, invalid tokens are rejected, and the backend learns the user
+  name from a header.
+kind: real-light
+namespaces: [shop, outside]
+timeout: 240s
+concepts: [JWT, RequestAuthentication, JWKS, issuer, audiences, requestPrincipals, request.auth.claims, outputClaimToHeaders, 401 vs 403, targetRefs Gateway]

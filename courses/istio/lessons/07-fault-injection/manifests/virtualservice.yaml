@@ -1,0 +1,11 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: ratings
+  namespace: shop
+spec:
+  hosts: [ratings]
+  http:
+  - name: main
+    route:
+    - destination: {host: ratings}

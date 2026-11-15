@@ -1,0 +1,26 @@
+# Namespace-wide: every workload in bank accepts only mTLS.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: bank
+spec:
+  mtls:
+    mode: STRICT
+---
+# Workload-specific exception: ledger's metrics port (container port 9090)
+# also accepts plaintext, for the monitoring system outside the mesh.
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: ledger-metrics
+  namespace: bank
+spec:
+  selector:
+    matchLabels:
+      app: ledger
+  mtls:
+    mode: STRICT
+  portLevelMtls:
+    9090:
+      mode: PERMISSIVE

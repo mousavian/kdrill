@@ -1,0 +1,10 @@
+title: "Ambient mode: ztunnel and a waypoint instead of sidecars"
+goal: >
+  Bring namespace `mall` into the mesh without sidecars: enrol it in
+  ambient mode, deploy a waypoint for L7 features, and with an
+  AuthorizationPolicy attached to the `api` Service let `web` send GET
+  requests to it while its other methods and every other caller are denied.
+kind: real-light
+namespaces: [mall]
+timeout: 240s
+concepts: [ambient mode, ztunnel, HBONE, istio.io/dataplane-mode, waypoint proxy, istio-waypoint GatewayClass, istio.io/use-waypoint, targetRefs, L4 vs L7 policy]
