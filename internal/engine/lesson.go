@@ -262,7 +262,7 @@ func (a *App) printTask(l course.Lesson) {
 	fmt.Printf("%s\n", l.Title)
 	fmt.Printf("Goal: %s\n\n", strings.Join(strings.Fields(l.Goal), " "))
 	if b, err := os.ReadFile(filepath.Join(l.Dir, "README.md")); err == nil {
-		fmt.Println(strings.TrimSpace(string(b)))
+		printMarkdown(string(b))
 	}
 }
 
@@ -345,7 +345,8 @@ func (a *App) hint() error {
 		fmt.Printf("no more hints (all %d shown). See the full answer with: kdrill solution\n", len(hints))
 		return nil
 	}
-	fmt.Printf("Hint %d/%d\n%s\n", n+1, len(hints), hints[n])
+	fmt.Printf("Hint %d/%d\n", n+1, len(hints))
+	printMarkdown(hints[n])
 	a.st.Active.HintsShown = n + 1
 	return a.save()
 }
@@ -462,7 +463,7 @@ func (a *App) solution(ref string) error {
 	}
 	dir := filepath.Join(l.Dir, "solution")
 	if b, err := os.ReadFile(filepath.Join(dir, "README.md")); err == nil {
-		fmt.Println(strings.TrimSpace(string(b)))
+		printMarkdown(string(b))
 	} else {
 		fmt.Println("(no solution/README.md)")
 	}
