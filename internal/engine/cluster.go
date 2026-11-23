@@ -277,7 +277,7 @@ func (a *App) componentHealthy(name string) bool {
 	if !fileExists(script) {
 		return true
 	}
-	return a.runScriptQuiet(script, a.Home+"/base/components/"+name, "check", 60*time.Second) == nil
+	return a.runScriptQuiet(script, a.Home+"/base/components/"+name, "check", 3*time.Minute) == nil
 }
 
 func (a *App) uninstallComponent(name string) error {

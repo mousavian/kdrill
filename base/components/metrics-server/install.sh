@@ -2,6 +2,9 @@
 # started without it. Pinned release; kubelet certificates are not verified (the
 # lab's kubelet uses a self-signed cert), one small pod that survives sim lessons.
 MS_VERSION="${MS_VERSION:-v0.9.1}"
+# Re-running over an existing install: the upstream manifest's 200Mi request
+# would meet our 96Mi limit and be rejected, so start from a clean Deployment.
+kubectl -n kube-system delete deploy metrics-server --ignore-not-found --wait >/dev/null
 kubectl apply -f "https://github.com/kubernetes-sigs/metrics-server/releases/download/${MS_VERSION}/components.yaml" >/dev/null
 kubectl -n kube-system patch deploy metrics-server --type=json -p '[
   {"op":"add","path":"/spec/template/spec/containers/0/args/-","value":"--kubelet-insecure-tls"},
