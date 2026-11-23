@@ -4,15 +4,15 @@ KDRILL  ?= $(ROOT)/bin/kdrill
 COURSE  := $(notdir $(CURDIR))
 
 .DEFAULT_GOAL := help
-.PHONY: help start stop lessons
+.PHONY: help start stop lessons status
 
 $(KDRILL):
 	$(MAKE) -C $(ROOT) build
 
 help:
-	@echo "Course $(COURSE): make start | stop | lessons"
+	@echo "Course $(COURSE): make start | stop | status"
 
 start stop: $(KDRILL)
 	@$(KDRILL) course $@ $(COURSE)
-lessons: $(KDRILL)
-	@$(KDRILL) lessons $(COURSE)
+status lessons: $(KDRILL)
+	@$(KDRILL) status $(COURSE)

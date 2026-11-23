@@ -32,7 +32,7 @@ make build                 # builds bin/kdrill (remembers where this repo lives)
 make install               # optional: copy it to $(go env GOPATH)/bin
 bin/kdrill doctor          # checks docker, memory, k3d, kubectl
 bin/kdrill cluster up      # creates the k3d cluster "kdrill" + installs KWOK
-bin/kdrill courses
+bin/kdrill status          # cluster, context, components, active lesson, course progress
 bin/kdrill start k8s-scheduling/01
 ```
 
@@ -44,6 +44,7 @@ kdrill hint                # progressive hints
 kdrill solution            # the reference answer
 kdrill reset               # start the lesson over
 kdrill next                # clean up and start the next lesson
+kdrill status              # where you are; `kdrill status <course>` lists its lessons
 ```
 
 kdrill uses its own kubeconfig (`~/.kdrill/kubeconfig`) for everything it runs,

@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"strings"
 	"time"
 
 	"kdrill/internal/state"
@@ -104,9 +103,9 @@ func (a *App) clusterCmd(sub string) error {
 		fmt.Println("cluster deleted; progress kept. Create a new one with: kdrill cluster up")
 		return nil
 	case "status":
-		return a.clusterStatus()
+		return a.status("") // old name, kept as an alias
 	}
-	return fmt.Errorf("usage: kdrill cluster up|down|nuke|status")
+	return fmt.Errorf("usage: kdrill cluster up|down|nuke")
 }
 
 func (a *App) clusterUp() error {
@@ -175,32 +174,6 @@ func (a *App) clusterUp() error {
 		return err
 	}
 	fmt.Printf("\ncluster %s is ready. Next:\n  kdrill start k8s-scheduling/01\n", a.Cluster)
-	return nil
-}
-
-func (a *App) clusterStatus() error {
-	exists, running, err := a.clusterState()
-	if err != nil {
-		return err
-	}
-	switch {
-	case !exists:
-		fmt.Printf("cluster %s: does not exist (kdrill cluster up)\n", a.Cluster)
-	case !running:
-		fmt.Printf("cluster %s: stopped (kdrill cluster up)\n", a.Cluster)
-	default:
-		fmt.Printf("cluster %s: running\n", a.Cluster)
-		if fileExists(a.kubeconfigPath()) {
-			if out, err := a.k("get", "nodes", "--no-headers"); err == nil {
-				for _, l := range strings.Split(out, "\n") {
-					fmt.Println("  " + l)
-				}
-			}
-		}
-	}
-	if len(a.st.Components) > 0 {
-		fmt.Println("components: " + strings.Join(a.st.Components, ", "))
-	}
 	return nil
 }
 

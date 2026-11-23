@@ -7,7 +7,7 @@ COURSE  := $(notdir $(abspath $(CURDIR)/../..))
 REF     := $(COURSE)/$(LESSON)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup verify hint reset cleanup solution show next
+.PHONY: help setup verify hint reset cleanup solution show next status
 
 $(KDRILL):
 	$(MAKE) -C $(ROOT) build
@@ -22,6 +22,7 @@ help:
 	@echo "  make solution  show the solution"
 	@echo "  make show      reprint the task"
 	@echo "  make next      clean up and start the next lesson"
+	@echo "  make status    cluster, active lesson and this course's progress"
 
 setup: $(KDRILL)
 	@$(KDRILL) start $(REF)
@@ -30,3 +31,5 @@ verify hint reset cleanup solution show: $(KDRILL)
 # next works from the active lesson, which must be this one.
 next: $(KDRILL)
 	@$(KDRILL) next $(REF)
+status: $(KDRILL)
+	@$(KDRILL) status $(COURSE)

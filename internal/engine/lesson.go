@@ -7,7 +7,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"text/tabwriter"
 	"time"
 
 	"kdrill/internal/course"
@@ -15,44 +14,6 @@ import (
 )
 
 // ---------------------------------------------------------------- listing ----
-
-func (a *App) courses() error {
-	cs, err := course.All(a.Home)
-	if err != nil {
-		return err
-	}
-	tw := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-	fmt.Fprintln(tw, "ID\tTITLE\tPROGRESS")
-	for _, c := range cs {
-		ls, _ := c.Lessons()
-		fmt.Fprintf(tw, "%s\t%s\t%d/%d\n", c.ID, c.Title, a.st.DoneCount(c.ID), len(ls))
-	}
-	return tw.Flush()
-}
-
-func (a *App) lessons(id string) error {
-	c, err := course.Load(a.Home, id)
-	if err != nil {
-		return err
-	}
-	ls, err := c.Lessons()
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%s - %s\n", c.ID, c.Title)
-	for _, l := range ls {
-		mark := " "
-		if a.st.Done(c.ID, l.ID) {
-			mark = "✓"
-		}
-		active := ""
-		if a.st.Active != nil && a.st.Active.Course == c.ID && a.st.Active.Lesson == l.ID {
-			active = "  <- active"
-		}
-		fmt.Printf("  %s %-32s %s%s\n", mark, l.ID, l.Title, active)
-	}
-	return nil
-}
 
 // ---------------------------------------------------------------- courses ----
 
@@ -284,35 +245,6 @@ func (a *App) show(ref string) error {
 	return nil
 }
 
-func (a *App) status() error {
-	x, err := a.loadActive()
-	if err != nil {
-		fmt.Println("active lesson: none")
-	} else {
-		l := x.lesson()
-		fmt.Printf("active lesson: %s (%s)\n", l.Ref(), l.Title)
-		fmt.Printf("goal: %s\n", strings.Join(strings.Fields(l.Goal), " "))
-		fmt.Printf("hints shown: %d, namespace: %s\n", a.st.Active.HintsShown, l.NS())
-	}
-	exists, running, cerr := a.clusterState()
-	switch {
-	case cerr != nil:
-		fmt.Println("cluster: unknown (" + cerr.Error() + ")")
-	case !exists:
-		fmt.Printf("cluster %s: does not exist (kdrill cluster up)\n", a.Cluster)
-	case !running:
-		fmt.Printf("cluster %s: stopped (kdrill cluster up)\n", a.Cluster)
-	default:
-		fmt.Printf("cluster %s: running\n", a.Cluster)
-	}
-	want := "k3d-" + a.Cluster
-	if cur, err := run(exec.CommandContext(a.ctx, "kubectl", "config", "current-context")); err == nil && cur != want {
-		fmt.Printf("warning: your kubectl context is %q, not %q.\n  switch with: kubectl config use-context %s\n  or use: KUBECONFIG=%s kubectl ...\n",
-			cur, want, want, a.kubeconfigPath())
-	}
-	return nil
-}
-
 func (a *App) profile(p string) error {
 	if p == "" {
 		fmt.Println(a.st.Profile)
@@ -439,7 +371,7 @@ func (a *App) next() error {
 		return err
 	}
 	if x.i+1 >= len(x.ls) {
-		fmt.Printf("course %s complete (%d/%d lessons done). Pick another with: kdrill courses\n",
+		fmt.Printf("course %s complete (%d/%d lessons done). Pick another with: kdrill status\n",
 			x.c.ID, a.st.DoneCount(x.c.ID), len(x.ls))
 		return nil
 	}

@@ -80,7 +80,7 @@ func Load(home, id string) (Course, error) {
 	c := Course{ID: id, Dir: dir}
 	if err := readYAML(filepath.Join(dir, "course.yaml"), &c); err != nil {
 		if os.IsNotExist(err) {
-			return c, fmt.Errorf("no such course %q (see: kdrill courses)", id)
+			return c, fmt.Errorf("no such course %q (see: kdrill status)", id)
 		}
 		return c, err
 	}

@@ -33,18 +33,20 @@ const usage = `kdrill - hands-on Kubernetes practice lab
 
 Setup
   doctor                       check docker, k3d, kubectl, memory
-  cluster up|down|nuke|status  create/start, stop, delete, inspect the local cluster
-  profile [lite|full]          show or set the resource profile
+  cluster up|down|nuke         create/start, stop, delete the local cluster
+  profile lite|full            set the resource profile
+
+Status
+  status                       cluster, kubectl context, profile, components,
+                               active lesson and progress of every course
+  status <course>              the same, with that course's lessons
 
 Courses
-  courses                      list courses with progress
-  lessons <course>             list lessons of a course
   course start|stop <course>   install / remove a course's components
 
 Lesson loop (ref = <course>/<lesson>, e.g. k8s-scheduling/01)
   start <ref>                  set up a lesson
   show                         reprint the task
-  status                       active lesson and cluster state
   hint                         reveal the next hint
   verify                       check your work (exit 0 on pass)
   reset                        cleanup, then start the lesson again
@@ -114,16 +116,16 @@ func (a *App) dispatch(cmd string, args []string, defaultHome string) error {
 	switch cmd {
 	case "cluster":
 		if len(args) != 1 {
-			return fmt.Errorf("usage: kdrill cluster up|down|nuke|status")
+			return fmt.Errorf("usage: kdrill cluster up|down|nuke")
 		}
 		return a.clusterCmd(args[0])
-	case "courses":
-		return a.courses()
-	case "lessons":
-		if err := need(1, "lessons <course>"); err != nil {
+	case "courses": // old name, kept as an alias
+		return a.status("")
+	case "lessons": // old name, kept as an alias
+		if err := need(1, "status <course>"); err != nil {
 			return err
 		}
-		return a.lessons(args[0])
+		return a.status(args[0])
 	case "course":
 		if len(args) != 2 || (args[0] != "start" && args[0] != "stop") {
 			return fmt.Errorf("usage: kdrill course start|stop <course>")
@@ -135,7 +137,11 @@ func (a *App) dispatch(cmd string, args []string, defaultHome string) error {
 		}
 		return a.startRef(args[0])
 	case "status":
-		return a.status()
+		c, err := opt("status [<course>]")
+		if err != nil {
+			return err
+		}
+		return a.status(c)
 	case "profile":
 		p, err := opt("profile [lite|full]")
 		if err != nil {

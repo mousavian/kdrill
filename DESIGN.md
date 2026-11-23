@@ -160,12 +160,13 @@ concepts: [PeerAuthentication, mTLS modes]
 kdrill doctor                 # check docker/runtime, memory limit, tools
 kdrill cluster up|down|nuke   # create / stop / delete the local cluster
 
-kdrill courses                # list courses + progress
+kdrill status [<course>]      # everything in one place: cluster, kubectl context,
+                              # profile, components, active lesson, course progress
+                              # (with <course>: that course's lessons)
 kdrill course start <course>  # install course components
 kdrill course stop  <course>  # uninstall them (free memory)
 
 kdrill start <course>/<nn>    # course start if needed, then lesson setup
-kdrill status                 # current lesson, goal, nodes/kind
 kdrill hint                   # next hint (progressive)
 kdrill verify                 # run checks
 kdrill reset                  # back to lesson starting state
