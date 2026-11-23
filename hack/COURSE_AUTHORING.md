@@ -21,6 +21,8 @@ courses/<course>/
     manifests/     starting YAML
     Makefile       one line: include ../../../../base/lib/lesson.mk
 base/components/<name>/install.sh, uninstall.sh   idempotent, pinned versions
+base/components/<name>/check.sh   exit 0 when installed and healthy; on every lesson
+                                  start kdrill reinstalls a component whose check fails
 ```
 
 There is **no limit on the number of lessons**. Use as many as the topic needs to

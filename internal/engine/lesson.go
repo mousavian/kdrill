@@ -188,6 +188,14 @@ func (a *App) startLesson(c course.Course, l course.Lesson) error {
 		if err := a.courseStart(c); err != nil {
 			return err
 		}
+	} else {
+		// The course is started, but its components may have gone missing
+		// since; check each one and reinstall what is broken.
+		for _, comp := range c.Components {
+			if err := a.installComponent(comp); err != nil {
+				return err
+			}
+		}
 	}
 	fmt.Printf("setting up %s...\n", l.Ref())
 	if err := a.setSimTaint(l.EffectiveKind(c) == "sim"); err != nil {

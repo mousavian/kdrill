@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -258,6 +259,15 @@ func (a *App) k(args ...string) (string, error) { return run(a.kubectl(args...))
 // runScript runs a script the way hack/lesson.sh does: common.sh is sourced first.
 // extra holds KDRILL_* variables; dir is the working directory.
 func (a *App) runScript(script, dir, phase string, extra []string, timeout time.Duration) error {
+	return a.runScriptTo(script, dir, phase, extra, timeout, os.Stdout, os.Stderr)
+}
+
+// runScriptQuiet runs a script with its output discarded (health checks).
+func (a *App) runScriptQuiet(script, dir, phase string, timeout time.Duration) error {
+	return a.runScriptTo(script, dir, phase, nil, timeout, io.Discard, io.Discard)
+}
+
+func (a *App) runScriptTo(script, dir, phase string, extra []string, timeout time.Duration, stdout, stderr io.Writer) error {
 	ctx, cancel := context.WithTimeout(a.ctx, timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "bash", "-c",
@@ -271,7 +281,7 @@ func (a *App) runScript(script, dir, phase string, extra []string, timeout time.
 		"KDRILL_CLUSTER="+a.Cluster,
 		"KDRILL_STATE_DIR="+a.StateDir)
 	cmd.Env = append(cmd.Env, extra...)
-	cmd.Stdin, cmd.Stdout, cmd.Stderr = nil, os.Stdout, os.Stderr
+	cmd.Stdin, cmd.Stdout, cmd.Stderr = nil, stdout, stderr
 	// Own process group so a timeout or Ctrl-C also kills kubectl children.
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 	cmd.Cancel = func() error { return syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL) }

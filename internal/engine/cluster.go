@@ -250,7 +250,13 @@ func (a *App) compScript(name, which string) string {
 
 func (a *App) installComponent(name string) error {
 	if state.Has(a.st.Components, name) {
-		return nil
+		if a.componentHealthy(name) {
+			return nil
+		}
+		// Recorded as installed but missing or broken (removed by hand, by a
+		// script pointed at the wrong cluster, or half uninstalled): reinstall.
+		fmt.Printf("component %s is missing or unhealthy; reinstalling it...\n", name)
+		a.st.Components = state.Remove(a.st.Components, name)
 	}
 	script := a.compScript(name, "install.sh")
 	if !fileExists(script) {
@@ -262,6 +268,16 @@ func (a *App) installComponent(name string) error {
 	}
 	a.st.Components = append(a.st.Components, name)
 	return a.save()
+}
+
+// componentHealthy runs the component's optional check.sh (exit 0 = healthy).
+// Components without one are trusted to still be installed.
+func (a *App) componentHealthy(name string) bool {
+	script := a.compScript(name, "check.sh")
+	if !fileExists(script) {
+		return true
+	}
+	return a.runScriptQuiet(script, a.Home+"/base/components/"+name, "check", 60*time.Second) == nil
 }
 
 func (a *App) uninstallComponent(name string) error {
