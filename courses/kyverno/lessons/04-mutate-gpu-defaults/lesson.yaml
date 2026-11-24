@@ -1,0 +1,9 @@
+title: "Mutate: GPU scheduling defaults"
+goal: >
+  Rewrite the ClusterPolicy `gpu-defaults` so that only Pods requesting
+  `nvidia.com/gpu` get the GPU toleration (appended, never duplicated) and a
+  default `nvidia.com/gpu.product: NVIDIA-L4` nodeSelector when they don't
+  pick a GPU type; then get `web`, `chat` and `trainer` onto the right nodes.
+kind: sim
+namespaces: [ml-team]
+concepts: [mutate, patchStrategicMerge, patchesJson6902, "+() add-if-absent anchor", preconditions, list replacement, idempotent patches]

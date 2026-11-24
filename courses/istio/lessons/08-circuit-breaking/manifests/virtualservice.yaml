@@ -1,0 +1,14 @@
+# Retries are switched off so that every failure is visible to the caller.
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: ledger
+  namespace: bank
+spec:
+  hosts: [ledger]
+  http:
+  - name: main
+    route:
+    - destination: {host: ledger}
+    retries:
+      attempts: 0

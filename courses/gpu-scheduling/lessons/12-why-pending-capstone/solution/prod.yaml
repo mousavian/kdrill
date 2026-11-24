@@ -1,0 +1,96 @@
+# --- chat: small LLM on L4s
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: chat, namespace: prod}
+spec:
+  replicas: 2
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: chat}}
+  template:
+    metadata: {labels: {app: chat}}
+    spec:
+      nodeSelector: {nvidia.com/gpu.product: NVIDIA-L4}
+      tolerations:                                   # FIX 1: GPU nodes are tainted
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        resources:
+          requests: {cpu: "4", memory: 16Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+# --- llm: 70B model on a full 8xH100 node
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: llm, namespace: prod}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: llm}}
+  template:
+    metadata: {labels: {app: llm}}
+    spec:
+      nodeSelector: {nvidia.com/gpu.product: NVIDIA-H100-80GB-HBM3}   # FIX 2: exact GFD value
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        resources:
+          requests: {cpu: "32", memory: 256Gi}
+          limits: {nvidia.com/gpu: 8}
+---
+# --- embed: embedding model on 1g.10gb MIG slices of the A100 node
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: embed, namespace: prod}
+spec:
+  replicas: 3
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: embed}}
+  template:
+    metadata: {labels: {app: embed}}
+    spec:
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: tei
+        image: ghcr.io/huggingface/text-embeddings-inference:1.8
+        resources:
+          requests: {cpu: "1", memory: 4Gi}
+          limits: {nvidia.com/mig-1g.10gb: 1}   # FIX 3: the profile the node offers
+---
+# --- vision: one L40S through DRA
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata: {name: l40s-gpu, namespace: prod}
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com   # FIX 4: the DeviceClass that exists
+          selectors:
+          - cel: {expression: 'device.attributes["gpu.nvidia.com"].productName == "NVIDIA L40S"'}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: vision, namespace: prod}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: vision}}
+  template:
+    metadata: {labels: {app: vision}}
+    spec:
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      resourceClaims:
+      - {name: gpu, resourceClaimTemplateName: l40s-gpu}
+      containers:
+      - name: vision
+        image: ghcr.io/example/vision-api:2.0
+        resources:
+          requests: {cpu: "4", memory: 16Gi}
+          claims: [{name: gpu}]

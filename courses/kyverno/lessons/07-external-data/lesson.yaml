@@ -1,0 +1,9 @@
+title: "External data: ConfigMap and API lookups in policies"
+goal: >
+  Replace the hard-coded values in the ClusterPolicy `gpu-access`: GPU Pods
+  are allowed only in namespaces labelled `gpu-access=approved` (looked up
+  with an API call), and the per-Pod GPU maximum comes from the ConfigMap
+  `platform/gpu-policy`.
+kind: sim
+namespaces: [ml-team, web-team, platform]
+concepts: [context, configMap context, apiCall, JMESPath functions, variables in conditions, background false]

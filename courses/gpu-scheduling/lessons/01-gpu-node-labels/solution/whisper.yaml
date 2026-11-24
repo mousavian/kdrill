@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whisper
+spec:
+  replicas: 2
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: whisper}
+  template:
+    metadata:
+      labels: {app: whisper}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nvidia.com/gpu.family
+                operator: In
+                values: [turing, ampere]
+      containers:
+      - name: whisper
+        image: ghcr.io/example/faster-whisper:1.1
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits:
+            nvidia.com/gpu: 1

@@ -1,0 +1,80 @@
+#!/bin/sh
+# ask - send chat completions from inside the cluster and summarise the answers.
+# Installed in the kdrill "client" pod of the inference course:
+#
+#   kubectl exec client -- ask [options] URL
+#
+#   -m MODEL   model name in the request body (default "tiny")
+#   -t N       max_tokens (default 8)
+#   -p TEXT    prompt (default "Say hello.")
+#   -w N       prompt of N words (w1 w2 ... wN); the simulator echoes its prompt, so -w 40 -t 30 yields 30 tokens
+#   -n N       number of requests (default 1)
+#   -c C       run C requests at a time (default 1)
+#   -r HDR     report this response header as WHO (default x-inference-pod)
+#   -s         stream (SSE): report chunks and the time to the first chunk
+#   -v         print one line per request: STATUS WHO TTFB TOTAL
+#   -H 'K: V'  extra request header (repeatable)
+#
+# The summary counts "STATUS WHO" lines, most frequent first:
+#       12 200 sim-7c9f-abc
+#        3 200 sim-7c9f-def
+# WHO is "-" when the header is absent. STATUS 000 means no HTTP answer at all.
+# With -s, each line is "STATUS WHO chunks=N first=SECONDS total=SECONDS".
+m=tiny; t=8; p="Say hello."; n=1; c=1; hdr=x-inference-pod; stream=""; verbose=""; extra=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -m) m="$2"; shift 2 ;;
+    -t) t="$2"; shift 2 ;;
+    -p) p="$2"; shift 2 ;;
+    -w) p="$(awk -v n="$2" 'BEGIN{for(i=1;i<=n;i++) printf "w%d ", i}')"; shift 2 ;;
+    -n) n="$2"; shift 2 ;;
+    -c) c="$2"; shift 2 ;;
+    -r) hdr="$2"; shift 2 ;;
+    -s) stream=1; shift ;;
+    -v) verbose=1; shift ;;
+    -H) extra="$extra
+$2"; shift 2 ;;
+    -h|--help) sed -n '2,22p' "$0"; exit 0 ;;
+    *) break ;;
+  esac
+done
+[ $# -ge 1 ] || { echo "usage: ask [-m MODEL] [-t N] [-p TEXT] [-w N] [-n N] [-c C] [-r HDR] [-s] [-v] [-H 'K: V'] URL" >&2; exit 2; }
+url="$1"; shift
+sflag=false; [ -n "$stream" ] && sflag=true
+body="{\"model\":\"$m\",\"messages\":[{\"role\":\"user\",\"content\":\"$p\"}],\"max_tokens\":$t,\"stream\":$sflag}"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+one() {   # one W  -> prints a result line
+  w="$1"
+  set -- -s -o "$tmp/b$w" -D "$tmp/h$w" -w '%{http_code} %{time_starttransfer} %{time_total}' --max-time 60 \
+    -H 'content-type: application/json' -d "$body"
+  OLDIFS="$IFS"; IFS='
+'
+  for h in $extra; do [ -n "$h" ] && set -- "$@" -H "$h"; done
+  IFS="$OLDIFS"
+  r="$(curl "$@" "$url" 2>/dev/null)"
+  [ -n "$r" ] || r="000 0 0"
+  code="${r%% *}"; rest="${r#* }"; first="${rest%% *}"; total="${rest#* }"
+  who="$(grep -i "^$hdr:" "$tmp/h$w" 2>/dev/null | tail -n 1 | cut -d: -f2- | sed 's/^ *//' | tr -d '\r')"
+  [ -n "$who" ] || who=-
+  if [ -n "$stream" ]; then
+    ch="$(grep -c '^data: {' "$tmp/b$w" 2>/dev/null)"
+    echo "$code $who chunks=${ch:-0} first=$first total=$total"
+  else
+    echo "$code $who $first $total"
+  fi
+  : > "$tmp/b$w"; : > "$tmp/h$w"
+}
+per=$(( (n + c - 1) / c ))
+w=0; left="$n"
+while [ "$w" -lt "$c" ] && [ "$left" -gt 0 ]; do
+  k="$per"; [ "$k" -gt "$left" ] && k="$left"
+  left=$((left - k))
+  (
+    i=0
+    while [ "$i" -lt "$k" ]; do one "$w"; i=$((i + 1)); done > "$tmp/out$w"
+  ) &
+  w=$((w + 1))
+done
+wait
+if [ -n "$verbose" ] || [ -n "$stream" ]; then cat "$tmp"/out*; else cat "$tmp"/out* | awk '{print $1, $2}' | sort | uniq -c | sort -rn; fi

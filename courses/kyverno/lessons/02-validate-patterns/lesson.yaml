@@ -1,0 +1,9 @@
+title: "Validate patterns: tags, registries, resources"
+goal: >
+  Complete the ClusterPolicy `pod-standards`: reject `latest` and untagged
+  images in containers and initContainers, and add a rule that rejects
+  images from unapproved registries with a message naming the offending
+  images, without breaking the existing requests/limits rule.
+kind: sim
+namespaces: [ml-serving]
+concepts: [pattern wildcards, anchors, "=() equality anchor", deny conditions, JMESPath, variables in messages, AnyNotIn]

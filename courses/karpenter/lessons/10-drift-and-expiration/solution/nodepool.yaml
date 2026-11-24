@@ -1,0 +1,22 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default
+spec:
+  template:
+    metadata:
+      labels:
+        fleet: graviton-2026                 # applied to every node of the pool
+    spec:
+      nodeClassRef: {group: karpenter.kwok.sh, kind: KWOKNodeClass, name: default}
+      requirements:
+      - {key: kubernetes.io/arch, operator: In, values: [arm64]}     # was amd64
+      - {key: karpenter.sh/capacity-type, operator: In, values: [on-demand]}
+      - {key: karpenter.k8s.aws/instance-category, operator: In, values: [m]}
+      expireAfter: 168h                      # recycle every node weekly
+      terminationGracePeriod: 1h             # a drain may take at most 1 h, then pods are force-deleted
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 30s
+  limits:
+    cpu: "64"

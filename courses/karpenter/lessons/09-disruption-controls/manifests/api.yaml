@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: pay
+spec:
+  replicas: 3
+  selector:
+    matchLabels: {app: api}
+  template:
+    metadata:
+      labels: {app: api}
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/example/payments-api:4.4
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+# Yesterday's settlement run, now finished (scaled to 0 by setup).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: settlement
+  namespace: pay
+spec:
+  replicas: 12
+  selector:
+    matchLabels: {app: settlement}
+  template:
+    metadata:
+      labels: {app: settlement}
+    spec:
+      containers:
+      - name: settle
+        image: ghcr.io/example/settlement:4.4
+        resources:
+          requests: {cpu: "1", memory: 2Gi}

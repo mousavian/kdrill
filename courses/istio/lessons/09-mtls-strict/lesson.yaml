@@ -1,0 +1,9 @@
+title: "Strict mTLS with PeerAuthentication"
+goal: >
+  Namespace `bank` still accepts plaintext from workloads outside the mesh.
+  Make every workload in `bank` accept only mutual TLS, except the metrics
+  port 9090 of `ledger`, which the legacy monitoring outside the mesh must
+  still be able to scrape. Prove that a plaintext client is rejected.
+kind: real-light
+namespaces: [bank, shop, legacy]
+concepts: [mutual TLS, PeerAuthentication, PERMISSIVE vs STRICT, policy scope, selector, portLevelMtls, workload certificates, SPIFFE]

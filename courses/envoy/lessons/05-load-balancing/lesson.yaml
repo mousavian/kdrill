@@ -1,0 +1,9 @@
+title: "Load balancing policies: sticky users with consistent hashing"
+goal: >
+  The cart service keeps per-user state in memory, so every request of a
+  user (header x-user) must reach the same echo pod, while different users
+  still spread over the pods. Switch the cluster from round robin to a
+  consistent-hash policy and hash on the x-user header.
+namespaces: [lab]
+timeout: 300s
+concepts: [lb_policy, ROUND_ROBIN, LEAST_REQUEST, RING_HASH, MAGLEV, hash_policy, session affinity, RANDOM]

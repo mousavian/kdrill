@@ -1,0 +1,7 @@
+title: Bin-pack GPUs to stop fragmentation
+goal: >
+  The 4-GPU `finetune` pod runs on a fleet where 6 GPUs were free but split
+  across nodes, by scheduling the 1-GPU `chat` pods with the bin-packing
+  scheduler profile `gpu-binpack`.
+kind: sim
+concepts: [GPU fragmentation, scheduler profiles, NodeResourcesFit MostAllocated, schedulerName, multiple schedulers]

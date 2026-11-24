@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: exp-a
+  labels:
+    kueue.x-k8s.io/queue-name: training   # Kueue suspends the Job and admits it when quota allows
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "50"]
+        env:
+        - {name: STEPS, value: "500"}
+        - {name: LR, value: "0.001"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: "1", memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: exp-b
+  labels:
+    kueue.x-k8s.io/queue-name: training
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "50"]
+        env:
+        - {name: STEPS, value: "500"}
+        - {name: LR, value: "0.002"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: "1", memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}

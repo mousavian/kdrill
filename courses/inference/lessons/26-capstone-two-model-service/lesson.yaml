@@ -1,0 +1,10 @@
+title: "Capstone: a two-model service with five planted faults"
+goal: >
+  One gateway serves two models (chat, summarize). It is broken in five independent
+  ways: model routing, load-aware picking, probes, graceful shutdown and autoscaling.
+  Find and fix each (configuration only: not the simulators), until verify's end-to-end
+  checks pass: both models answer, the picker avoids a saturated replica, chat scales
+  out under load, and a rollout under traffic drops nothing.
+namespaces: [lab]
+timeout: 600s
+concepts: [debugging, HTTPRoute ResolvedRefs, endpoint picker wiring, startup/liveness/readiness probes, preStop, terminationGracePeriodSeconds, KEDA ScaledObject, body-based routing, rollouts under load]

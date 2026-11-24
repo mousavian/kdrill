@@ -1,0 +1,39 @@
+# embed: 1 GPU embedding service
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: embed, namespace: ml}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: embed}}
+  template:
+    metadata: {labels: {app: embed}}
+    spec:
+      nodeSelector:
+        karpenter.k8s.aws/instance-gpu-name: l4
+      containers:
+      - name: tei
+        image: ghcr.io/huggingface/text-embeddings-inference:1.8
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+# rerank: 1 GPU reranker; the model needs 16 GB of GPU memory
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: rerank, namespace: ml}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: rerank}}
+  template:
+    metadata: {labels: {app: rerank}}
+    spec:
+      nodeSelector:
+        karpenter.k8s.aws/instance-gpu-name: a100
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: rerank
+        image: ghcr.io/example/reranker:0.4
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits: {nvidia.com/gpu: 1}

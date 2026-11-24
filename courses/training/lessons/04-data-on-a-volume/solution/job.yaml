@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      initContainers:
+      - name: prepare            # runs to completion before train starts
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [prepare, --src, /opt/ml-tiny/datasets/tinyshakespeare.txt.gz, --out, /data]
+        resources:
+          requests: {cpu: 100m, memory: 64Mi}
+          limits: {memory: 256Mi}
+        volumeMounts:
+        - {name: data, mountPath: /data}
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "300", --seed, "1", --log-every, "50"]
+        env:
+        - {name: DATA, value: /data}           # the directory prepare wrote (input.txt + meta.json)
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        volumeMounts:
+        - {name: data, mountPath: /data, readOnly: true}
+      volumes:
+      - name: data
+        persistentVolumeClaim: {claimName: dataset}

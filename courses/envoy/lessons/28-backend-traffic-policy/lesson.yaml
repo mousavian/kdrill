@@ -1,0 +1,8 @@
+title: "BackendTrafficPolicy: sticky load balancing and passive health checks"
+goal: >
+  The cart route needs per-user stickiness (consistent hashing on x-user),
+  and the sick pod behind it must be ejected automatically. Express both in
+  one BackendTrafficPolicy attached to the HTTPRoute cart.
+namespaces: [lab]
+timeout: 300s
+concepts: [BackendTrafficPolicy, loadBalancer, ConsistentHash, LeastRequest, healthCheck.passive, outlier detection, healthCheck.active, circuitBreaker, policy precedence]

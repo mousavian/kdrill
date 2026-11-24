@@ -1,0 +1,8 @@
+title: "Traffic splitting: a 90/10 canary with an opt-in header"
+goal: >
+  Version 2 of the web app is deployed next to version 1 but gets no
+  traffic. Send 10% of requests to web-v2 with weighted clusters, and let
+  testers force v2 with the header x-canary: always.
+namespaces: [lab]
+timeout: 300s
+concepts: [weighted_clusters, canary, header-based routing, runtime_fraction, request_mirror_policies]

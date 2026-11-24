@@ -1,0 +1,49 @@
+# Fixed versions of the three workloads the reports flag. Apply after the policy.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: worker, namespace: team-a}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: worker}}
+  template:
+    metadata: {labels: {app: worker}}
+    spec:
+      containers:
+      - name: worker
+        image: registry.acme.io/worker:3.7.2   # was :latest
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 512Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: cache, namespace: team-a}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: cache}}
+  template:
+    metadata: {labels: {app: cache}}
+    spec:
+      containers:
+      - name: cache
+        image: redis:7.4
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 512Mi}     # was missing
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: embedder, namespace: team-b}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: embedder}}
+  template:
+    metadata: {labels: {app: embedder}}
+    spec:
+      containers:
+      - name: embedder
+        image: registry.acme.io/embedder:1.2.0   # was untagged (= latest)
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 1Gi}

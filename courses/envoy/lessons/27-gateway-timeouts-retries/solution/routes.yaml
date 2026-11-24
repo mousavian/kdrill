@@ -1,0 +1,50 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge
+spec:
+  gatewayClassName: eg
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: api
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["api.lab"]
+  rules:
+  - matches:
+    - path: {type: PathPrefix, value: /api}
+    timeouts:
+      request: 1s                    # whole request, retries included
+    backendRefs:
+    - {name: echo, port: 80}
+  - matches:
+    - path: {type: PathPrefix, value: /reports}
+    timeouts:
+      request: 10s
+    backendRefs:
+    - {name: echo, port: 80}
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: api-retries
+spec:
+  targetRefs:                        # attach to the HTTPRoute (all its rules)
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: api
+  retry:
+    numRetries: 2
+    retryOn:
+      triggers: [connect-failure, retriable-status-codes]
+      httpStatusCodes: [503]
+    perRetry:
+      backOff:
+        baseInterval: 10ms
+        maxInterval: 100ms

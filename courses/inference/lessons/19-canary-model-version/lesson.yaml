@@ -1,0 +1,9 @@
+title: "Canary a new model version by weight"
+goal: >
+  A new model version (v2) was switched on for everybody at once. Put the route
+  back under control: 90% of requests to v1 and 10% to v2, and let testers force
+  v2 with the header `x-canary: always`, so a bad version hurts a few users
+  instead of all of them.
+namespaces: [lab]
+timeout: 300s
+concepts: [weighted backendRefs, canary release, HTTPRoute header match, rule order, traffic splitting, model rollout, rollback]

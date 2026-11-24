@@ -1,0 +1,18 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: api-ratelimit
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: api
+  rateLimit:
+    type: Local
+    local:
+      rules:
+      - clientSelectors:              # gold customers: their own, bigger bucket
+        - headers:
+          - {name: x-plan, value: gold}
+        limit: {requests: 30, unit: Minute}
+      - limit: {requests: 5, unit: Minute}   # no selector: everything else

@@ -1,0 +1,18 @@
+title: Istio service mesh
+description: >
+  A real Istio (1.31) on the k3d node with real containers and real traffic:
+  sidecar injection and what the proxy is made of (listeners, clusters,
+  routes), ingress with the Gateway API, version routing with
+  DestinationRule subsets and VirtualService, weighted canaries, timeouts
+  and retries, fault injection, circuit breaking and outlier detection,
+  strict mTLS, AuthorizationPolicy, JWT authentication at the gateway,
+  access logs and metrics with the Telemetry API, ambient mode (ztunnel and
+  a waypoint), and a debugging capstone. Lessons 01-12 and 14 use sidecars;
+  lesson 13 uses ambient mode. verify sends real requests from curl pods in
+  the cluster and checks status codes, which version answered, headers and
+  ratios. The course installs the pinned istioctl into the kdrill state
+  directory (~/.kdrill/bin/istioctl). Each lesson's cleanup also deletes any
+  Istio policy or routing object left in istio-system.
+kind: real-light
+components: [istio]
+requires: [k8s-scheduling]

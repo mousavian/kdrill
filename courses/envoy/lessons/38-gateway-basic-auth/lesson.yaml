@@ -1,0 +1,9 @@
+title: "SecurityPolicy: basic auth for one route"
+goal: >
+  The admin pages under /admin on shop.lab are open to anyone. Protect only
+  the admin HTTPRoute with HTTP basic auth (user ops, password kdrill-ops,
+  stored as an htpasswd Secret) and pass the user name to the backend in
+  x-user. The web route stays open.
+namespaces: [lab]
+timeout: 300s
+concepts: [SecurityPolicy, basicAuth, htpasswd Secret, "{SHA} hashes", 401 vs 403, WWW-Authenticate, forwardUsernameHeader, policy targetRefs]

@@ -1,0 +1,12 @@
+{
+  "keys": [
+    {
+      "kty": "RSA",
+      "alg": "RS256",
+      "use": "sig",
+      "kid": "kdrill-2026",
+      "n": "ksIgXX0IF6o4ulActtbtZl12hk7dG8RAvfUPPpOnc1NrFF_Hx7BtLLJeWAFjlM1-JCYQTa3kste9NkteGVPQht7Py2-_VEBoDAQFZxyZB7Z1Vstt1jC77h58Ewf_6Vjdfuic3IqhtvL9lfRqriUqX_qp3TUilAwsSmadk-TdFdV3F7THzMEcrRVCTlqdypteJClYQPAn1d2zQvzsYle6w3X0ZWK_4Y2EZb0sIBuILRc8nD_Qs2RKFcmnKsYVukx480Tw_0BZot6dw41hXjG4sgJpx-UfG3VFkzP3tPEK86gATwm_ig9k262UZqIgPEmF0D-bN1ocswQU-8VCSutJpQ",
+      "e": "AQAB"
+    }
+  ]
+}

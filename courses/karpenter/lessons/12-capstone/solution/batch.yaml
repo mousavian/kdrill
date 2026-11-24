@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: crunch, namespace: batch}
+spec:
+  replicas: 6
+  selector: {matchLabels: {app: crunch}}
+  template:
+    metadata: {labels: {app: crunch}}
+    spec:
+      # FIX 5: no capacity-type pin. The spot pool (weight 50) is still tried
+      # first; when its 8-CPU limit is used up, the general pool takes the rest.
+      tolerations:
+      - {key: spot, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: crunch
+        image: ghcr.io/example/crunch:3.0
+        resources:
+          requests: {cpu: "2", memory: 4Gi}

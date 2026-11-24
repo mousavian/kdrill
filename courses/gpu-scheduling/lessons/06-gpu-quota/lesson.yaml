@@ -1,0 +1,8 @@
+title: Cap each team's GPUs with ResourceQuota
+goal: >
+  Namespaces `team-a` and `team-b` each have a ResourceQuota `gpu-quota`
+  limiting `requests.nvidia.com/gpu` to 4, team-a's `sweep` is brought down to
+  its share, and team-b's `serve` runs.
+kind: sim
+namespaces: [team-a, team-b]
+concepts: [ResourceQuota, requests.nvidia.com/gpu, quota vs running pods, FailedCreate]

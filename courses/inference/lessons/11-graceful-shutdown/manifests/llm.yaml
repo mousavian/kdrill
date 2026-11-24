@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+  labels: {app: llm}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm, llm-d.ai/engine-type: vllm}
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: sim
+        image: ghcr.io/llm-d/llm-d-inference-sim@sha256:9992453829c0dea8d120b8e0322bb0e4237cbb3c6d9ea3bdce060410c40c91c9
+        # an answer takes about 4.5 s: 0.5 s to the first token + 20 tokens x 200 ms
+        args: [--model, tiny, --mode, echo, --port, "8000", --max-num-seqs, "4", --time-to-first-token, 500ms, --inter-token-latency, 200ms]
+        env:
+        - {name: POD_NAME, valueFrom: {fieldRef: {fieldPath: metadata.name}}}
+        - {name: POD_IP, valueFrom: {fieldRef: {fieldPath: status.podIP}}}
+        ports:
+        - {name: http, containerPort: 8000}
+        readinessProbe:
+          httpGet: {path: /health/ready, port: http}
+          periodSeconds: 2
+        resources:
+          requests: {cpu: 10m, memory: 24Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm
+spec:
+  selector: {app: llm}
+  ports:
+  - {name: http, port: 80, targetPort: http}

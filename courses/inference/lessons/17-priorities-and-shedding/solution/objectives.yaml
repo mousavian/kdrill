@@ -1,0 +1,17 @@
+apiVersion: llm-d.ai/v1
+kind: InferenceObjective
+metadata:
+  name: chat
+spec:
+  priority: 100
+  poolRefs:
+  - {name: pool, group: inference.networking.k8s.io, kind: InferencePool}
+---
+apiVersion: llm-d.ai/v1
+kind: InferenceObjective
+metadata:
+  name: batch
+spec:
+  priority: -10
+  poolRefs:
+  - {name: pool, group: inference.networking.k8s.io, kind: InferencePool}

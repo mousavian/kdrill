@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: notebook, namespace: research}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: notebook}}
+  template:
+    metadata: {labels: {app: notebook}}
+    spec:
+      containers:
+      - {name: jupyter, image: quay.io/jupyter/pytorch-notebook:2025-01-20, resources: {requests: {cpu: "1", memory: 2Gi}}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: finetune, namespace: research}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: finetune}}
+  template:
+    metadata: {labels: {app: finetune}}
+    spec:
+      containers:
+      - {name: trainer, image: nvcr.io/nvidia/pytorch:25.01-py3, resources: {requests: {cpu: "2", memory: 4Gi}}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: chat, namespace: inference}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: chat}}
+  template:
+    metadata: {labels: {app: chat}}
+    spec:
+      containers:
+      - {name: vllm, image: vllm/vllm-openai:v0.11.0, resources: {requests: {cpu: "1", memory: 2Gi}}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: scratch, namespace: sandbox}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: scratch}}
+  template:
+    metadata: {labels: {app: scratch}}
+    spec:
+      containers:
+      - {name: shell, image: busybox:1.37, resources: {requests: {cpu: 100m, memory: 64Mi}}}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: {name: vector-db, namespace: inference}
+spec:
+  replicas: 1
+  serviceName: vector-db
+  selector: {matchLabels: {app: vector-db}}
+  template:
+    metadata: {labels: {app: vector-db}}
+    spec:
+      containers:
+      - {name: qdrant, image: qdrant/qdrant:v1.13.0, resources: {requests: {cpu: 500m, memory: 1Gi}}}

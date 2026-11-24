@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embed
+spec:
+  replicas: 8
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: embed}
+  template:
+    metadata:
+      labels: {app: embed}
+    spec:
+      containers:
+      - name: tei
+        image: ghcr.io/huggingface/text-embeddings-inference:1.8
+        args: ["--model-id", "BAAI/bge-large-en-v1.5"]   # needs ~3 GB of GPU memory
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits:
+            nvidia.com/gpu: 1

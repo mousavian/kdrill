@@ -1,0 +1,9 @@
+title: "Capstone: why is my GPU workload not running?"
+goal: >
+  Six GPU workloads across `prod` and `research` are stuck, each for a
+  different reason (taints, labels, MIG profiles, DRA, Kueue, quota). Diagnose
+  and fix every one of them without touching the fleet, quotas or queues.
+kind: sim
+namespaces: [prod, research]
+timeout: 240s
+concepts: [debugging Pending pods, FailedScheduling, FailedCreate, Kueue inadmissible workloads, DRA allocation failures]

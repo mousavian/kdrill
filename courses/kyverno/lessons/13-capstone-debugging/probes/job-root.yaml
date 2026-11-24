@@ -1,0 +1,10 @@
+apiVersion: batch/v1
+kind: Job
+metadata: {name: probe-backfill}
+spec:
+  template:
+    metadata: {labels: {owner: team-payments}}
+    spec:
+      restartPolicy: Never
+      containers:
+      - {name: c, image: registry.acme.io/payments/reconcile:1.0.0}

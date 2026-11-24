@@ -1,0 +1,9 @@
+title: "Bridge to AI inference routing: endpoint picking"
+goal: >
+  Prepare the llm route for an inference endpoint picker: let a header
+  (x-gateway-destination-endpoint) choose the exact model-server pod, fall
+  back to least-request balancing when the header is missing or names a pod
+  outside the pool, with a BackendTrafficPolicy on the HTTPRoute.
+namespaces: [lab]
+timeout: 300s
+concepts: [Gateway API Inference Extension, InferencePool, endpoint picker (EPP), ext_proc, x-gateway-destination-endpoint, override_host load balancing, endpointOverride, LeastRequest, body-based routing, Envoy AI Gateway, token rate limits]

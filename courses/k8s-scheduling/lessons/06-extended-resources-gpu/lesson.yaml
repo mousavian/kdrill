@@ -1,0 +1,6 @@
+title: Give the LLM its GPUs
+goal: >
+  Each `llm` pod requests 2 GPUs (`nvidia.com/gpu`) and all 3 replicas run on
+  the GPU nodes, which stay tainted.
+kind: sim
+concepts: [extended resources, nvidia.com/gpu, GPU node taints, device capacity]

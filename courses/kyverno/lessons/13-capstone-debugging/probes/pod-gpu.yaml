@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-gpu, labels: {app: probe, owner: team-risk}}
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+  - name: model
+    image: registry.acme.io/risk/fraud-model:1.8.0
+    resources: {limits: {nvidia.com/gpu: 1}}

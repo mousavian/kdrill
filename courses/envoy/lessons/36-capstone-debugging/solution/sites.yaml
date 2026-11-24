@@ -1,0 +1,113 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: edge
+  namespace: lab
+spec:
+  gatewayClassName: eg
+  listeners:
+  - name: http
+    protocol: HTTP
+    port: 80
+---
+# 1. www.lab -> web
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: web
+  namespace: lab
+spec:
+  parentRefs: [{name: edge, sectionName: http}]    # FIX 1: the listener is called http
+  hostnames: ["www.lab"]
+  rules:
+  - backendRefs: [{name: web, port: 80}]
+---
+# 2. api.lab -> api (2 pods)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: api
+  namespace: lab
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["api.lab"]
+  rules:
+  - backendRefs: [{name: api, port: 80}]              # FIX 2: the Service port is 80
+---
+# 3. pay.lab -> the pay Service of the payments team (namespace payments)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: pay
+  namespace: lab
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["pay.lab"]
+  rules:
+  - backendRefs: [{name: pay, namespace: payments, port: 80}]
+---
+# 4. reports.lab -> reports
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: reports
+  namespace: lab
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["reports.lab"]
+  rules:
+  - backendRefs: [{name: reports, port: 80}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reports
+  namespace: lab
+spec:
+  selector: {app: reports}                          # FIX 4: the pods are labelled app=reports
+  ports:
+  - {name: http, port: 80, targetPort: http}
+---
+# 5. checkout.lab -> checkout, actively health-checked
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: checkout
+  namespace: lab
+spec:
+  parentRefs: [{name: edge}]
+  hostnames: ["checkout.lab"]
+  rules:
+  - backendRefs: [{name: checkout, port: 80}]
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: checkout-health
+  namespace: lab
+spec:
+  targetRefs:
+  - {group: gateway.networking.k8s.io, kind: HTTPRoute, name: checkout}
+  healthCheck:
+    panicThreshold: 0              # never send traffic to unhealthy hosts
+    active:
+      type: HTTP
+      interval: 2s
+      timeout: 1s
+      unhealthyThreshold: 2
+      healthyThreshold: 1
+      http:
+        path: /health
+        expectedStatuses: [200]                    # FIX 5: /health answers 200
+---
+# FIX 3: the payments team allows HTTPRoutes from lab to reference its Services
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-lab-routes
+  namespace: payments
+spec:
+  from:
+  - {group: gateway.networking.k8s.io, kind: HTTPRoute, namespace: lab}
+  to:
+  - {group: "", kind: Service, name: pay}

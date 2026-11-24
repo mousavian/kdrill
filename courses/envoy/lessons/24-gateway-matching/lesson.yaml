@@ -1,0 +1,9 @@
+title: "HTTPRoute matching: paths, headers, methods, query params, precedence"
+goal: >
+  Extend the HTTPRoutes so api.lab requests reach api-v1, api-v2 or orders
+  by path, header, method and query parameter, and every other *.lab host
+  reaches web, exactly as the routing table says. Gateway API precedence,
+  not rule order, decides.
+namespaces: [lab]
+timeout: 300s
+concepts: [HTTPRouteMatch, PathPrefix vs Exact vs RegularExpression, header matches, method matches, queryParams, match precedence, wildcard hostnames, hostname precedence]

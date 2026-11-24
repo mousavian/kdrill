@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-cpu, namespace: ml-team}
+spec:
+  nodeSelector: {kubernetes.io/os: linux}
+  containers:
+  - {name: web, image: nginx:1.27}

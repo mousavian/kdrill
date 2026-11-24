@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: embed
+  labels: {app: embed}
+spec:
+  replicas: 6
+  selector:
+    matchLabels: {app: embed}
+  template:
+    metadata:
+      labels: {app: embed}
+      annotations:
+        # BAAI/bge-m3 (568M parameters, 16-bit) plus runtime: needs about 9 GB of GPU memory
+        kdrill.dev/model-gpu-memory: "9Gi"
+    spec:
+      containers:
+      - name: server
+        image: ghcr.io/huggingface/text-embeddings-inference:1.8
+        args: [--model-id, BAAI/bge-m3]
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits: {nvidia.com/mig-1g.10gb: 1}

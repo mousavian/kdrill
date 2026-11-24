@@ -1,0 +1,121 @@
+# 1. Every Pod in a prod namespace (label env=prod) has a non-empty owner label.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-owner-label
+spec:
+  background: true
+  rules:
+  - name: owner-label
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels: {env: prod}
+    validate:
+      failureAction: Enforce            # FIX 1: was Audit (report only)
+      message: "Pods in prod namespaces need a non-empty owner label"
+      pattern:
+        metadata:
+          labels:
+            owner: "?*"
+---
+# 2. In prod namespaces, every container image comes from registry.acme.io.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: restrict-registries
+spec:
+  background: true
+  rules:
+  - name: acme-registry
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels: {env: prod}     # FIX 2: the namespaces are labelled env, not environment
+    validate:
+      failureAction: Enforce
+      message: "images must come from registry.acme.io"
+      pattern:
+        spec:
+          =(initContainers):
+          - image: "registry.acme.io/*"
+          containers:
+          - image: "registry.acme.io/*"
+---
+# 3. Pods in prod namespaces set spec.securityContext.runAsNonRoot: true.
+#    Deployments, Jobs and CronJobs with such Pod templates are rejected
+#    when they are applied.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-run-as-nonroot
+  # FIX 3: the autogen-controllers: Deployment annotation is gone, so Jobs,
+  # CronJobs (and StatefulSets, DaemonSets, ...) are checked at apply time too.
+spec:
+  background: true
+  rules:
+  - name: run-as-nonroot
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels: {env: prod}
+    validate:
+      failureAction: Enforce
+      message: "Pods in prod namespaces must set runAsNonRoot"
+      pattern:
+        spec:
+          securityContext:              # FIX 4: no =( ) anchors - the fields are required,
+            runAsNonRoot: true          #        not "must match if present"
+---
+# 4. GPU Pods (any container with a nvidia.com/gpu limit) are labelled
+#    scheduling.acme.io/tier=gpu, and every Pod with that label gets the
+#    GPU node toleration.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: gpu-tier
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: none
+spec:
+  rules:
+  # FIX 5: rules run in order, each on the result of the previous one.
+  # Label first, then the rule that looks at the label.
+  - name: label-gpu-tier
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    preconditions:
+      all:
+      - key: "{{ request.object.spec.containers[].resources.limits.\"nvidia.com/gpu\" || `[]` | length(@) }}"
+        operator: GreaterThan
+        value: 0
+    mutate:
+      patchStrategicMerge:
+        metadata:
+          labels:
+            scheduling.acme.io/tier: gpu
+  - name: tolerate-gpu-tier
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    preconditions:
+      all:
+      - key: "{{ request.object.metadata.labels.\"scheduling.acme.io/tier\" || '' }}"
+        operator: Equals
+        value: gpu
+      - key: "{{ request.object.spec.tolerations[?key == 'nvidia.com/gpu'] || `[]` | length(@) }}"
+        operator: Equals
+        value: 0
+    mutate:
+      patchesJson6902: |-
+        - op: add
+          path: /spec/tolerations/-
+          value: {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}

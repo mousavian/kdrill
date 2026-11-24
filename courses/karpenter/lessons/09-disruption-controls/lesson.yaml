@@ -1,0 +1,10 @@
+title: Disruption controls before you turn consolidation on
+goal: >
+  Consolidation is paused on NodePool `default`. Before switching it on,
+  protect the singleton `ledger` pod with `karpenter.sh/do-not-disrupt`, give
+  `api` a PodDisruptionBudget, and add disruption budgets to the NodePool;
+  then enable consolidation and let Karpenter shrink the fleet around them.
+kind: sim
+namespaces: [pay]
+timeout: 240s
+concepts: [karpenter.sh/do-not-disrupt, PodDisruptionBudget, disruption budgets, budget schedules and reasons, consolidateAfter Never]

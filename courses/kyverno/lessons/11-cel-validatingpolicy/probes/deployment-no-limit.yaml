@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: probe-no-limit}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: probe-no-limit}}
+  template:
+    metadata: {labels: {app: probe-no-limit}}
+    spec:
+      containers:
+      - {name: server, image: registry.acme.io/ml/ranker:3.2.1}

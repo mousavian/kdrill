@@ -1,0 +1,9 @@
+title: "Authorization with the RBAC filter (and JWT claims)"
+goal: >
+  Everyone with a valid token can currently do everything. Add Envoy's RBAC
+  filter so that /public/ stays open, any authenticated user may read
+  (GET/HEAD) outside /api/admin/, and only tokens with role admin may write
+  or touch /api/admin/.
+namespaces: [lab]
+timeout: 300s
+concepts: [RBAC filter, ALLOW/DENY, policies, permissions, principals, and_rules, or_rules, not_rule, metadata principal, payload_in_metadata, shadow_rules, ext_authz]

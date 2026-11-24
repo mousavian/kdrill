@@ -1,0 +1,35 @@
+# Which nodes this quota stands for: Kueue adds these labels as a
+# nodeSelector to the pods it admits under this flavor.
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: a100
+spec:
+  nodeLabels:
+    nvidia.com/gpu.product: NVIDIA-A100-SXM4-80GB
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: ml-cq
+spec:
+  namespaceSelector: {}          # null would admit from NO namespace
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu]   # every resource the pods request
+    flavors:
+    - name: a100
+      resources:
+      - name: cpu
+        nominalQuota: 64
+      - name: memory
+        nominalQuota: 512Gi
+      - name: nvidia.com/gpu
+        nominalQuota: 8
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: ml-team
+  namespace: ml-team
+spec:
+  clusterQueue: ml-cq

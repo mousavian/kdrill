@@ -1,0 +1,9 @@
+title: "Hyperparameters in a ConfigMap, reproducible with a seed"
+goal: >
+  Two Jobs meant to be the same experiment give different results, and their
+  hyperparameters are buried in command lines. Move the hyperparameters into a
+  ConfigMap `hparams` that both Jobs load, fix the seed, and make the two runs
+  reproduce the same final loss.
+namespaces: [train]
+timeout: 240s
+concepts: [ConfigMap, envFrom, environment variables vs arguments, random seed, reproducibility, immutable Job templates]

@@ -1,0 +1,12 @@
+# GPU Pod that already tolerates another taint and picks no GPU type.
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-gpu, namespace: ml-team}
+spec:
+  tolerations:
+  - {key: dedicated, operator: Equal, value: ml, effect: NoSchedule}
+  containers:
+  - name: model
+    image: vllm/vllm-openai:v0.11.0
+    resources:
+      limits: {nvidia.com/gpu: 1}

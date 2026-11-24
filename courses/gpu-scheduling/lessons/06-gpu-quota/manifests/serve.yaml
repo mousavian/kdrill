@@ -1,0 +1,21 @@
+# team-b: model serving
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serve
+  namespace: team-b
+spec:
+  replicas: 3
+  selector:
+    matchLabels: {app: serve}
+  template:
+    metadata:
+      labels: {app: serve}
+    spec:
+      containers:
+      - name: triton
+        image: nvcr.io/nvidia/tritonserver:25.01-py3
+        resources:
+          requests: {cpu: "4", memory: 16Gi}
+          limits:
+            nvidia.com/gpu: 1

@@ -1,0 +1,70 @@
+# --- catalog: beta users (x-beta: true) get v2, everyone else v1 ---------
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: catalog
+  namespace: shop
+spec:
+  host: catalog
+  subsets:
+  - name: v1
+    labels: {version: v1}
+  - name: v2
+    labels: {version: v2}
+---
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: catalog
+  namespace: shop
+spec:
+  hosts: [catalog]
+  http:
+  - name: beta
+    match:
+    - headers: {x-beta: {exact: "true"}}
+    route:
+    - destination: {host: catalog, subset: v2}
+  - name: default
+    route:
+    - destination: {host: catalog, subset: v1}
+---
+# --- payments: only mTLS, only the gateway and web may call it -----------
+apiVersion: security.istio.io/v1
+kind: PeerAuthentication
+metadata:
+  name: default
+  namespace: shop
+spec:
+  mtls:
+    mode: STRICT
+---
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: payments
+  namespace: shop
+spec:
+  host: payments
+  trafficPolicy:
+    connectionPool:
+      http:
+        http1MaxPendingRequests: 50
+    # FIX 3: "tls: {mode: DISABLE}" made callers send plaintext to a STRICT
+    # server. Removed: auto mTLS picks ISTIO_MUTUAL by itself.
+---
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: payments
+  namespace: shop
+spec:
+  selector:
+    matchLabels: {app: payments}
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals:
+        - cluster.local/ns/shop/sa/web
+        - cluster.local/ns/shop/sa/shop-gateway-istio   # FIX 4: the gateway's ServiceAccount (was shop-gateway)

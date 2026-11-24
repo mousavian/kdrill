@@ -1,0 +1,8 @@
+title: Your first NodePool
+goal: >
+  Four `web` pods are Pending because no node can take them. Create the
+  NodePool `default` so Karpenter launches on-demand amd64 nodes for them, and
+  record which instance type it picked.
+kind: sim
+namespaces: [shop]
+concepts: [Karpenter, NodePool, KWOKNodeClass, NodeClaim, provisioning, pending pods]

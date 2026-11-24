@@ -1,0 +1,20 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: chat
+spec:
+  scaleTargetRef: {name: chat}
+  minReplicaCount: 2
+  maxReplicaCount: 5
+  pollingInterval: 5
+  advanced:
+    horizontalPodAutoscalerConfig:
+      behavior:
+        scaleDown: {stabilizationWindowSeconds: 15}
+  triggers:
+  - type: metrics-api
+    metadata:
+      url: http://aggregator.lab.svc.cluster.local/
+      valueLocation: inflight
+      targetValue: "3"
+      format: json

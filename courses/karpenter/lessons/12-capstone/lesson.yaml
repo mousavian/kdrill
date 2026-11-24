@@ -1,0 +1,9 @@
+title: "Capstone: why won't Karpenter do what I want?"
+goal: >
+  Five workloads across `prod`, `ml` and `batch` are Pending, over-provisioned
+  or blocking a fleet update, each for a different Karpenter-related reason.
+  Diagnose and fix every one without touching the NodePools.
+kind: sim
+namespaces: [prod, ml, batch]
+timeout: 300s
+concepts: [debugging Karpenter, FailedScheduling from karpenter, NodeClaims and events, limits, taints, do-not-disrupt, drift, GPU right-sizing]

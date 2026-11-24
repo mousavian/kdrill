@@ -1,0 +1,14 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: llm-endpoint-picking
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: llm
+  loadBalancer:
+    type: LeastRequest                 # the fallback: fewest outstanding requests
+    endpointOverride:                  # ... unless the request names an endpoint
+      extractFrom:
+      - header: x-gateway-destination-endpoint

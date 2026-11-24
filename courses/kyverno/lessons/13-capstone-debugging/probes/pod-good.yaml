@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-good, labels: {app: probe, owner: team-payments}}
+spec:
+  securityContext: {runAsNonRoot: true}
+  containers:
+  - {name: c, image: registry.acme.io/payments/checkout:5.2.0}

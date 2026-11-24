@@ -1,0 +1,9 @@
+title: "Graceful preemption: a last checkpoint on SIGTERM"
+goal: >
+  When the training pod is evicted it is killed before it can save, and the
+  next pod repeats hundreds of steps. Let SIGTERM reach the trainer and give it
+  enough time to write a final checkpoint, so the next pod continues from the
+  exact step where the eviction happened.
+namespaces: [train]
+timeout: 240s
+concepts: [SIGTERM, terminationGracePeriodSeconds, PID 1 and signals, exec form vs shell form, eviction, spot instances, checkpoint on preemption]

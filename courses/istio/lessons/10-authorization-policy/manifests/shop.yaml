@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: web
+  namespace: shop
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin
+  namespace: shop
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scanner
+  namespace: shop
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: web}
+  template:
+    metadata:
+      labels: {app: web}
+    spec:
+      serviceAccountName: web
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: curl
+        image: curlimages/curl:8.23.0
+        command: [sleep, infinity]
+        resources:
+          requests: {cpu: 5m, memory: 8Mi}
+          limits: {memory: 32Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin
+  namespace: shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: admin}
+  template:
+    metadata:
+      labels: {app: admin}
+    spec:
+      serviceAccountName: admin
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: curl
+        image: curlimages/curl:8.23.0
+        command: [sleep, infinity]
+        resources:
+          requests: {cpu: 5m, memory: 8Mi}
+          limits: {memory: 32Mi}
+---
+# A vulnerability scanner: must not reach the ledger.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scanner
+  namespace: shop
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: scanner}
+  template:
+    metadata:
+      labels: {app: scanner}
+    spec:
+      serviceAccountName: scanner
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: curl
+        image: curlimages/curl:8.23.0
+        command: [sleep, infinity]
+        resources:
+          requests: {cpu: 5m, memory: 8Mi}
+          limits: {memory: 32Mi}

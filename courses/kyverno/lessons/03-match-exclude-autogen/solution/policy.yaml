@@ -1,0 +1,31 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-run-as-nonroot
+  # autogen annotation removed: Kyverno now also checks Deployments, Jobs, ...
+spec:
+  # Rules that look at who sends the request (subjects, roles, userInfo) can't
+  # run in background scans: a stored object has no requester.
+  background: false
+  rules:
+  - name: run-as-nonroot
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels:
+              env: prod
+    exclude:
+      any:
+      - subjects:
+        - kind: ServiceAccount
+          name: backup-agent
+          namespace: prod
+    validate:
+      failureAction: Enforce
+      message: "prod Pods must run as non-root (spec.securityContext.runAsNonRoot=true)"
+      pattern:
+        spec:
+          securityContext:
+            runAsNonRoot: true

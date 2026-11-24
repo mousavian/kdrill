@@ -1,0 +1,8 @@
+title: "Gang admission: a JobSet is queued whole"
+goal: >
+  Two 2-worker JobSets run at once on a quota meant for one. Queue both
+  through Kueue so that each is admitted as a single Workload with all its
+  workers, or waits with none of them.
+namespaces: [train]
+timeout: 240s
+concepts: [gang admission, Kueue JobSet integration, Workload podSets, all-or-nothing, queue-name on the JobSet]

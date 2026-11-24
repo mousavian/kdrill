@@ -1,0 +1,10 @@
+title: "Rolling out a new model version when capacity is scarce"
+goal: >
+  A new model version is stuck: the namespace has room for exactly four model pods
+  and the default rolling update wants a fifth (surge) pod first. Change the update
+  strategy so that the rollout completes without extra capacity and without ever
+  dropping below three ready replicas, add a PodDisruptionBudget that protects the
+  same floor, and make new replicas prove themselves before the next old one goes.
+namespaces: [lab]
+timeout: 300s
+concepts: [RollingUpdate, maxSurge, maxUnavailable, ResourceQuota, PodDisruptionBudget, minReadySeconds, rollout status, scarce GPUs]

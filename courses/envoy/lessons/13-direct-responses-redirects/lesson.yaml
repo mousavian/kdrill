@@ -1,0 +1,9 @@
+title: "Direct responses and redirects: answers without a backend"
+goal: >
+  Let Envoy answer some requests itself: a /healthz endpoint, a permanent
+  redirect from old.lab to https://new.lab, a /blog to /news redirect, and a
+  friendly 404 page for unknown sites, while everything else on new.lab
+  still reaches the web backend.
+namespaces: [lab]
+timeout: 300s
+concepts: [direct_response, redirect, https_redirect, scheme_redirect, host_redirect, prefix_rewrite redirect, response_code, catch-all virtual host]

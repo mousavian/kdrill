@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  completions: 1          # one successful pod = done (the default)
+  backoffLimit: 2         # retry a failed pod at most twice
+  template:
+    metadata:
+      labels: {app: train}
+    spec:
+      restartPolicy: Never   # a Job pod must not use Always
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "400", --seed, "1", --log-every, "50"]
+        env:
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 500m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}

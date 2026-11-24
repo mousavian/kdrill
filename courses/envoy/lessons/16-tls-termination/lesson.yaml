@@ -1,0 +1,8 @@
+title: "TLS termination with SNI: two sites, two certificates"
+goal: >
+  Serve shop.lab and api.lab over HTTPS on port 10443, each with its own
+  certificate chosen by SNI, negotiate HTTP/2 via ALPN, and redirect plain
+  HTTP on port 10000 to HTTPS.
+namespaces: [lab]
+timeout: 300s
+concepts: [DownstreamTlsContext, transport_socket, filter_chain_match, server_names, SNI, tls_inspector, ALPN, https_redirect, certificates]

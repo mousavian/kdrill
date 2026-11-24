@@ -1,0 +1,9 @@
+title: "The admin interface: what is Envoy actually doing?"
+goal: >
+  Envoy serves three sites by Host header (shop.lab, catalog.lab, api.lab)
+  and each one fails differently. Use the admin interface (/clusters,
+  /config_dump, /stats) to find out why, and fix the Envoy config so that
+  all three answer 200 from their own backend for any path.
+namespaces: [lab]
+timeout: 300s
+concepts: [admin interface, /clusters, /config_dump, /stats, response flags, UF, UH, NR, no healthy upstream]

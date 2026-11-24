@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: shakespeare-v2
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "2", --log-every, "50"]
+        env:
+        - {name: STEPS, value: "600"}
+        - {name: CKPT_DIR, value: /ckpt}
+        - {name: CKPT_EVERY, value: "50"}
+        - {name: CKPT_KEEP, value: "0"}        # 0 = keep every checkpoint
+        - {name: OMP_NUM_THREADS, value: "2"}
+        resources:
+          requests: {cpu: "1", memory: 512Mi}
+          limits: {cpu: "2", memory: 768Mi}
+        volumeMounts:
+        - {name: ckpt, mountPath: /ckpt}
+        - {name: models, mountPath: /models}
+      volumes:
+      - name: ckpt
+        persistentVolumeClaim: {claimName: checkpoints}
+      - name: models
+        persistentVolumeClaim: {claimName: models}

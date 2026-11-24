@@ -1,0 +1,10 @@
+title: "Replicas on GPU nodes: one GPU per replica, and fragmentation"
+kind: sim
+goal: >
+  A small fleet of two 4-GPU nodes should run six 1-GPU replicas of an 8B model
+  and one 70B replica that needs 4 GPUs on a single node. The 70B pod is Pending
+  although 2 GPUs are free in total. Understand why and rearrange the workloads
+  (not the fleet) so that every pod runs and no GPU is overbooked.
+namespaces: [lab]
+timeout: 120s
+concepts: [nvidia.com/gpu extended resource, whole GPUs, tensor parallelism, fragmentation, Pending reasons, nodeSelector, scheduler spreading, capacity planning]

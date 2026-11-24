@@ -1,0 +1,21 @@
+# team-a: hyper-parameter sweep, one trial per GPU
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sweep
+  namespace: team-a
+spec:
+  replicas: 8
+  selector:
+    matchLabels: {app: sweep}
+  template:
+    metadata:
+      labels: {app: sweep}
+    spec:
+      containers:
+      - name: trial
+        image: ghcr.io/example/sweep-trial:2.3
+        resources:
+          requests: {cpu: "4", memory: 16Gi}
+          limits:
+            nvidia.com/gpu: 1

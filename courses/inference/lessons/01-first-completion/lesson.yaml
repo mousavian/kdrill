@@ -1,0 +1,9 @@
+title: "First completion: a model server behind a Service"
+goal: >
+  The Deployment `llm` runs llama.cpp's server with a 135M-parameter model, but
+  it never becomes ready and the Service `llm` has nothing behind it. Fix it so
+  that a chat completion sent to http://llm/v1/chat/completions from the client
+  pod returns generated text.
+namespaces: [lab]
+timeout: 240s
+concepts: [llama.cpp server, OpenAI-compatible API, /v1/chat/completions, hostPath weights, containerPort vs Service targetPort, CrashLoopBackOff]

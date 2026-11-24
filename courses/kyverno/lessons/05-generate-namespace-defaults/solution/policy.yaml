@@ -1,0 +1,62 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: tenant-defaults
+spec:
+  rules:
+  - name: default-deny
+    match:
+      any:
+      - resources:
+          kinds: [Namespace]
+          selector:
+            matchExpressions:
+            - {key: tenant, operator: Exists}
+    generate:
+      generateExisting: true          # also for namespaces that already exist
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      name: default-deny
+      namespace: "{{ request.object.metadata.name }}"
+      synchronize: true               # re-create / revert it if someone changes it
+      data:
+        spec:
+          podSelector: {}
+          policyTypes: [Ingress]
+  - name: gpu-quota
+    match:
+      any:
+      - resources:
+          kinds: [Namespace]
+          selector:
+            matchExpressions:
+            - {key: tenant, operator: Exists}
+    generate:
+      generateExisting: true
+      apiVersion: v1
+      kind: ResourceQuota
+      name: gpu-quota
+      namespace: "{{ request.object.metadata.name }}"
+      synchronize: true
+      data:
+        spec:
+          hard:
+            requests.nvidia.com/gpu: "4"
+  - name: ca-bundle
+    match:
+      any:
+      - resources:
+          kinds: [Namespace]
+          selector:
+            matchExpressions:
+            - {key: tenant, operator: Exists}
+    generate:
+      generateExisting: true
+      apiVersion: v1
+      kind: ConfigMap
+      name: ca-bundle
+      namespace: "{{ request.object.metadata.name }}"
+      synchronize: true               # with clone: changes to the source propagate
+      clone:
+        namespace: platform
+        name: ca-bundle

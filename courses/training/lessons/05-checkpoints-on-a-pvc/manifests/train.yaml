@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "600", --seed, "1", --log-every, "50"]
+        env:
+        - {name: CKPT_DIR, value: /ckpt}
+        - {name: CKPT_EVERY, value: "100"}
+        - {name: OMP_NUM_THREADS, value: "2"}
+        resources:
+          requests: {cpu: "1", memory: 512Mi}
+          limits: {cpu: "2", memory: 768Mi}
+        volumeMounts:
+        - {name: ckpt, mountPath: /ckpt}
+      volumes:
+      - name: ckpt
+        emptyDir: {}

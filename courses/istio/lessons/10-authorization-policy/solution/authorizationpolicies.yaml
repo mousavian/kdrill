@@ -1,0 +1,49 @@
+# 1. Deny by default: an ALLOW policy with no rules matches nothing, so
+#    every request to every workload in bank is denied...
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: allow-nothing
+  namespace: bank
+spec: {}
+---
+# 2. ...except what an ALLOW policy explicitly allows.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: ledger
+  namespace: bank
+spec:
+  selector:
+    matchLabels: {app: ledger}
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: [cluster.local/ns/shop/sa/web]
+    to:
+    - operation:
+        methods: [GET]
+        paths: [/anything/accounts/*]
+  - from:
+    - source:
+        principals: [cluster.local/ns/shop/sa/admin]
+    to:
+    - operation:
+        paths: [/anything/accounts/*, /anything/admin/*]
+---
+# 3. DENY policies are evaluated before ALLOW policies: nobody deletes accounts.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: no-account-deletes
+  namespace: bank
+spec:
+  selector:
+    matchLabels: {app: ledger}
+  action: DENY
+  rules:
+  - to:
+    - operation:
+        methods: [DELETE]
+        paths: [/anything/accounts/*]

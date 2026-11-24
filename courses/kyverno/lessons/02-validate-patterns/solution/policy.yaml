@@ -1,0 +1,58 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: pod-standards
+spec:
+  background: true
+  rules:
+  - name: require-resources
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    validate:
+      failureAction: Enforce
+      message: "every container needs cpu and memory requests and a memory limit"
+      pattern:
+        spec:
+          containers:
+          - resources:
+              requests:
+                cpu: "?*"
+                memory: "?*"
+              limits:
+                memory: "?*"
+  - name: disallow-latest
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    validate:
+      failureAction: Enforce
+      message: "use a pinned image tag, not latest or no tag"
+      pattern:
+        spec:
+          # =( ) equality anchor: "if initContainers is present, each must match"
+          =(initContainers):
+          - image: "*:* & !*:latest"      # has a tag AND the tag is not latest
+          containers:
+          - image: "*:* & !*:latest"
+  - name: restrict-registries
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    validate:
+      failureAction: Enforce
+      # Variables ({{ }}) are JMESPath expressions over the admission request.
+      message: >-
+        image not from an approved registry (registry.acme.io/, ghcr.io/acme/):
+        {{ request.object.spec.[initContainers, containers][][].image }}
+      deny:
+        conditions:
+          any:
+          - key: "{{ request.object.spec.[initContainers, containers][][].image }}"
+            operator: AnyNotIn            # true if any image matches none of the values
+            value:
+            - "registry.acme.io/*"
+            - "ghcr.io/acme/*"

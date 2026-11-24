@@ -1,0 +1,39 @@
+# Claim templates as they are today. ResourceClaimTemplates are immutable:
+# delete and re-create them to change them.
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: gpu-40g
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          # TODO: only GPUs with at least 40Gi of memory
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: two-h100
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpus
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          # TODO: two H100s
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: any-gpu
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com

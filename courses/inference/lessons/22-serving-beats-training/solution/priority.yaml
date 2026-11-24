@@ -1,0 +1,15 @@
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: serving
+  labels: {kdrill.dev/lesson: inference.22-serving-beats-training}
+value: 100000
+description: online inference; may preempt training
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: training
+  labels: {kdrill.dev/lesson: inference.22-serving-beats-training}
+value: 1000
+description: fine-tuning and batch jobs; can be preempted by serving

@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: encoder
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: encoder}
+  template:
+    metadata:
+      labels: {app: encoder}
+    spec:
+      resourceClaims:
+      - name: gpu
+        resourceClaimTemplateName: any-gpu
+      containers:
+      - name: encoder
+        image: ghcr.io/example/asr-encoder:0.3
+        resources:
+          requests: {cpu: "4", memory: 32Gi}
+          claims:
+          - name: gpu
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: decoder
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: decoder}
+  template:
+    metadata:
+      labels: {app: decoder}
+    spec:
+      resourceClaims:
+      - name: gpu
+        resourceClaimTemplateName: any-gpu
+      containers:
+      - name: decoder
+        image: ghcr.io/example/asr-decoder:0.3
+        resources:
+          requests: {cpu: "4", memory: 32Gi}
+          claims:
+          - name: gpu

@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: fleet
+spec:
+  replicas: 4
+  selector:
+    matchLabels: {app: api}
+  template:
+    metadata:
+      labels: {app: api}
+    spec:
+      containers:
+      - name: api
+        image: ghcr.io/example/api:3.2          # multi-arch (amd64 + arm64)
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api
+  namespace: fleet
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels: {app: api}

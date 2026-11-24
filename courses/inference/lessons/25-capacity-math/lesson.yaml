@@ -1,0 +1,10 @@
+title: "Capacity math: from requests per second to GPUs and autoscaler bounds"
+kind: sim
+goal: >
+  Plan the fleet for a chat model from measured numbers: choose the GPU type that
+  serves the peak load most cheaply, compute the replicas needed with headroom,
+  the replicas needed to survive the loss of a zone, the nodes to buy, and the
+  autoscaler's minimum and maximum. Write the plan in the ConfigMap `plan`.
+namespaces: [lab]
+timeout: 120s
+concepts: [capacity planning, tokens per second per GPU, headroom, N+1, zone failure, cost per token, autoscaler min/max, GPU nodes]

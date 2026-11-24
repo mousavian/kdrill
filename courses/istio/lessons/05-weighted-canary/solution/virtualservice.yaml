@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: catalog
+  namespace: shop
+spec:
+  hosts: [catalog]
+  http:
+  - name: main
+    route:
+    - destination: {host: catalog, subset: v1}
+      weight: 80
+    - destination: {host: catalog, subset: v2}
+      weight: 20
+    # Dark launch: v3 gets a copy of every request; its answers are dropped.
+    mirror: {host: catalog, subset: v3}
+    mirrorPercentage: {value: 100.0}

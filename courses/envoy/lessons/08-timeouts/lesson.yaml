@@ -1,0 +1,8 @@
+title: "Timeouts: fail fast where it matters"
+goal: >
+  Slow API calls hang for 15 s before Envoy gives up. Give the /api routes a
+  1 s timeout (Envoy answers 504) and the /reports routes a 10 s timeout, so
+  interactive calls fail fast while legitimately slow reports still work.
+namespaces: [lab]
+timeout: 300s
+concepts: [route timeout, 504 upstream request timeout, connect_timeout, idle_timeout, stream_idle_timeout, request_timeout, x-envoy-upstream-rq-timeout-ms, UT]

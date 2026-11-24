@@ -1,0 +1,10 @@
+title: "Packing small models: MIG slices instead of whole GPUs"
+kind: sim
+goal: >
+  Six replicas of a small embedding model (about 9 GB of GPU memory each) are
+  Pending because each asks for a whole GPU and the two whole GPUs serve the chat
+  model. Put them on MIG slices: pick the smallest slice profile the model fits in
+  and let all six run on one partitioned GPU.
+namespaces: [lab]
+timeout: 120s
+concepts: [MIG, GPU partitioning, nvidia.com/mig-1g.10gb, time-slicing, MPS, memory isolation, GPU utilisation, small models]

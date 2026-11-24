@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rerank
+spec:
+  replicas: 4
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: rerank}
+  template:
+    metadata:
+      labels: {app: rerank}
+    spec:
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: ["--model", "Qwen/Qwen3-Reranker-4B"]   # needs ~15 GB of GPU memory
+        resources:
+          requests: {cpu: "4", memory: 16Gi}
+          limits:
+            nvidia.com/mig-2g.20gb: 1      # one MIG slice instead of a whole H100

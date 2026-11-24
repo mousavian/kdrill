@@ -1,0 +1,10 @@
+title: "Results as artifacts: named runs, a model, and cleanup"
+goal: >
+  The new run `shakespeare-v2` finishes in seconds because it picks up the
+  previous run's checkpoints, keeps every checkpoint it writes, and leaves no
+  model behind. Give each run its own directory named after the Job, keep only
+  two checkpoints, write the final model, clean the Job up after a while, and
+  sample from the model.
+namespaces: [train]
+timeout: 300s
+concepts: [run naming, downward API, dependent environment variables $(VAR), model artifacts, checkpoint retention, ttlSecondsAfterFinished]

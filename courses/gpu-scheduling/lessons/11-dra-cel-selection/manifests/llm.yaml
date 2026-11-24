@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm}
+    spec:
+      resourceClaims:
+      - name: gpu
+        resourceClaimTemplateName: gpu-40g
+      containers:
+      - name: llm
+        image: vllm/vllm-openai:v0.11.0
+        resources:
+          requests: {cpu: "4", memory: 32Gi}
+          claims:
+          - name: gpu

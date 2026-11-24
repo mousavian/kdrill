@@ -1,0 +1,52 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: gpu-defaults
+  annotations:
+    # Mutate the Pods themselves, not the Deployments/Jobs that create them.
+    pod-policies.kyverno.io/autogen-controllers: none
+spec:
+  rules:
+  # Rule 1: append the GPU toleration. tolerations is a list without a merge
+  # key, so a strategic-merge patch would REPLACE the Pod's tolerations.
+  - name: add-gpu-toleration
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ml-team}
+    preconditions:
+      all:
+      # some container has a GPU limit
+      - key: "{{ request.object.spec.containers[].resources.limits.\"nvidia.com/gpu\" || `[]` | length(@) }}"
+        operator: GreaterThan
+        value: 0
+      # ...and the Pod does not tolerate the GPU taint yet (an append is not idempotent)
+      - key: "{{ request.object.spec.tolerations[?key == 'nvidia.com/gpu'] || `[]` | length(@) }}"
+        operator: Equals
+        value: 0
+    mutate:
+      patchesJson6902: |-
+        - op: add
+          path: /spec/tolerations/-
+          value: {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+  # Rule 2: default GPU type. nodeSelector is a map, so strategic merge keeps
+  # the other keys; +( ) adds the key only if it is absent.
+  - name: default-gpu-product
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ml-team}
+    preconditions:
+      all:
+      - key: "{{ request.object.spec.containers[].resources.limits.\"nvidia.com/gpu\" || `[]` | length(@) }}"
+        operator: GreaterThan
+        value: 0
+    mutate:
+      patchStrategicMerge:
+        spec:
+          nodeSelector:
+            +(nvidia.com/gpu.product): NVIDIA-L4

@@ -1,0 +1,41 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: api-auth
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: api
+  jwt:
+    providers:
+    - name: lab
+      issuer: https://auth.lab
+      audiences: [shop]
+      localJWKS:
+        type: ValueRef
+        valueRef:                    # the ConfigMap jwks (key jwks)
+          group: ""
+          kind: ConfigMap
+          name: jwks
+      claimToHeaders:
+      - {claim: sub, header: x-user}
+  authorization:
+    defaultAction: Deny
+    rules:
+    - name: anyone-with-a-token-may-read
+      action: Allow
+      operation:
+        methods: [GET, HEAD]
+      principal:
+        jwt:
+          provider: lab
+          claims:
+          - {name: iss, values: ["https://auth.lab"]}
+    - name: admins-may-do-everything
+      action: Allow
+      principal:
+        jwt:
+          provider: lab
+          claims:
+          - {name: role, values: [admin]}

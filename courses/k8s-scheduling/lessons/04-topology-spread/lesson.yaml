@@ -1,0 +1,6 @@
+title: Spread the API across zones
+goal: >
+  The 6 replicas of `api` run exactly 2 per zone across zones a, b and c,
+  enforced by a topology spread constraint rather than by luck or pinning.
+kind: sim
+concepts: [topologySpreadConstraints, maxSkew, whenUnsatisfiable, failure domains]

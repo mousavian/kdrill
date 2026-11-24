@@ -1,0 +1,8 @@
+title: A dedicated GPU pool with taints
+goal: >
+  Web pods are riding on expensive GPU nodes. Taint the `gpu` NodePool so only
+  pods that tolerate it (the GPU inference pods) land there, and watch
+  Karpenter replace the GPU nodes and move `web` to the general pool.
+kind: sim
+namespaces: [ml]
+concepts: [NodePool taints, tolerations, startupTaints, dedicated pools, drift on template change]

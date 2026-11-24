@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-no-limit}
+spec:
+  containers:
+  - name: model
+    image: registry.acme.io/ml/ranker:3.2.1

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat
+  labels: {app: chat}
+spec:
+  replicas: 2
+  selector:
+    matchLabels: {app: chat}
+  template:
+    metadata:
+      labels: {app: chat, llm-d.ai/engine-type: vllm}
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: sim
+        image: ghcr.io/llm-d/llm-d-inference-sim@sha256:9992453829c0dea8d120b8e0322bb0e4237cbb3c6d9ea3bdce060410c40c91c9
+        # a model that takes 10 s to load; an answer of 20 tokens takes about 2.3 s; 3 requests at a time
+        args: [--model, chat, --mode, echo, --port, "8000", --max-num-seqs, "3", --startup-duration, 10s, --time-to-first-token, 300ms, --inter-token-latency, 100ms]
+        env:
+        - {name: POD_NAME, valueFrom: {fieldRef: {fieldPath: metadata.name}}}
+        - {name: POD_IP, valueFrom: {fieldRef: {fieldPath: status.podIP}}}
+        ports:
+        - {name: http, containerPort: 8000}
+        startupProbe:
+          httpGet: {path: /health/ready, port: http}
+          periodSeconds: 2
+          failureThreshold: 30
+        livenessProbe:
+          httpGet: {path: /health, port: http}
+          periodSeconds: 10
+        readinessProbe:
+          httpGet: {path: /health/ready, port: http}
+          periodSeconds: 2
+        lifecycle:
+          preStop:
+            sleep: {seconds: 8}
+        resources:
+          requests: {cpu: 10m, memory: 24Mi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat
+spec:
+  selector: {app: chat}
+  ports: [{name: http, port: 80, targetPort: http}]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-pods
+spec:
+  clusterIP: None
+  selector: {app: chat}
+  ports: [{name: http, port: 8000}]

@@ -1,0 +1,8 @@
+title: Queue GPU jobs with Kueue
+goal: >
+  Create a ResourceFlavor `a100`, a ClusterQueue `ml-cq` with an 8-GPU quota
+  and a LocalQueue `ml-team`, so that Kueue admits two of the three waiting
+  training Jobs onto the A100 nodes and keeps the third queued.
+kind: sim
+namespaces: [ml-team]
+concepts: [Kueue, ResourceFlavor, ClusterQueue, LocalQueue, Workload, job suspension, admission]

@@ -1,0 +1,63 @@
+# chat: a 7B model, one L4 per replica
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: chat, namespace: ai}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: chat}}
+  template:
+    metadata: {labels: {app: chat}}
+    spec:
+      nodeSelector:
+        nvidia.com/gpu.product: NVIDIA-L4
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+# eval: nightly evals of a 13B model in fp8; needs one GPU with >= 24 GB
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: eval, namespace: ai}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: eval}}
+  template:
+    metadata: {labels: {app: eval}}
+    spec:
+      nodeSelector:
+        karpenter.k8s.aws/instance-gpu-name: a100      # "the A100s are the good ones"
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: eval
+        image: ghcr.io/example/evals:0.9
+        resources:
+          requests: {cpu: "2", memory: 12Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+# train: 8 x H100 fine-tuning run (this one is right)
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: train, namespace: ai}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: train}}
+  template:
+    metadata: {labels: {app: train}}
+    spec:
+      nodeSelector:
+        karpenter.k8s.aws/instance-gpu-name: h100
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: trainer
+        image: nvcr.io/nvidia/pytorch:25.01-py3
+        command: ["torchrun", "--nproc-per-node=8", "train.py"]
+        resources:
+          requests: {cpu: "96", memory: 1024Gi}
+          limits: {nvidia.com/gpu: 8}

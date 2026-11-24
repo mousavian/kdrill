@@ -1,0 +1,8 @@
+title: "Watching a run: metrics, and why it is slow"
+goal: >
+  A long run crawls and nobody can see its progress without reading logs.
+  Expose the trainer's Prometheus metrics through a Service, find out why it is
+  slow, and fix it so it trains at least 2.5 times faster.
+namespaces: [train]
+timeout: 240s
+concepts: [Prometheus metrics endpoint, Service for a Job pod, steps per second, CPU limits and CFS throttling, cpu.stat, kubectl events]

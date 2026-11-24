@@ -1,0 +1,15 @@
+# Looks like a dcgm-exporter Pod (namespace given by verify).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: dcgm-exporter-probe1
+  labels: {app: dcgm-exporter}
+spec:
+  containers:
+  - name: c
+    image: nvcr.io/nvidia/k8s/dcgm-exporter:4.2.3-4.1.3-ubuntu22.04
+    volumeMounts:
+    - {name: pod-resources, mountPath: /var/lib/kubelet/pod-resources}
+  volumes:
+  - name: pod-resources
+    hostPath: {path: /var/lib/kubelet/pod-resources}

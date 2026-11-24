@@ -1,0 +1,56 @@
+# Validate JWTs at the ingress gateway. A request without a token passes
+# authentication (it just has no identity); a request with an invalid token
+# (bad signature, expired, unknown issuer, wrong audience) gets 401.
+apiVersion: security.istio.io/v1
+kind: RequestAuthentication
+metadata:
+  name: jwt
+  namespace: shop
+spec:
+  targetRefs:
+  - kind: Gateway
+    group: gateway.networking.k8s.io
+    name: shop-gateway
+  jwtRules:
+  - issuer: https://auth.kdrill.local
+    audiences: [shop]
+    # The issuer's public keys (manifests/jwks.json). On a real system use
+    # jwksUri: https://<issuer>/.well-known/jwks.json instead.
+    jwks: |
+      {"keys":[{"kty":"RSA","alg":"RS256","use":"sig","kid":"kdrill-2026","n":"ksIgXX0IF6o4ulActtbtZl12hk7dG8RAvfUPPpOnc1NrFF_Hx7BtLLJeWAFjlM1-JCYQTa3kste9NkteGVPQht7Py2-_VEBoDAQFZxyZB7Z1Vstt1jC77h58Ewf_6Vjdfuic3IqhtvL9lfRqriUqX_qp3TUilAwsSmadk-TdFdV3F7THzMEcrRVCTlqdypteJClYQPAn1d2zQvzsYle6w3X0ZWK_4Y2EZb0sIBuILRc8nD_Qs2RKFcmnKsYVukx480Tw_0BZot6dw41hXjG4sgJpx-UfG3VFkzP3tPEK86gATwm_ig9k262UZqIgPEmF0D-bN1ocswQU-8VCSutJpQ","e":"AQAB"}]}
+    outputClaimToHeaders:
+    - header: x-user
+      claim: sub
+---
+# Decide who gets in. Without this policy a request with NO token would
+# still reach the backend.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: require-jwt
+  namespace: shop
+spec:
+  targetRefs:
+  - kind: Gateway
+    group: gateway.networking.k8s.io
+    name: shop-gateway
+  action: ALLOW
+  rules:
+  - to:
+    - operation:
+        paths: [/anything/public/*]
+  - from:
+    - source:
+        requestPrincipals: [https://auth.kdrill.local/*]
+    to:
+    - operation:
+        paths: [/anything/orders/*]
+  - from:
+    - source:
+        requestPrincipals: [https://auth.kdrill.local/*]
+    to:
+    - operation:
+        paths: [/anything/admin/*]
+    when:
+    - key: request.auth.claims[groups]
+      values: [admins]

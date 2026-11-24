@@ -1,0 +1,9 @@
+title: "Your first Envoy: listener, connection manager, route, cluster"
+goal: >
+  Envoy in namespace `lab` crashes at start because its only route points to
+  a cluster that doesn't exist. Add the cluster `echo` (the Service echo on
+  port 80) so that Envoy starts and proxies every request on port 10000 to
+  the echo backend.
+namespaces: [lab]
+timeout: 300s
+concepts: [static_resources, listener, filter chain, HTTP connection manager, route_config, virtual host, cluster, STRICT_DNS, admin interface]

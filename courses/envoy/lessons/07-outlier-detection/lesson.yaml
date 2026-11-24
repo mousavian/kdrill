@@ -1,0 +1,9 @@
+title: "Outlier detection: eject the pod that keeps failing"
+goal: >
+  One of the three pods behind the echo Service passes its readiness probe
+  but answers every request with 503, so a third of the traffic fails.
+  Configure passive outlier detection on the cluster so Envoy ejects that
+  host after 3 consecutive 5xx and keeps it out for at least 30 s.
+namespaces: [lab]
+timeout: 300s
+concepts: [outlier_detection, consecutive_5xx, base_ejection_time, max_ejection_percent, failed_outlier_check, passive health checking, success_rate]

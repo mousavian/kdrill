@@ -1,0 +1,9 @@
+title: "Ingress with the Gateway API: Gateway and HTTPRoute"
+goal: >
+  Expose the shop to clients outside the mesh through an Istio ingress
+  gateway: a Gateway API `Gateway` named `shop-gateway` for host
+  `shop.example.com`, and an HTTPRoute that sends `/api/...` to `api`
+  (without the `/api` prefix) and everything else to `web`.
+kind: real-light
+namespaces: [shop, outside]
+concepts: [ingress gateway, Gateway API, GatewayClass istio, Gateway, HTTPRoute, automated deployment, hostnames, PathPrefix, URLRewrite, route status]

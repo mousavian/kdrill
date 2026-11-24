@@ -1,0 +1,8 @@
+title: "Rate limiting with BackendTrafficPolicy (local)"
+goal: >
+  Limit the public API to 5 requests per minute per Envoy, but give
+  requests carrying x-plan: gold a separate, higher budget of 30 per
+  minute, with a local rate limit in a BackendTrafficPolicy on the route.
+namespaces: [lab]
+timeout: 300s
+concepts: [rateLimit, Local vs Global, rules, clientSelectors, limit requests/unit, 429, x-ratelimit headers, Redis-backed global limits]

@@ -1,0 +1,19 @@
+apiVersion: networking.istio.io/v1
+kind: DestinationRule
+metadata:
+  name: ledger
+  namespace: bank
+spec:
+  host: ledger
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 1          # at most 1 connection to ledger per caller sidecar
+      http:
+        http1MaxPendingRequests: 1 # at most 1 request queued waiting for it
+        maxRequestsPerConnection: 1
+    outlierDetection:
+      consecutive5xxErrors: 2      # 2 errors in a row -> eject that Pod
+      interval: 5s
+      baseEjectionTime: 2m
+      maxEjectionPercent: 100

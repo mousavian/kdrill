@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: inventory
+  namespace: shop
+spec:
+  hosts: [inventory]
+  http:
+  - name: main
+    route:
+    - destination: {host: inventory}
+    timeout: 2s                 # the whole request, all attempts included
+    retries:
+      attempts: 3               # up to 3 retries = 4 attempts in total
+      retryOn: 5xx,connect-failure,reset

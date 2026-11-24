@@ -1,0 +1,9 @@
+title: "Version routing: DestinationRule subsets and header matches"
+goal: >
+  `catalog` in namespace `shop` runs v1 and v2 behind one Service, and
+  requests land on both at random. Route every request to v1, except
+  requests with the header `x-beta: true`, which go to v2. Fix the broken
+  DestinationRule and write the VirtualService.
+kind: real-light
+namespaces: [shop]
+concepts: [DestinationRule, subsets, VirtualService, http match, header match, route order, client-side routing]

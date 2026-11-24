@@ -1,0 +1,22 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: model-from-body
+spec:
+  targetRefs:
+  - {group: gateway.networking.k8s.io, kind: Gateway, name: edge}
+  lua:
+  - type: Inline
+    inline: |
+      function envoy_on_request(handle)
+        local body = handle:body()
+        if body ~= nil and body:length() > 0 then
+          local s = body:getBytes(0, body:length())
+          local m = string.match(s, '"model"%s*:%s*"([^"]+)"')
+          if m ~= nil then
+            handle:headers():replace("x-model", m)
+            return
+          end
+        end
+        handle:headers():remove("x-model")
+      end

@@ -1,0 +1,9 @@
+title: "SecurityPolicy: JWT authentication and claim-based authorization"
+goal: >
+  Protect the api.lab route with a SecurityPolicy: valid JWTs from the lab
+  issuer for audience shop only, the sub claim passed to the backend as
+  x-user, everyone with a valid token may read (GET), and only role admin
+  may change things.
+namespaces: [lab]
+timeout: 300s
+concepts: [SecurityPolicy, jwt providers, localJWKS, remoteJWKS, claimToHeaders, authorization, defaultAction, principal.jwt.claims, operation.methods, basicAuth, apiKeyAuth, extAuth, OIDC]

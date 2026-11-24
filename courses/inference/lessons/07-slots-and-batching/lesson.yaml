@@ -1,0 +1,9 @@
+title: "Server-side concurrency: slots, batching and context"
+goal: >
+  Four users ask the model at the same time but the server has one slot, so
+  three of them wait. Give it four parallel slots without starving them of
+  context: the 4th user must not queue (requests waiting stays 0), a prompt of
+  about 300 tokens must still fit in a slot, and the pod must stay inside its memory limit.
+namespaces: [lab]
+timeout: 240s
+concepts: [parallel slots, continuous batching, requests waiting, throughput vs latency, context per slot, --parallel, -c, KV cache memory]

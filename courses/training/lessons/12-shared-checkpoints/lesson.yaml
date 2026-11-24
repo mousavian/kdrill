@@ -1,0 +1,9 @@
+title: "One checkpoint volume for all workers"
+goal: >
+  The two-worker run never starts: its second worker is Pending because the
+  checkpoint volume can be mounted by a single pod only. Give the workers a
+  volume they can share, so rank 0 can write the checkpoints and every rank
+  can read them.
+namespaces: [train]
+timeout: 240s
+concepts: [access modes, ReadWriteOncePod, ReadWriteOnce, ReadWriteMany, PVC immutability, rank 0 writes, shared checkpoints]

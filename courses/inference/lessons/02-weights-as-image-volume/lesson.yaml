@@ -1,0 +1,10 @@
+title: "Getting weights to the pod: an image volume"
+goal: >
+  The model server `llm` starts with an empty /models and exits. Deliver the
+  weights the Kubernetes way for large read-only artifacts: as an OCI image
+  mounted with an image volume (kdrill.local/smollm2-135m:q4km), not copied by
+  an init container, not baked into the server image, not read from the node's
+  disk with a hostPath.
+namespaces: [lab]
+timeout: 240s
+concepts: [image volume, OCI artifact, weights vs server image, hostPath, init container download, imagePullPolicy, image pull time]

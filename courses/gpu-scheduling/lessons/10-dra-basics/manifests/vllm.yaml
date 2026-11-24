@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+spec:
+  replicas: 3
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: vllm}
+  template:
+    metadata:
+      labels: {app: vllm}
+    spec:
+      resourceClaims:
+      - name: gpu                              # pod-level name for the claim
+        resourceClaimTemplateName: one-gpu     # one ResourceClaim per pod, made from this template
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: ["--model", "Qwen/Qwen2.5-14B-Instruct"]
+        resources:
+          requests: {cpu: "8", memory: 64Gi}
+          claims:
+          - name: gpu                          # this container uses the claim

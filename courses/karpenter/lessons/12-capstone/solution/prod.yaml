@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: checkout, namespace: prod}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: checkout}}
+  template:
+    metadata: {labels: {app: checkout}}
+    spec:
+      # FIX 1: no zone pin (us-east-1a doesn't exist in this region)
+      containers:
+      - name: checkout
+        image: ghcr.io/example/checkout:5.1
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: legacy, namespace: prod}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: legacy}}
+  template:
+    metadata:
+      labels: {app: legacy}
+      # FIX 2: the migration is over; the stale do-not-disrupt annotation
+      # blocked the drift replacement of its node
+    spec:
+      containers:
+      - name: legacy
+        image: ghcr.io/example/legacy-billing:1.0
+        resources:
+          requests: {cpu: "1", memory: 2Gi}

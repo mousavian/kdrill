@@ -1,0 +1,9 @@
+title: "Protecting the fleet: a rate limit per client"
+goal: >
+  One API key ("mallory") floods the model server and every other client waits
+  behind it. Add a per-client rate limit at the gateway, keyed on the x-api-key
+  header, so that each key gets its own small budget of requests per second:
+  mallory is throttled with 429s and alice's requests are fast again.
+namespaces: [lab]
+timeout: 300s
+concepts: [rate limiting, BackendTrafficPolicy rateLimit, local rate limit, Distinct header, token bucket, 429, noisy neighbour, token budgets, API keys]

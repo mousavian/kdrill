@@ -1,0 +1,40 @@
+# The two setup ClusterQueues with cohortName and preemption added.
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: team-a-cq
+  labels: {kdrill.dev/lesson: gpu-scheduling.08-kueue-cohorts}   # kdrill's cleanup label
+spec:
+  cohortName: research             # share unused quota with the other queues in "research"
+  preemption:
+    reclaimWithinCohort: Any       # take lent quota back by preempting borrowers
+  namespaceSelector:
+    matchLabels: {kubernetes.io/metadata.name: team-a}
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu]
+    flavors:
+    - name: h100
+      resources:
+      - {name: cpu, nominalQuota: 96}
+      - {name: memory, nominalQuota: 1024Gi}
+      - {name: nvidia.com/gpu, nominalQuota: 4}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: team-b-cq
+  labels: {kdrill.dev/lesson: gpu-scheduling.08-kueue-cohorts}   # kdrill's cleanup label
+spec:
+  cohortName: research
+  preemption:
+    reclaimWithinCohort: Any
+  namespaceSelector:
+    matchLabels: {kubernetes.io/metadata.name: team-b}
+  resourceGroups:
+  - coveredResources: [cpu, memory, nvidia.com/gpu]
+    flavors:
+    - name: h100
+      resources:
+      - {name: cpu, nominalQuota: 96}
+      - {name: memory, nominalQuota: 1024Gi}
+      - {name: nvidia.com/gpu, nominalQuota: 4}

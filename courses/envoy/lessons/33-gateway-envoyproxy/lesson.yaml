@@ -1,0 +1,9 @@
+title: "EnvoyProxy: customise the Gateway's Envoy fleet"
+goal: >
+  Give the Gateway edge its own EnvoyProxy configuration: the platform's
+  JSON access log format, a team label on the Envoy pods and smaller
+  resource requests, merged with the cluster defaults so the Gateway stays
+  Programmed.
+namespaces: [lab]
+timeout: 300s
+concepts: [EnvoyProxy, infrastructure.parametersRef, GatewayClass parametersRef, mergeType, envoyDeployment, envoyService, telemetry.accessLog, bootstrap, EnvoyPatchPolicy]

@@ -1,0 +1,27 @@
+# First attempt by the platform team: "GPU pods need the GPU toleration and
+# should default to L4s".
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: gpu-defaults
+  annotations:
+    # Mutate the Pods themselves, not the Deployments/Jobs that create them.
+    pod-policies.kyverno.io/autogen-controllers: none
+spec:
+  rules:
+  - name: gpu-defaults
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+          namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: ml-team}
+    mutate:
+      patchStrategicMerge:
+        spec:
+          tolerations:
+          - key: nvidia.com/gpu
+            operator: Exists
+            effect: NoSchedule
+          nodeSelector:
+            nvidia.com/gpu.product: NVIDIA-L4

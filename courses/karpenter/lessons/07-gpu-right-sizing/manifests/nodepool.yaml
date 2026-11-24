@@ -1,0 +1,18 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: gpu
+spec:
+  template:
+    spec:
+      nodeClassRef: {group: karpenter.kwok.sh, kind: KWOKNodeClass, name: default}
+      requirements:
+      - {key: karpenter.sh/capacity-type, operator: In, values: [on-demand]}
+      - {key: karpenter.k8s.aws/instance-category, operator: In, values: [g, p]}
+      taints:
+      - {key: nvidia.com/gpu, value: "true", effect: NoSchedule}
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 15s
+  limits:
+    nvidia.com/gpu: "32"

@@ -1,0 +1,10 @@
+title: Drift and expiration roll the fleet for you
+goal: >
+  Move NodePool `default` from amd64 to Graviton (arm64), label its nodes,
+  and set a weekly expiry with a one-hour drain limit. Karpenter detects
+  that the running nodes have drifted from the new spec and replaces them,
+  one at a time, without you touching a node.
+kind: sim
+namespaces: [fleet]
+timeout: 240s
+concepts: [drift, NodePool template hash, RequirementsDrifted, expireAfter, terminationGracePeriod, rolling node replacement]

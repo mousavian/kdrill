@@ -1,0 +1,8 @@
+title: GPU scheduling for AI workloads
+description: >
+  Scheduling simulated GPU fleets: discovery labels, bin-packing, time-slicing
+  and MIG, priority, quotas, Kueue queues/cohorts/gang admission, and Dynamic
+  Resource Allocation (DRA). Builds on k8s-scheduling.
+kind: sim
+components: [kwok-job-runtime, kueue, gpu-binpack-scheduler]
+requires: [k8s-scheduling]

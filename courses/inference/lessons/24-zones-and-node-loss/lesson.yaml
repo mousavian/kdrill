@@ -1,0 +1,11 @@
+title: "Spreading replicas across zones and surviving a node loss"
+kind: sim
+goal: >
+  Six replicas of the chat model are packed into one zone by a leftover
+  preference, so losing that zone (or one node) takes most of the capacity with
+  it. Spread them evenly across the three zones with a topology spread
+  constraint, add a PodDisruptionBudget, and verify's node-loss drill must leave
+  the service whole.
+namespaces: [lab]
+timeout: 240s
+concepts: [topologySpreadConstraints, topology.kubernetes.io/zone, maxSkew, whenUnsatisfiable, node affinity preferences, node failure, PodDisruptionBudget, availability]

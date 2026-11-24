@@ -1,0 +1,96 @@
+# Existing workloads, deployed long before the policy.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: api, namespace: team-a}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: api}}
+  template:
+    metadata: {labels: {app: api}}
+    spec:
+      containers:
+      - name: api
+        image: registry.acme.io/api:4.1.0
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 256Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: worker, namespace: team-a}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: worker}}
+  template:
+    metadata: {labels: {app: worker}}
+    spec:
+      containers:
+      - name: worker
+        image: registry.acme.io/worker:latest
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 512Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: cache, namespace: team-a}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: cache}}
+  template:
+    metadata: {labels: {app: cache}}
+    spec:
+      containers:
+      - name: cache
+        image: redis:7.4
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: frontend, namespace: team-b}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: frontend}}
+  template:
+    metadata: {labels: {app: frontend}}
+    spec:
+      containers:
+      - name: frontend
+        image: registry.acme.io/frontend:2.0.3
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 256Mi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: embedder, namespace: team-b}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: embedder}}
+  template:
+    metadata: {labels: {app: embedder}}
+    spec:
+      containers:
+      - name: embedder
+        image: registry.acme.io/embedder
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 1Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: metrics, namespace: team-b}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: metrics}}
+  template:
+    metadata: {labels: {app: metrics}}
+    spec:
+      containers:
+      - name: metrics
+        image: prom/statsd-exporter:v0.28.0
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {memory: 192Mi}

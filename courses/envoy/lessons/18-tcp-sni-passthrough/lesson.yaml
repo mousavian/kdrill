@@ -1,0 +1,8 @@
+title: "TCP proxying and TLS passthrough by SNI"
+goal: >
+  Two backends terminate TLS themselves (a.lab and b.lab). Make Envoy route
+  their TLS connections on port 10443 by SNI to the right backend with the
+  TCP proxy, without decrypting anything.
+namespaces: [lab]
+timeout: 300s
+concepts: [tcp_proxy, network filters, L4 proxying, tls_inspector, server_names, TLS passthrough, end-to-end TLS, PROXY protocol]

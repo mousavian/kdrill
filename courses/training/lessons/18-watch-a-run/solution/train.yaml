@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels: {app: train}
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "50"]
+        env:
+        - {name: STEPS, value: "3000"}
+        - {name: METRICS_PORT, value: "9090"}     # Prometheus text format on /metrics
+        - name: OMP_NUM_THREADS
+          valueFrom:
+            resourceFieldRef: {resource: limits.cpu, divisor: "1"}
+        ports:
+        - {name: metrics, containerPort: 9090}
+        resources:
+          requests: {cpu: "1", memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}     # a whole core: no throttling for one thread

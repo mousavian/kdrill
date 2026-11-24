@@ -1,0 +1,8 @@
+title: "Local rate limiting: a token bucket per route"
+goal: >
+  Protect the /api routes with Envoy's local rate limit filter: at most 5
+  requests per 10 seconds, excess answered with 429 and the header
+  x-local-rate-limit: true, while /health stays unlimited.
+namespaces: [lab]
+timeout: 300s
+concepts: [local_ratelimit filter, token bucket, typed_per_filter_config, filter_enabled, filter_enforced, 429, RL, global rate limiting]

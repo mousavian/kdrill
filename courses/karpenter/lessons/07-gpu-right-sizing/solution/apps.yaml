@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: chat, namespace: ai}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: chat}}
+  template:
+    metadata: {labels: {app: chat}}
+    spec:
+      nodeSelector:
+        karpenter.k8s.aws/instance-gpu-name: l4        # FIX: a label Karpenter knows before launch
+        karpenter.k8s.aws/instance-gpu-count: "1"      # FIX: a 1-GPU pod gets a 1-GPU instance
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        resources:
+          requests: {cpu: "2", memory: 8Gi}
+          limits: {nvidia.com/gpu: 1}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: eval, namespace: ai}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: eval}}
+  template:
+    metadata: {labels: {app: eval}}
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: karpenter.k8s.aws/instance-gpu-name   # FIX: any 24 GB GPU will do
+                operator: In
+                values: [l4, a10g]
+              - key: karpenter.k8s.aws/instance-gpu-count  # FIX: one GPU, one-GPU instance
+                operator: In
+                values: ["1"]
+      tolerations:
+      - {key: nvidia.com/gpu, operator: Exists, effect: NoSchedule}
+      containers:
+      - name: eval
+        image: ghcr.io/example/evals:0.9
+        resources:
+          requests: {cpu: "2", memory: 12Gi}
+          limits: {nvidia.com/gpu: 1}

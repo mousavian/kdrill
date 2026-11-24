@@ -1,0 +1,8 @@
+title: "Checkpoints on a volume, and a Job that uses them"
+goal: >
+  The training Job writes its checkpoints into the pod, so they vanish with
+  it, and the sampling Job finds nothing. Write the checkpoints to the PVC
+  `checkpoints`, then run Job `sample` against the finished model.
+namespaces: [train]
+timeout: 240s
+concepts: [checkpoints, emptyDir vs PersistentVolumeClaim, Job ordering, kubectl wait, sharing a volume between Jobs]

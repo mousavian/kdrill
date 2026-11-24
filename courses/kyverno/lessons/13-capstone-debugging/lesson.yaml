@@ -1,0 +1,10 @@
+title: "Capstone: policies that don't do what they say"
+goal: >
+  Four ClusterPolicies guard the prod namespaces, and none of them works as
+  documented: violations get through, a Deployment can't schedule. Find and
+  fix every bug in the policies (not the workloads) so that each policy
+  behaves exactly as its description says.
+kind: sim
+namespaces: [payments, analytics, playground]
+timeout: 240s
+concepts: [debugging policies, Audit vs Enforce, namespaceSelector, anchors, autogen-controllers, mutate rule order, policy reports, dry-run]

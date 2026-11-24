@@ -1,0 +1,27 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyExtensionPolicy
+metadata:
+  name: epp
+spec:
+  targetRefs:
+  - {group: gateway.networking.k8s.io, kind: HTTPRoute, name: llm}
+  extProc:
+  - backendRefs:
+    - {name: epp, port: 9002}
+    messageTimeout: 5s
+    processingMode:
+      request: {body: FullDuplexStreamed}
+      response: {body: FullDuplexStreamed}
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: pick
+spec:
+  targetRefs:
+  - {group: gateway.networking.k8s.io, kind: HTTPRoute, name: llm}
+  loadBalancer:
+    type: LeastRequest
+    endpointOverride:
+      extractFrom:
+      - header: x-gateway-destination-endpoint

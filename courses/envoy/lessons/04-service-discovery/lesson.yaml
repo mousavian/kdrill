@@ -1,0 +1,10 @@
+title: "Service discovery: let Envoy see every pod"
+goal: >
+  Envoy reaches the 3 echo pods through the Service's ClusterIP, so it sees
+  one host and kube-proxy decides the balancing per connection. Make
+  Envoy's cluster `echo` contain one host per echo pod (headless Service +
+  STRICT_DNS) so that Envoy itself spreads requests evenly and notices pods
+  coming and going.
+namespaces: [lab]
+timeout: 300s
+concepts: [STRICT_DNS, LOGICAL_DNS, STATIC, EDS, headless Service, ClusterIP vs pod IPs, connection pooling, dns_refresh_rate]

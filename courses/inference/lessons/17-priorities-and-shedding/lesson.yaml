@@ -1,0 +1,10 @@
+title: "Priorities: shed batch traffic when the pool is saturated"
+goal: >
+  The model pool is saturated and interactive chat users wait behind a flood of
+  batch requests, because the picker treats every request alike. Define two
+  InferenceObjectives for the pool (chat: high priority; batch: negative priority)
+  so that, under saturation, requests marked as batch are shed immediately with a
+  429 and chat requests are still served.
+namespaces: [lab]
+timeout: 300s
+concepts: [InferenceObjective, request priority, criticality, saturation, load shedding, 429, x-gateway-inference-objective, poolRefs, flow control]

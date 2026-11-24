@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: tenant-defaults
+spec:
+  rules:
+  - name: default-deny
+    match:
+      any:
+      - resources:
+          kinds: [Namespace]
+          selector:
+            matchExpressions:
+            - {key: tenant, operator: Exists}
+    generate:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      name: default-deny
+      namespace: "{{ request.object.metadata.name }}"
+      synchronize: false
+      data:
+        spec:
+          podSelector: {}
+          policyTypes: [Ingress]
+  # TODO: GPU quota, CA bundle

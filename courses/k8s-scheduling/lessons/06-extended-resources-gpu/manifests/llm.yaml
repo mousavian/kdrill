@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+spec:
+  replicas: 3
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm}
+    spec:
+      containers:
+      - name: server
+        image: nginx:1.27
+        resources:
+          requests:
+            cpu: "1"
+            memory: 2Gi

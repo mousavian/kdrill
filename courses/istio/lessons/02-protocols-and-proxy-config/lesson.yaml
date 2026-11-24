@@ -1,0 +1,9 @@
+title: "Inside the sidecar: listeners, routes, clusters and protocol selection"
+goal: >
+  The VirtualService for `catalog` in namespace `store` has no effect and
+  `reviews` gets no HTTP handling either, because Istio treats both
+  Services as plain TCP. Find out why with istioctl proxy-config and fix
+  the two Services so that the sidecars handle their traffic as HTTP.
+kind: real-light
+namespaces: [store]
+concepts: [Envoy listeners, routes, clusters, endpoints, xDS, istioctl proxy-config, protocol selection, port naming, appProtocol]

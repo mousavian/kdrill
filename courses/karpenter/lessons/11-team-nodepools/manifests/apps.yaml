@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: etl, namespace: team-a}
+spec:
+  replicas: 4
+  selector: {matchLabels: {app: etl}}
+  template:
+    metadata: {labels: {app: etl}}
+    spec:
+      containers:
+      - name: etl
+        image: ghcr.io/team-a/etl:7.1
+        resources:
+          requests: {cpu: "1", memory: 4Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: web, namespace: team-b}
+spec:
+  replicas: 3
+  selector: {matchLabels: {app: web}}
+  template:
+    metadata: {labels: {app: web}}
+    spec:
+      containers:
+      - name: web
+        image: ghcr.io/team-b/web:2.3
+        resources:
+          requests: {cpu: "1", memory: 2Gi}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: metrics, namespace: platform}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app: metrics}}
+  template:
+    metadata: {labels: {app: metrics}}
+    spec:
+      containers:
+      - name: prometheus
+        image: quay.io/prometheus/prometheus:v3.5.0
+        resources:
+          requests: {cpu: 500m, memory: 2Gi}

@@ -1,0 +1,23 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-run-as-nonroot
+  annotations:
+    # "Don't generate rules for Deployments etc." - someone found the
+    # autogen-... rejections confusing and switched them off.
+    pod-policies.kyverno.io/autogen-controllers: none
+spec:
+  background: true
+  rules:
+  - name: run-as-nonroot
+    match:
+      any:
+      - resources:
+          kinds: [Pod]
+    validate:
+      failureAction: Enforce
+      message: "prod Pods must run as non-root (spec.securityContext.runAsNonRoot=true)"
+      pattern:
+        spec:
+          securityContext:
+            runAsNonRoot: true

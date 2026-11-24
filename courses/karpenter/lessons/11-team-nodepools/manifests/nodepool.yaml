@@ -1,0 +1,17 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: shared
+spec:
+  template:
+    spec:
+      nodeClassRef: {group: karpenter.kwok.sh, kind: KWOKNodeClass, name: default}
+      requirements:
+      - {key: kubernetes.io/arch, operator: In, values: [amd64]}
+      - {key: karpenter.sh/capacity-type, operator: In, values: [on-demand]}
+      - {key: karpenter.k8s.aws/instance-category, operator: In, values: [c, m, r]}
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 15s
+  limits:
+    cpu: "32"

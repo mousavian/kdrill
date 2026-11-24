@@ -1,0 +1,18 @@
+# Draft of the CEL version, started by a colleague. Not finished.
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-memory-limits
+spec:
+  validationActions: [Audit]
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: [v1]
+      operations: [CREATE, UPDATE]
+      resources: [pods]
+    namespaceSelector:
+      matchLabels: {kubernetes.io/metadata.name: ml-serving}
+  validations:
+  - expression: "object.spec.containers.all(c, has(c.resources.limits) && 'memory' in c.resources.limits)"
+    message: "every container needs a memory limit"

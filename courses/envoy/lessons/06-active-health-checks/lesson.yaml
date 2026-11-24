@@ -1,0 +1,10 @@
+title: "Active health checking (and the panic threshold)"
+goal: >
+  Envoy's health check on the echo cluster never notices a sick pod. Make it
+  probe the real health endpoint fast enough that a pod whose /health fails
+  stops getting traffic within seconds, comes back when it recovers, and
+  make sure Envoy does not fall back to sending traffic to sick pods when
+  most of them are unhealthy.
+namespaces: [lab]
+timeout: 300s
+concepts: [health_checks, http_health_check, interval, unhealthy_threshold, healthy_threshold, health_flags, failed_active_hc, healthy_panic_threshold]

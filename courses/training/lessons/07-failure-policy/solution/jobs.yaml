@@ -1,0 +1,66 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: buggy
+spec:
+  backoffLimit: 3
+  activeDeadlineSeconds: 1200        # never run longer than 20 minutes
+  ttlSecondsAfterFinished: 3600      # delete the Job (and its pods) an hour after it ends
+  podFailurePolicy:
+    rules:
+    - action: FailJob                # a bug: retrying cannot help
+      onExitCodes:
+        containerName: train
+        operator: In
+        values: [42]
+    - action: Ignore                 # evicted / preempted / drained: not the job's fault
+      onPodConditions:
+      - type: DisruptionTarget
+  template:
+    spec:
+      restartPolicy: Never           # required by podFailurePolicy
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "25"]
+        env:
+        - {name: STEPS, value: "300"}
+        - {name: FAIL_AT_STEP, value: "50"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 250m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: steady
+spec:
+  backoffLimit: 0
+  activeDeadlineSeconds: 1200
+  ttlSecondsAfterFinished: 3600
+  podFailurePolicy:
+    rules:
+    - action: FailJob
+      onExitCodes:
+        containerName: train
+        operator: In
+        values: [42]
+    - action: Ignore
+      onPodConditions:
+      - type: DisruptionTarget
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "25"]
+        env:
+        - {name: STEPS, value: "500"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 250m, memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}

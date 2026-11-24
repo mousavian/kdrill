@@ -1,0 +1,10 @@
+title: "Mutate existing resources: propagate a namespace label to its Deployments"
+goal: >
+  Fix the ClusterPolicy `propagate-cost-center` so that every Deployment in a
+  namespace with a `cost-center` label carries the same `cost-center` label:
+  for Deployments that already exist when the policy is applied, and again
+  whenever the namespace label changes.
+kind: sim
+namespaces: [research, inference, sandbox]
+timeout: 240s
+concepts: [mutate existing, targets, mutateExistingOnPolicyUpdate, trigger vs target, background controller RBAC, JMESPath quoting]

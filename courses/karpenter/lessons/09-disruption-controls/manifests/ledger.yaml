@@ -1,0 +1,23 @@
+# A single-replica ledger writer. Restarting it means a 20-minute replay, so
+# it must only move during a planned maintenance window.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ledger
+  namespace: pay
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: ledger}
+  template:
+    metadata:
+      labels: {app: ledger}
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/zone: us-west-2a     # its volume lives in us-west-2a
+      containers:
+      - name: ledger
+        image: ghcr.io/example/ledger:2.0
+        resources:
+          requests: {cpu: 500m, memory: 8Gi}

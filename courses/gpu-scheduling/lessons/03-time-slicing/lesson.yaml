@@ -1,0 +1,7 @@
+title: Share GPUs with time-slicing (and know its limits)
+goal: >
+  The 8 small `notebooks` run on the time-sliced T4 node, and the 4-GPU
+  `trainer` runs on exclusive (non-shared) GPUs, both enforced with required
+  node affinity on `nvidia.com/gpu.sharing-strategy`.
+kind: sim
+concepts: [time-slicing, nvidia.com/gpu.replicas, nvidia.com/gpu.sharing-strategy, oversubscription, no memory isolation]

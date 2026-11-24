@@ -1,0 +1,20 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default
+spec:
+  template:
+    spec:
+      nodeClassRef:                 # provider-specific settings live in the NodeClass
+        group: karpenter.kwok.sh
+        kind: KWOKNodeClass
+        name: default
+      requirements:                 # which instances Karpenter may launch
+      - key: kubernetes.io/arch
+        operator: In
+        values: [amd64]
+      - key: karpenter.sh/capacity-type
+        operator: In
+        values: [on-demand]
+  limits:
+    cpu: "32"                       # never more than 32 vCPUs of nodes in this pool

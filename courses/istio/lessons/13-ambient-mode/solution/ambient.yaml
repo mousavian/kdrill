@@ -1,0 +1,45 @@
+# 1. Enrol every Pod of the namespace in ambient mode: ztunnel on the node
+#    takes over their traffic (mTLS, L4 policy). No restarts, no sidecars.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: mall
+  labels:
+    istio.io/dataplane-mode: ambient
+    # 3. ...and send traffic for the namespace's Services through the waypoint.
+    istio.io/use-waypoint: waypoint
+---
+# 2. A waypoint: an Envoy for L7 features, deployed by Istio for this namespace.
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: waypoint
+  namespace: mall
+  labels:
+    istio.io/waypoint-for: service   # handle traffic addressed to Services (the default)
+spec:
+  gatewayClassName: istio-waypoint
+  listeners:
+  - name: mesh
+    port: 15008
+    protocol: HBONE
+---
+# 4. L7 policy, enforced by the waypoint for traffic to Service api.
+apiVersion: security.istio.io/v1
+kind: AuthorizationPolicy
+metadata:
+  name: api-access
+  namespace: mall
+spec:
+  targetRefs:
+  - kind: Service
+    group: ""
+    name: api
+  action: ALLOW
+  rules:
+  - from:
+    - source:
+        principals: [cluster.local/ns/mall/sa/web]
+    to:
+    - operation:
+        methods: [GET]

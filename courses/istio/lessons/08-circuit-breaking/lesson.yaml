@@ -1,0 +1,9 @@
+title: "Circuit breaking and outlier detection"
+goal: >
+  Protect `ledger` in namespace `bank` with a DestinationRule: eject a
+  ledger Pod that keeps failing (outlier detection) so callers stop seeing
+  its errors, and cap concurrent requests so that excess load is rejected
+  immediately (circuit breaking) instead of piling up.
+kind: real-light
+namespaces: [bank]
+concepts: [DestinationRule trafficPolicy, connectionPool, circuit breaker, http1MaxPendingRequests, outlierDetection, ejection, x-envoy-overloaded, response flags UO UF]

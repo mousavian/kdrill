@@ -1,0 +1,8 @@
+title: "A hyperparameter sweep as an Indexed Job"
+goal: >
+  A three-run learning-rate sweep trains the same learning rate three times.
+  Make it an Indexed Job so that each pod trains its own learning rate, then
+  record the best one in a ConfigMap `sweep-result`.
+namespaces: [train]
+timeout: 240s
+concepts: [Indexed Job, completionMode, JOB_COMPLETION_INDEX, completions vs parallelism, hyperparameter sweep, choosing by validation loss]

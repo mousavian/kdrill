@@ -1,0 +1,6 @@
+title: Run the trainer on the ML pool
+goal: >
+  The `trainer` Deployment runs on the dedicated ML nodes and only there,
+  `web` stays off them, and the ML nodes keep their taint.
+kind: sim
+concepts: [taints, tolerations, NoSchedule, toleration vs node affinity]

@@ -1,0 +1,9 @@
+title: "Autoscaling on in-flight requests with KEDA"
+goal: >
+  Make the model server scale on load instead of CPU: a KEDA ScaledObject that
+  reads the number of in-flight requests (running + waiting) from the metrics
+  aggregator and keeps about 2 per replica, scaling 1 -> 4 under eight users and
+  back down quickly when they leave. The ScaledObject you start with does not scale.
+namespaces: [lab]
+timeout: 360s
+concepts: [KEDA, ScaledObject, metrics-api scaler, valueLocation, targetValue, pollingInterval, stabilization window, scale up and down, in-flight requests, HPA owned by KEDA]

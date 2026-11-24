@@ -1,0 +1,8 @@
+title: "Dynamic configuration: xDS from files (LDS and CDS)"
+goal: >
+  Move Envoy's listener and clusters out of the static bootstrap into
+  file-based dynamic resources (LDS and CDS), then add a new cluster and
+  route for echo-v2 while Envoy keeps running, without a restart.
+namespaces: [lab]
+timeout: 300s
+concepts: [xDS, LDS, CDS, RDS, EDS, SDS, ADS, dynamic_resources, path_config_source, watched_directory, DiscoveryResponse, version_info, config_dump dynamic_active_clusters, warming]

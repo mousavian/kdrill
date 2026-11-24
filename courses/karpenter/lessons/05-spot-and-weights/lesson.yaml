@@ -1,0 +1,8 @@
+title: Spot first, on-demand as fallback
+goal: >
+  Add a weighted `spot` NodePool with a 16-CPU budget so the interruptible
+  `render` jobs prefer cheap spot capacity and overflow to on-demand, while
+  `api` stays on on-demand nodes.
+kind: sim
+namespaces: [batch]
+concepts: [spot vs on-demand, karpenter.sh/capacity-type, NodePool weight, fallback between NodePools, price-based selection]

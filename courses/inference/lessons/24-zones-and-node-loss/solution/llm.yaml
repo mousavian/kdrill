@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm
+  labels: {app: llm}
+spec:
+  replicas: 6
+  selector:
+    matchLabels: {app: llm}
+  template:
+    metadata:
+      labels: {app: llm}
+    spec:
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels: {app: llm}
+        matchLabelKeys: [pod-template-hash]
+      containers:
+      - name: vllm
+        image: vllm/vllm-openai:v0.11.0
+        args: [--model, meta-llama/Llama-3.1-8B-Instruct]
+        resources:
+          requests: {cpu: "8", memory: 32Gi}
+          limits: {nvidia.com/gpu: 1}

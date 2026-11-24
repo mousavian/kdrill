@@ -1,0 +1,7 @@
+# Not a model-server image: the policy must not touch it.
+apiVersion: v1
+kind: Pod
+metadata: {name: probe-other, namespace: prod-ml}
+spec:
+  containers:
+  - {name: web, image: "nginx:1.27"}

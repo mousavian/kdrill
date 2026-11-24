@@ -1,0 +1,10 @@
+title: Consolidation shrinks the fleet after scale-down
+goal: >
+  After a traffic peak `web` and `worker` scaled down, but the big node
+  bought for the peak is still there, mostly idle. Turn on consolidation of
+  underutilized nodes so Karpenter replaces it with a small
+  node by itself.
+kind: sim
+namespaces: [shop]
+timeout: 240s
+concepts: [consolidation, WhenEmpty vs WhenEmptyOrUnderutilized, consolidateAfter, delete vs replace, disruption events]

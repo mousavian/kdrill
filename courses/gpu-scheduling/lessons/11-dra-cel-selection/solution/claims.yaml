@@ -1,0 +1,46 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: gpu-40g
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpu
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          selectors:
+          - cel:
+              # capacity is a quantity: compare with compareTo()
+              expression: device.capacity["gpu.nvidia.com"].memory.compareTo(quantity("40Gi")) >= 0
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: two-h100
+spec:
+  spec:
+    devices:
+      requests:
+      - name: gpus
+        exactly:
+          deviceClassName: gpu.nvidia.com
+          count: 2
+          selectors:
+          - cel:
+              expression: device.attributes["gpu.nvidia.com"].productName == "NVIDIA H100 80GB HBM3"
+---
+# A standalone claim (not a template): allocated once, usable by many pods.
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: shared-l4
+spec:
+  devices:
+    requests:
+    - name: gpu
+      exactly:
+        deviceClassName: gpu.nvidia.com
+        selectors:
+        - cel:
+            expression: device.attributes["gpu.nvidia.com"].productName == "NVIDIA L4"

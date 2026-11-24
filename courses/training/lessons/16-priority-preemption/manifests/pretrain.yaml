@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: checkpoints
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests: {storage: 100Mi}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pretrain
+  labels:
+    kueue.x-k8s.io/queue-name: training
+    kueue.x-k8s.io/priority-class: low
+spec:
+  backoffLimit: 3
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--seed, "1", --log-every, "50"]
+        env:
+        - {name: STEPS, value: "6000"}       # a long run: about 6-8 minutes
+        - {name: CKPT_DIR, value: /ckpt}
+        - {name: CKPT_EVERY, value: "100"}
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: "1", memory: 512Mi}
+          limits: {cpu: "1", memory: 768Mi}
+        volumeMounts:
+        - {name: ckpt, mountPath: /ckpt}
+      volumes:
+      - name: ckpt
+        persistentVolumeClaim: {claimName: checkpoints}

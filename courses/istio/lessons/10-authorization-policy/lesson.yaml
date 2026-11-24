@@ -1,0 +1,9 @@
+title: "Authorization: deny by default, allow by identity, path and method"
+goal: >
+  Anything in the mesh can call `ledger` in namespace `bank`. Lock it down
+  with AuthorizationPolicies: deny everything in `bank` by default, let
+  `shop/web` read accounts, let `shop/admin` manage accounts and the admin
+  API, and make sure nobody can delete an account.
+kind: real-light
+namespaces: [bank, shop]
+concepts: [AuthorizationPolicy, ALLOW, DENY, allow-nothing, principals, source identity, operation paths methods, policy evaluation order, RBAC access denied]

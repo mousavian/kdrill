@@ -1,0 +1,29 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: behind-lb
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: edge
+  clientIPDetection:
+    xForwardedFor:
+      numTrustedHops: 1          # one trusted proxy in front: use the rightmost XFF entry
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: admin-office-only
+spec:
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    name: admin
+  authorization:
+    defaultAction: Deny
+    rules:
+    - name: office
+      action: Allow
+      principal:
+        clientCIDRs: ["203.0.113.0/24"]

@@ -1,0 +1,8 @@
+title: "A training run is a Job, not a Deployment"
+goal: >
+  A training script runs in a Deployment, finishes, and is started again and
+  again. Run it as a Job `train` that trains once to completion, and record the
+  final loss it printed in a ConfigMap `result`.
+namespaces: [train]
+timeout: 240s
+concepts: [Job, restartPolicy, completions, backoffLimit, Deployment vs Job, kubectl logs]

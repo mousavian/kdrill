@@ -1,0 +1,8 @@
+title: "Virtual hosts and routes: matching Host, path and headers"
+goal: >
+  Rework Envoy's route configuration so that requests reach web, api-v1 or
+  api-v2 by Host header, path and the x-api-version header, exactly as the
+  routing table in the README says. Order and match type matter.
+namespaces: [lab]
+timeout: 300s
+concepts: [virtual hosts, domain matching, wildcard domains, route order, prefix, path, path_separated_prefix, safe_regex, header matchers]

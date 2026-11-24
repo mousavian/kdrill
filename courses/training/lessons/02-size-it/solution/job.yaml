@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: train
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "300", --seed, "1", --log-every, "50"]
+        env:
+        - {name: BATCH_SIZE, value: "64"}      # peak RSS about 450 MB (512 needed about 1.1 GB)
+        - name: OMP_NUM_THREADS                # = the CPU limit, rounded up
+          valueFrom:
+            resourceFieldRef: {resource: limits.cpu, divisor: "1"}
+        resources:
+          requests: {cpu: "1", memory: 512Mi}
+          limits: {cpu: "2", memory: 768Mi}

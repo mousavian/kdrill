@@ -1,0 +1,66 @@
+# Lean Envoy Gateway for kdrill. Used by base/components/envoy-gateway/install.sh
+# (helm chart oci://docker.io/envoyproxy/gateway-helm).
+
+deployment:
+  envoyGateway:
+    resources:
+      requests: {cpu: 50m, memory: 96Mi}
+      limits: {memory: 384Mi}
+  pod:
+    # Sim lessons of other courses taint the real node; the controller must keep
+    # running there and never land on a KWOK fake node.
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: "true"
+    tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+
+certgen:
+  job:
+    nodeSelector:
+      node-role.kubernetes.io/control-plane: "true"
+    tolerations:
+    - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+
+# The topology injector is a mutating webhook on pod binding; it only adds
+# zone labels, which a single-node lab doesn't have. Leaving it out means no
+# webhook can get in the way of anything when the controller is down.
+topologyInjector:
+  enabled: false
+
+config:
+  envoyGateway:
+    logging:
+      level:
+        default: info
+    provider:
+      type: Kubernetes
+      kubernetes:
+        # Each Gateway's Envoy Deployment/Service is created in the Gateway's own
+        # namespace (default: the controller's namespace). Lesson cleanup then
+        # removes the data plane together with the lesson namespace, and
+        # `kubectl get pods` in the lesson shows the proxy next to the apps.
+        deploy:
+          type: GatewayNamespace
+    # Defaults for every Envoy fleet (EnvoyProxy spec). A GatewayClass- or
+    # Gateway-level EnvoyProxy replaces these unless it sets mergeType.
+    envoyProxy:
+      provider:
+        type: Kubernetes
+        kubernetes:
+          # No LoadBalancer in the lab: a ClusterIP Service, reached from the
+          # in-cluster client pod.
+          envoyService:
+            type: ClusterIP
+          envoyDeployment:
+            replicas: 1
+            container:
+              resources:
+                requests: {cpu: 20m, memory: 48Mi}
+                limits: {memory: 256Mi}
+      # Small Envoy: 1 worker thread.
+      concurrency: 1
+      # Default drain is long (minimum 10 s, up to 60 s) which makes every
+      # Gateway deletion and lesson cleanup slow.
+      shutdown:
+        drainTimeout: 5s
+        minDrainDuration: 1s

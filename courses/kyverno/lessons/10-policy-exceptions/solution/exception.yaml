@@ -1,0 +1,24 @@
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: dcgm-exporter-host-path
+  namespace: policy-exceptions          # the only namespace Kyverno reads exceptions from (here)
+  annotations:
+    # Who approved it and why: exceptions are reviewed artifacts.
+    kdrill.dev/reason: "DCGM exporter reads the kubelet pod-resources socket; read-only mount; approved by platform-security"
+spec:
+  exceptions:
+  - policyName: pod-security-baseline
+    ruleNames:
+    - disallow-host-path                # the Pod rule
+    - autogen-disallow-host-path        # the generated rule that checks the DaemonSet itself
+  match:
+    any:
+    - resources:
+        kinds: [DaemonSet]
+        namespaces: [gpu-operator]
+        names: [dcgm-exporter]
+    - resources:
+        kinds: [Pod]
+        namespaces: [gpu-operator]
+        names: ["dcgm-exporter-*"]      # Pods are named <daemonset>-<random>

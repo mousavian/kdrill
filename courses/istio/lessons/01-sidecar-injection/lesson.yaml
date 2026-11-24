@@ -1,0 +1,9 @@
+title: "Sidecar injection: putting workloads into the mesh"
+goal: >
+  Put the `web`, `api` and `client` Deployments in namespace `shop` into the
+  mesh with an Envoy sidecar each, keep the `batch` Deployment explicitly out
+  of it, and prove that mesh traffic between sidecars is mutually
+  authenticated (mTLS with SPIFFE identities).
+kind: real-light
+namespaces: [shop]
+concepts: [service mesh, sidecar, injection webhook, istio-injection label, native sidecars, istiod, xDS, SPIFFE identity, auto mTLS, PERMISSIVE]

@@ -1,0 +1,84 @@
+# Lean Kyverno for kdrill: one replica per controller, small requests.
+# Used by base/components/kyverno/install.sh (helm chart kyverno/kyverno).
+global:
+  # Sim lessons taint the real node node-role.kubernetes.io/control-plane:NoSchedule
+  # and add KWOK fake nodes. Kyverno must keep running on the real node and
+  # must never be "scheduled" onto a fake node (its webhook would vanish).
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: "true"
+  tolerations:
+  - {key: node-role.kubernetes.io/control-plane, operator: Exists, effect: NoSchedule}
+
+crds:
+  # Post-upgrade migration job: not needed for a fresh pinned install.
+  migration:
+    enabled: false
+
+config:
+  # Webhooks never see kube-system (chart default) or the kyverno namespace
+  # (excludeKyvernoNamespace), so the system can always heal itself.
+  excludeKyvernoNamespace: true
+  # Kyverno's mutation that adds "docker.io/" to bare image names would only
+  # confuse the image-rule lessons.
+  enableDefaultRegistryMutation: false
+
+features:
+  # Every webhook Kyverno registers uses failurePolicy: Ignore, whatever a
+  # policy says. If the admission controller is down, requests go through
+  # unchecked instead of wedging the API server (namespace deletion, kdrill
+  # cleanup, course stop). The price: no enforcement while Kyverno is down.
+  forceFailurePolicyIgnore:
+    enabled: true
+  policyExceptions:
+    enabled: true
+    # PolicyExceptions are only honoured in this namespace (lesson 09).
+    namespace: policy-exceptions
+  backgroundScan:
+    # Re-scan existing resources every 2 minutes (default 1h) so PolicyReports
+    # catch up quickly in a lab.
+    backgroundScanInterval: 2m
+  logging:
+    verbosity: 1
+  omitEvents:
+    eventTypes: [PolicyApplied, PolicySkipped]
+
+admissionController:
+  replicas: 1
+  initContainer:
+    resources:
+      limits: {memory: 128Mi}
+      requests: {cpu: 10m, memory: 32Mi}
+  container:
+    resources:
+      limits: {memory: 384Mi}
+      requests: {cpu: 50m, memory: 96Mi}
+
+backgroundController:
+  enabled: true          # generate and mutate-existing rules
+  replicas: 1
+  resources:
+    limits: {memory: 192Mi}
+    requests: {cpu: 20m, memory: 48Mi}
+  rbac:
+    clusterRole:
+      # mutate-existing rules in the course patch Deployments and StatefulSets.
+      extraResources:
+      - apiGroups: [apps]
+        resources: [deployments, statefulsets]
+        verbs: [update, patch]
+
+reportsController:
+  enabled: true          # PolicyReports
+  replicas: 1
+  resources:
+    limits: {memory: 192Mi}
+    requests: {cpu: 20m, memory: 48Mi}
+
+cleanupController:
+  enabled: false         # cleanup policies / DeletingPolicy are not taught
+
+webhooksCleanup:
+  # Pre-delete hook job (pulls a kubectl image); uninstall.sh removes the
+  # webhook configurations itself.
+  enabled: false
+
