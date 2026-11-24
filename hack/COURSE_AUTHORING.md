@@ -110,9 +110,9 @@ building that course in a brand-new session with no earlier context. If you were
 pointed at one, you are the owner of the build, not a subagent, so these rules
 replace the stricter ones above:
 
-- You may run git. The repo root is the parent directory (`/Users/rahman/code/misc`);
-  kdrill is a subfolder. Commit straight to `main` (the owner has said this is
-  fine), staging only `kdrill/` paths: `git add kdrill`. Never stage other folders.
+- You may run git. This folder is the repo root (github.com/mousavian/kdrill).
+  Commit straight to `main` (the owner has said this is fine), staging only the
+  paths you changed. Never `git add -A`.
 - You may make small, tested changes to `base/lib/common.sh`, `internal/`, `cmd/`
   when a course needs them (run `make test`, rebuild, re-run one lesson of an
   older course to prove nothing broke). Keep them minimal and list them in STATUS.md.

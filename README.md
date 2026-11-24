@@ -6,9 +6,25 @@ own `kubectl`, and `kdrill verify` tells you exactly what is still wrong.
 Runs on one small k3d cluster (fake KWOK nodes for scheduling and scale
 topics, real containers and traffic for the gateway and service-mesh courses,
 real tiny models for the inference and training courses), sized for an 8 GB
-laptop. See [DESIGN.md](DESIGN.md) for the full plan.
+laptop. No cloud account, no cloud bill, no GPU.
 
-Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/), from [site/](site/).
+Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/). How it is built:
+[DESIGN.md](DESIGN.md). What is done and what is next: [STATUS.md](STATUS.md).
+
+## Courses
+
+| Course | Lessons | Runs on | What you practise |
+|---|---|---|---|
+| `k8s-scheduling` | 6 | simulated nodes | Why pods go Pending: requests, taints, spread, priority, GPUs. Start here. |
+| `gpu-scheduling` | 12 | simulated nodes | Bin-packing, time-slicing, MIG, quotas, Kueue, gang admission, DRA. |
+| `karpenter` | 12 | simulated nodes | Real Karpenter launching fake nodes: NodePools, spot, consolidation, drift. |
+| `kyverno` | 13 | simulated nodes | Admission policy as code: validate, mutate, generate, exceptions, CEL. |
+| `envoy` | 38 | real traffic | Envoy from a config file to Envoy Gateway and the Gateway API. |
+| `istio` | 14 | real traffic | Sidecars, canaries, mTLS, authorization, ambient mode. |
+| `inference` | 26 | real model | Serve an LLM: probes, KEDA on queue depth, endpoint picking, GPU capacity. |
+| `training` | 20 | real model | Real PyTorch runs as Jobs: checkpoints, preemption, JobSet, Kueue. |
+
+141 lessons in all. More courses are planned; see [courses/QUEUE.md](courses/QUEUE.md).
 
 ## Prerequisites
 
@@ -30,6 +46,8 @@ Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/), from [site/](site/).
 ## Quick start
 
 ```sh
+git clone https://github.com/mousavian/kdrill
+cd kdrill
 make build                 # builds bin/kdrill (remembers where this repo lives)
 make install               # optional: copy it to $(go env GOPATH)/bin
 bin/kdrill doctor          # checks docker, memory, k3d, kubectl
@@ -110,3 +128,10 @@ listed in `course.yaml`. Details and file formats: [DESIGN.md](DESIGN.md).
 ## Development
 
 `make test` runs unit tests, `make clean` removes `bin/`.
+
+The landing page lives in [site/](site/) and is published to GitHub Pages by
+`.github/workflows/pages.yml`.
+
+## License
+
+[MIT](LICENSE).

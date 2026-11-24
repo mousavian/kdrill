@@ -20,8 +20,8 @@ python3 -m http.server -d site 8000
 ## Publish
 
 `.github/workflows/pages.yml` deploys `index.html`, `404.html`, `og.png` and
-`CNAME` (not `notes/`) when `site/` changes on `main`. It runs once kdrill is
-its own GitHub repository with this folder at the root.
+`CNAME` (not `notes/`) when `site/` changes on `main`, or when run by hand
+from the Actions tab.
 
 1. Repository settings, Pages: Source "GitHub Actions"; custom domain
    `kdrill.5xx.tech`; tick "Enforce HTTPS" once the certificate is issued.
@@ -29,9 +29,6 @@ its own GitHub repository with this folder at the root.
 
 ## Before launch
 
-- `https://github.com/mousavian/kdrill` is linked throughout (hero button,
-  quick start, footer). Change it in `index.html` if the repository ends up
-  elsewhere.
 - Lesson titles are embedded in the `COURSES` array in `index.html` (from
   `notes/courses.json`). Update both when courses change; the 141 total also
   appears in the copy, the share text and `og.png`.

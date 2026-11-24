@@ -1,1 +1,27 @@
+# build output
 bin/
+/_site/
+
+# Go
+*.test
+*.out
+coverage.*
+
+# Python (base/images, lesson scripts)
+__pycache__/
+*.py[cod]
+.venv/
+
+# local state and secrets
+.env
+.env.*
+*.pem
+*.key
+kubeconfig*
+
+# editors and OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~

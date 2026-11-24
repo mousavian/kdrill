@@ -1,5 +1,4 @@
 # Publishes site/ to GitHub Pages at kdrill.5xx.tech.
-# Works once kdrill is its own repository (this folder at the repo root).
 # Repo settings: Pages > Source: GitHub Actions; custom domain kdrill.5xx.tech.
 name: pages
 
