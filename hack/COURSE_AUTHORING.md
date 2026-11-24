@@ -101,6 +101,10 @@ anything left on the machine; confirmation of teardown.
 
 ## Building from a BUILD.md brief (fresh session)
 
+Which course: the first one in `courses/QUEUE.md` that still has a `BUILD.md`.
+When it is built, remove it from the queue and push `main` (the scheduled
+builder runs in the cloud and only sees what is pushed).
+
 Some course directories contain only a `BUILD.md`. That file is the brief for
 building that course in a brand-new session with no earlier context. If you were
 pointed at one, you are the owner of the build, not a subagent, so these rules

@@ -15,12 +15,11 @@ Last updated: 2026-11-15
 | istio | 14 | istio (istioctl 1.31.4 + Gateway API v1.6.3 CRDs) | real-light: real containers and traffic on the k3d node; about 120 MB for istiod + CNI agent + ztunnel, about 30 MB per sidecar |
 | training | 20 | ml-tiny-image (builds `kdrill.local/ml-tiny:0.1.0`, PyTorch 2.15.0 CPU), jobset v0.13.0, kueue v0.20.4 (shared with gpu-scheduling) | real-compute: real PyTorch training (a 354k-parameter char GPT) in Jobs, Indexed Jobs, JobSets and Kueue queues; MinIO (Chainguard build, pinned by digest) as a lesson workload in 09; first `course start` builds the image (about 250 MB download, 1-3 min); tested only in a Linux container, not on the Mac (see Known gaps) |
 
-Not built yet, each with a ready-to-use build brief (`courses/<name>/BUILD.md`):
-fine-tuning, kubeflow (the kubeflow brief produces
-several small courses). To build one, open a new session in this folder and say:
-"Build the course described in courses/<name>/BUILD.md". Suggested order:
-fine-tuning, kubeflow. Both reuse the shared image `base/images/ml-tiny`
-(see `base/images/README.md`).
+Not built yet, each with a build brief (`courses/<name>/BUILD.md`), in the order of
+`courses/QUEUE.md`: llm-from-zero (build a model from zero: data, tokenizer,
+hand-written backprop, a GPT; also renames `training` to `training-platform`),
+fine-tuning (hands-on, on that model), kubeflow (several small courses). The
+scheduled "Kdrill course builder" routine takes the first one in the queue.
 
 ## Decisions made without you — review these
 

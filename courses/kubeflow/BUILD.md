@@ -1,12 +1,16 @@
 # BUILD brief — Kubeflow courses
 
+**Queue check first:** open `courses/QUEUE.md`. Build the first course listed
+there that still has a `BUILD.md`. If that is not this one, stop reading this
+file and open that course's brief instead.
+
 You are building kdrill course material in a fresh session. Read, in this
 order, before writing anything:
 
 1. `hack/COURSE_AUTHORING.md` — layout, limits, quality bar, test cycle, and the
    section "Building from a BUILD.md brief" (your permissions and hand-off).
 2. `DESIGN.md`, `README.md`, `STATUS.md`, `base/lib/common.sh`, `base/images/README.md`.
-3. `courses/training/`, `courses/inference/`, `courses/fine-tuning/` if built —
+3. `courses/training-platform/` (or `courses/training/` before the rename), `courses/inference/`, `courses/llm-from-zero/` and `courses/fine-tuning/` if built —
    Kubeflow wraps the mechanics those courses teach by hand. Reuse the `ml-tiny`
    image, its training script and the model servers; do not fork them.
 4. `courses/kyverno/` for a helm/manifest-installed component with webhooks

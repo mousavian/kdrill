@@ -1,143 +1,95 @@
 # BUILD brief — `fine-tuning` course
 
-You are building one kdrill course in a fresh session. Read, in this order,
-before writing anything:
+**Queue check first:** open `courses/QUEUE.md`. Build the first course listed
+there that still has a `BUILD.md`. If that is not this one, stop reading this
+file and open that course's brief instead.
 
-1. `hack/COURSE_AUTHORING.md` — layout, limits, quality bar, test cycle, and the
-   section "Building from a BUILD.md brief" (your permissions and hand-off).
-2. `DESIGN.md`, `README.md`, `STATUS.md`, `base/lib/common.sh`, `base/images/README.md`.
-3. `courses/training/` if it has been built (lessons, `lib.sh`, and the
-   `ml-tiny` image under `base/images/ml-tiny/`). This course continues from it
-   but must also work when the learner skipped it.
-4. `courses/inference/` if built — the serving lessons here should use the same
-   server and client helpers.
+**Prerequisite:** the `llm-from-zero` course must already be built (its
+`BUILD.md` gone and `kind: local` supported by the engine). If it is not, stop
+and report that; do not build this course first.
 
-## Goal
+You are building one kdrill course in a fresh session. Read first:
+`hack/COURSE_AUTHORING.md` (including "Building from a BUILD.md brief"),
+`STATUS.md`, `README.md`, and all of `courses/llm-from-zero/` (its lessons,
+workspace layout, image, verify style and capstone). This course continues it.
 
-A learner who finishes understands what fine-tuning is mechanically and can run
-it as a Kubernetes workflow: take a base model, prepare a dataset, train a LoRA
-adapter as a Job, evaluate it against the base, version the artifact, and serve
-base and adapters side by side. The model is a tiny character-level GPT on CPU
-so every run takes a minute or two; READMEs say what changes with a real LLM,
-PEFT/Transformers and GPUs.
+## What the owner wants
 
-- Directory: `courses/fine-tuning`, `kind: real-compute`,
-  `requires: [training]` (informational).
-- No lesson cap.
+Hands-on ML, the same way as `llm-from-zero`: the learner writes the
+fine-tuning code themselves. Plain Python in the course container, no
+Kubernetes (`kind: local`, same engine support, same workspace convention:
+`~/kdrill-work/fine-tuning/`). A brief earlier version of this file described a
+Kubernetes-workflow course; that is no longer wanted.
 
-## Design decisions already made (change only with a recorded reason)
+## Starting point
 
-- **No big downloads.** The base model is the tiny GPT from `ml-tiny`. A
-  pretrained base checkpoint must be available without running the training
-  course: either committed to the repo (a few MB at most) or produced
-  deterministically during the image build. Check size before committing.
-- **LoRA is written by hand** in the image (`lora.py`, roughly 50 lines: low-rank
-  A/B matrices on the attention projections, rank, alpha, merge/unmerge). The
-  learner reads it in the first LoRA lesson. Seeing the parameter count drop is
-  part of the lesson.
-- **Datasets are small bundled text files** in clearly different styles (for
-  example the base is trained on one corpus and adapters on two others), so
-  "did fine-tuning work" is measurable: loss on the target style falls well
-  below the base model's loss on it. Pick corpora with clear licences (public
-  domain) and keep them small.
-- **Evaluation writes JSON** (`eval.json`: loss/perplexity per dataset, per
-  model) that verify reads. Fixed seeds, loose thresholds.
-- Optional `full` profile lesson using Hugging Face `peft` on a very small real
-  model is allowed only if it fits in memory and is clearly marked as needing
-  internet. The `lite` path must never download.
+The base model is the learner's own GPT from the `llm-from-zero` capstone.
+Setup must also work if they skipped it: provide a reference base checkpoint
+(trained by the reference solution, produced deterministically by setup in a
+few minutes, or committed if it is at most a few MB) and the same tokenizer.
+Fine-tuning data is small and bundled or fetched with pinned checksums; the
+offline rule from `llm-from-zero` applies.
 
-## Machine constraints
+Pick tasks where improvement is measurable on a tiny model, for example:
+- **style**: adapt to a second author/genre (held-out loss on the target style);
+- **format**: learn a fixed question → answer template from a few hundred
+  examples (exact-match / format accuracy on held-out prompts);
+- **preference**: prefer one kind of completion over another (win rate on a
+  held-out set of pairs).
 
-8 GB Mac, Docker VM 4 GB, one k3s node, CPU only, arm64. A fine-tune run:
-1–2 minutes, under ~600 MB RSS. Storage is `local-path` PVCs. Reuse the
-`ml-tiny-image` component; extend the image (bump its version) rather than
-making a second one, and re-test one lesson of each course that already uses it.
-
-## Proposed lesson outline (a starting point — reorder, split, add)
+## Proposed lesson outline (a starting point — reorder, split, add; no cap)
 
 Part A — what fine-tuning changes
-1. Baseline: load the base checkpoint in a Job, sample text, evaluate on the base
-   corpus and on the target corpus. Starts with a Job that can't find the model
-   (wrong mount/path).
-2. Full fine-tune: continue training all weights on the target data; evaluate.
-   See the cost: a full copy of the model per task, and the base corpus loss gets worse.
-3. Catastrophic forgetting, measured; mitigations (lower LR, fewer steps, mixed data).
-4. Freezing layers: train only the last block / head; compare trainable
-   parameter counts and results.
+1. Baseline: load the base model, measure it on the target task and on its
+   original data. Write the evaluation harness the rest of the course uses.
+2. Full fine-tuning: continue training all weights on the new data; learning
+   rate and steps much smaller than pre-training; compare.
+3. Catastrophic forgetting, measured; mitigations (lower LR, fewer steps,
+   mixing in original data).
+4. Freezing: train only the last block / head; trainable parameter counts.
 
-Part B — LoRA
-5. LoRA by hand: read `lora.py`, run an adapter fine-tune, compare trainable
-   parameters and artifact size (adapter is kilobytes vs the full checkpoint).
-6. Rank and alpha: an Indexed Job sweep over rank; pick the smallest rank that
-   meets the target loss.
-7. Which modules to adapt (attention only vs attention + MLP).
-8. Learning rate and step count for adapters; over-fitting a tiny dataset and
-   spotting it with a held-out split.
-9. Merge vs keep separate: merged weights for a single-task server; adapters for many tasks.
+Part B — building the dataset
+5. Instruction / SFT data: write the formatter (prompt template, special
+   tokens), clean and deduplicate examples, split by example.
+6. Loss masking: train only on the answer tokens, not the prompt; verify by
+   checking gradients are zero on prompt positions.
+7. Data quality vs quantity: the same budget on noisy vs cleaned examples.
 
-Part C — data
-10. Dataset preparation as its own Job: clean, split train/validation, write to a
-    PVC with a manifest (hash, sizes). The tune Job must refuse a dataset
-    without a validation split.
-11. Dataset versioning: two dataset versions; the adapter records which one it
-    was trained on (metadata file next to the weights).
+Part C — parameter-efficient fine-tuning, by hand
+8. LoRA from scratch: a wrapper with low-rank A/B matrices on the attention
+   projections, scaling by alpha/r, frozen base; trainable parameter count and
+   adapter file size.
+9. Rank and alpha: a small sweep; smallest rank that reaches the target.
+10. Which layers to adapt: attention only vs attention + MLP.
+11. Merging: fold the adapter into the weights; outputs identical before and
+    after (verify checks numerically); when to keep adapters separate.
+12. Several adapters on one base: switch per request; compare tasks.
+13. Quantisation basics: int8 weights for the frozen base written by hand,
+    memory saved and quality lost; the idea behind QLoRA.
 
-Part D — the workflow on Kubernetes
-12. The fine-tune Job done properly: resources, checkpoint/resume (short recap of
-    the training course mechanics applied here), failure policy.
-13. Evaluation as a gate: an eval Job that exits non-zero when the adapter is
-    not better than base by a margin; promotion only after it passes.
-14. Artifacts and versions: a simple registry layout on a PVC or MinIO
-    (`models/<name>/<version>/{adapter.pt,meta.json,eval.json}`), a "promoted"
-    pointer, and rollback to the previous version.
-15. Chain it: prep → tune → eval → promote as one pipeline using plain
-    Kubernetes (init containers or a JobSet with ordered jobs — whichever is
-    clean on the versions installed). Note where Kubeflow Pipelines / Argo fit.
-16. Many adapters at once: tune two adapters in parallel under a Kueue quota.
+Part D — preferences and evaluation
+14. Preference data: chosen / rejected pairs.
+15. DPO from scratch: the loss written by hand, a reference model, beta;
+    win rate on held-out pairs.
+16. Evaluation that you can trust: held-out sets, contamination checks
+    (n-gram overlap between fine-tuning data and eval), seeds and variance.
+17. Capstone: a new small task of the learner's choice: build the dataset,
+    choose full vs LoRA, tune, evaluate against base, write a model card with
+    the numbers.
 
-Part E — serving the result
-17. Serve the base model with one adapter loaded at startup (a Deployment of
-    the tiny server; completions endpoint).
-18. Multi-adapter serving: one base in memory, adapter chosen per request by
-    model name; add a new adapter without restarting (reload on file change or
-    an admin call), verify both answer in their own style.
-19. Compare base vs tuned behind one Service (A/B by header or weight) and roll
-    back by moving the "promoted" pointer.
-20. Capstone: given a new small dataset, deliver a promoted adapter that passes
-    the eval gate and is being served, with a planted fault in the pipeline.
+## How verify works
 
-## How verify should work
-
-- Read results, not intentions: `eval.json` numbers (tuned loss on target below
-  base loss by a margin; base-corpus loss not degraded beyond a bound where the
-  lesson is about forgetting), adapter file size and trainable-parameter count
-  from `meta.json`, Job exit codes, which adapter answered a request (the server
-  returns the adapter name/version in a response header or field).
-- Guard against cheats: evaluating on training data, copying the base as the
-  "adapter", editing `eval.json` by hand (have the eval Job sign results with a
-  hash of the weights it loaded, or re-run a short eval inside verify), raising
-  the threshold instead of improving the adapter.
-- Runs take a minute or two: README states the wait; verify polls with a clear message.
-
-## Known traps
-
-- Determinism on CPU: set seeds and thread count; thresholds must survive
-  small run-to-run differences. Run each lesson three times before trusting it.
-- Character-level models learn style quickly but generalise poorly; choose
-  metrics (held-out loss) that actually move.
-- Keep checkpoint format stable between `training` and this course; if
-  `training` is rebuilt later it must still produce a compatible base.
-- Real pods must never land on KWOK fake nodes left by other courses.
-
-## Check upstream before relying on it
-
-Only the pieces you add beyond plain Kubernetes: JobSet ordering features if
-used (startup policy / dependsOn names and versions), Kueue version in
-`base/components/kueue`, MinIO tag if used, and — for the optional `full`
-lesson — `peft` / `transformers` versions and a model small enough to fit.
+As in `llm-from-zero`: hidden pytest tests in the course container against the
+learner's workspace, numeric checks (LoRA merge equality, masked-gradient
+zeros, DPO loss on known inputs), and outcome checks from short runs that
+verify starts itself with fixed seeds and loose thresholds. Guard against
+cheats: using `peft`/`trl` or other fine-tuning libraries (check imports),
+training on the evaluation set, editing result files, copying the base as the
+"tuned" model.
 
 ## Done means
 
-Every lesson passes the full test cycle in `hack/COURSE_AUTHORING.md`; course
-stop/start is clean; image changes are re-tested against other courses;
-footprint written in STATUS.md; this file is deleted; committed to `main`.
+Every lesson passes the full test cycle in `hack/COURSE_AUTHORING.md` (cluster
+stopped, temporary `KDRILL_WORK`/`KDRILL_STATE_DIR`); STATUS.md and README.md
+updated; this file deleted; the course removed from `courses/QUEUE.md`;
+committed and pushed to `main`.
