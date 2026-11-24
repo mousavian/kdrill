@@ -18,9 +18,9 @@ The point: practise the outages, the pending pods and the policies that block
 deploys before you meet them at work. Nothing is multiple choice; the cluster
 is the exam.
 
-## Numbers (all true as of November 2026)
+## Numbers (all true as of 25 November 2026)
 
-- 8 courses, 141 lessons live; 2 more courses planned (fine-tuning, Kubeflow).
+- 9 courses, 168 lessons live; 2 more courses planned (fine-tuning, Kubeflow).
 - Runs on one small k3d (k3s) cluster sized for an 8 GB laptop. Give Docker
   about 4 GB.
 - No cloud account, no cloud bill, no GPU needed.
@@ -42,14 +42,15 @@ is the exam.
 | envoy | 38 | real traffic | Envoy from a config file to Envoy Gateway and the Gateway API. |
 | istio | 14 | real traffic | Sidecars, canaries, mTLS, authorization, ambient mode. |
 | inference | 26 | real model | Serve an LLM: probes, KEDA on queue depth, endpoint picking, GPU capacity. |
-| training | 20 | real model | Real PyTorch runs as Jobs: checkpoints, preemption, JobSet, Kueue. |
+| training-platform | 20 | real model | Real PyTorch runs as Jobs: checkpoints, preemption, JobSet, Kueue. |
+| llm-from-zero | 27 | no cluster | Build a language model yourself: data, tokenizers, hand-written backprop, a GPT. |
 | fine-tuning | planned | real model | LoRA on the tiny model, eval gates, adapter serving. |
 | kubeflow | planned | real model | Trainer, KServe, Katib, Pipelines. |
 
 Dependencies (for maps or diagrams): gpu-scheduling, kyverno, envoy, istio need
-k8s-scheduling; karpenter and training need k8s-scheduling + gpu-scheduling;
-inference needs envoy + gpu-scheduling; fine-tuning needs training; kubeflow
-needs training + inference.
+k8s-scheduling; karpenter and training-platform need k8s-scheduling + gpu-scheduling; llm-from-zero needs nothing;
+inference needs envoy + gpu-scheduling; fine-tuning needs llm-from-zero; kubeflow
+needs training-platform + inference.
 
 ## The lesson loop (real commands and real output)
 
@@ -96,7 +97,7 @@ The GitHub URL is a placeholder until the repository is public; use it as is.
 
 - Plain, dry, a little funny. Engineers talking to engineers. Never salesy.
 - Sentence case everywhere. Buttons say what they do ("Copy the commands",
-  "See all 141 lessons"). No arrows appended to buttons or links.
+  "See all 168 lessons"). No arrows appended to buttons or links.
 - No eyebrow labels in tracked capitals above headings, no "A · B · C" meta
   strings, no "WORD — fragment" labels, unless the design's concept itself
   calls for that typography (for example printed packaging or an exam paper).

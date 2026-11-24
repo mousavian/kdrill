@@ -4,6 +4,7 @@
   "title": "Kubernetes scheduling fundamentals",
   "kind": "sim",
   "requires": [],
+  "line": "Why pods go Pending: requests, taints, spread, priority, GPUs. Start here.",
   "lessons": [
    {
     "id": "01-requests-and-pending",
@@ -44,6 +45,7 @@
   "requires": [
    "k8s-scheduling"
   ],
+  "line": "Bin-packing, time-slicing, MIG, quotas, Kueue, gang admission, DRA.",
   "lessons": [
    {
     "id": "01-gpu-node-labels",
@@ -115,6 +117,7 @@
    "k8s-scheduling",
    "gpu-scheduling"
   ],
+  "line": "Real Karpenter launching fake nodes: NodePools, spot, consolidation, drift.",
   "lessons": [
    {
     "id": "01-first-nodepool",
@@ -185,6 +188,7 @@
   "requires": [
    "k8s-scheduling"
   ],
+  "line": "Admission policy as code: validate, mutate, generate, exceptions, CEL.",
   "lessons": [
    {
     "id": "01-first-policy",
@@ -260,6 +264,7 @@
   "requires": [
    "k8s-scheduling"
   ],
+  "line": "Envoy from a config file to Envoy Gateway and the Gateway API.",
   "lessons": [
    {
     "id": "01-first-proxy",
@@ -460,6 +465,7 @@
   "requires": [
    "k8s-scheduling"
   ],
+  "line": "Sidecars, canaries, mTLS, authorization, ambient mode.",
   "lessons": [
    {
     "id": "01-sidecar-injection",
@@ -541,6 +547,7 @@
    "envoy",
    "gpu-scheduling"
   ],
+  "line": "Serve an LLM: probes, KEDA on queue depth, endpoint picking, GPU capacity.",
   "lessons": [
    {
     "id": "01-first-completion",
@@ -675,13 +682,14 @@
   ]
  },
  {
-  "id": "training",
-  "title": "Training models on Kubernetes",
+  "id": "training-platform",
+  "title": "Running model training on Kubernetes",
   "kind": "real-compute",
   "requires": [
    "k8s-scheduling",
    "gpu-scheduling"
   ],
+  "line": "Real PyTorch runs as Jobs: checkpoints, preemption, JobSet, Kueue.",
   "lessons": [
    {
     "id": "01-run-as-a-job",
@@ -786,24 +794,168 @@
   ]
  },
  {
+  "id": "llm-from-zero",
+  "title": "Build a language model from zero",
+  "kind": "local",
+  "requires": [],
+  "line": "Build a language model yourself: data, tokenizers, hand-written backprop, a GPT. No cluster.",
+  "lessons": [
+   {
+    "id": "01-gather",
+    "n": "01",
+    "title": "Gather data for real"
+   },
+   {
+    "id": "02-inspect",
+    "n": "02",
+    "title": "Look before you clean"
+   },
+   {
+    "id": "03-clean",
+    "n": "03",
+    "title": "Clean it"
+   },
+   {
+    "id": "04-dedup",
+    "n": "04",
+    "title": "Filter and deduplicate"
+   },
+   {
+    "id": "05-split",
+    "n": "05",
+    "title": "Split without leakage"
+   },
+   {
+    "id": "06-data-card",
+    "n": "06",
+    "title": "Put it together and write the data card"
+   },
+   {
+    "id": "07-char-tokenizer",
+    "n": "07",
+    "title": "A character tokenizer"
+   },
+   {
+    "id": "08-bpe",
+    "n": "08",
+    "title": "Byte-pair encoding from scratch"
+   },
+   {
+    "id": "09-vocab-size",
+    "n": "09",
+    "title": "Vocabulary size trade-offs"
+   },
+   {
+    "id": "10-bigram-counts",
+    "n": "10",
+    "title": "A counting bigram model"
+   },
+   {
+    "id": "11-loss-perplexity",
+    "n": "11",
+    "title": "Loss and perplexity"
+   },
+   {
+    "id": "12-autograd",
+    "n": "12",
+    "title": "Autograd from scratch"
+   },
+   {
+    "id": "13-neural-bigram",
+    "n": "13",
+    "title": "A neural bigram"
+   },
+   {
+    "id": "14-mlp-lm",
+    "n": "14",
+    "title": "An MLP language model with manual backprop"
+   },
+   {
+    "id": "15-init-and-lr",
+    "n": "15",
+    "title": "Training dynamics - initialisation and learning rate"
+   },
+   {
+    "id": "16-layernorm",
+    "n": "16",
+    "title": "Normalisation - layer norm by hand"
+   },
+   {
+    "id": "17-numpy-to-torch",
+    "n": "17",
+    "title": "From numpy to PyTorch"
+   },
+   {
+    "id": "18-training-loop",
+    "n": "18",
+    "title": "Batches and the training loop properly"
+   },
+   {
+    "id": "19-attention",
+    "n": "19",
+    "title": "Self-attention, one causal head"
+   },
+   {
+    "id": "20-transformer-block",
+    "n": "20",
+    "title": "The transformer block"
+   },
+   {
+    "id": "21-gpt",
+    "n": "21",
+    "title": "The full GPT"
+   },
+   {
+    "id": "22-train-for-real",
+    "n": "22",
+    "title": "Train it for real"
+   },
+   {
+    "id": "23-regularisation",
+    "n": "23",
+    "title": "Overfitting and regularisation"
+   },
+   {
+    "id": "24-generation",
+    "n": "24",
+    "title": "Generation - temperature, top-k, top-p"
+   },
+   {
+    "id": "25-scaling",
+    "n": "25",
+    "title": "A small scaling experiment"
+   },
+   {
+    "id": "26-evaluation",
+    "n": "26",
+    "title": "Evaluation beyond a single loss"
+   },
+   {
+    "id": "27-capstone",
+    "n": "27",
+    "title": "Capstone - the whole pipeline on a corpus of your choice"
+   }
+  ]
+ },
+ {
   "id": "fine-tuning",
   "title": "Fine-tuning models on Kubernetes",
   "kind": "real-compute",
   "requires": [
-   "training"
+   "llm-from-zero"
   ],
-  "lessons": [],
-  "status": "planned"
+  "line": "LoRA on the tiny model, eval gates, adapter serving.",
+  "lessons": []
  },
  {
   "id": "kubeflow",
   "title": "Kubeflow (Trainer, KServe, Katib, Pipelines)",
   "kind": "real-compute",
   "requires": [
-   "training",
+   "training-platform",
    "inference"
   ],
-  "lessons": [],
-  "status": "planned"
+  "line": "Trainer, KServe, Katib, Pipelines.",
+  "lessons": []
  }
 ]
