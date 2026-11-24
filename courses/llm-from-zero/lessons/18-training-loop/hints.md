@@ -1,0 +1,5 @@
+`get_batch`: `ix = torch.randint(0, len(data) - block_size, (batch_size,), generator=generator)`; then `torch.stack([data[i:i + block_size] for i in ix.tolist()])` for `x` and the same slice shifted by one for `y`. The upper bound `len(data) - block_size` is exclusive, which is exactly what keeps `i + block_size + 1` inside the data.
+---
+`evaluate`: remember `was_training = model.training`, call `model.eval()`, loop `iters` times calling `get_batch` and the model (the decorator `@torch.no_grad()` is already on the function), accumulate `loss.item()`, then `model.train(was_training)` and return the mean.
+---
+`train`: build `opt = torch.optim.AdamW(...)` and `g = torch.Generator().manual_seed(seed)`. In the loop: at `step % eval_every == 0` call a helper that evaluates train and val data with fresh `torch.Generator().manual_seed(1234)` generators, appends the row and logs. Then `get_batch(train_data, ..., g)`, `model.train()`, forward, `opt.zero_grad(set_to_none=True)`, `loss.backward()`, `opt.step()`. After the loop evaluate once more with `step = steps`.

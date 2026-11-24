@@ -1,0 +1,6 @@
+title: Byte-pair encoding from scratch
+goal: >
+  Train byte-level BPE merges on the training text and write encode, decode and special
+  tokens, so that any text round-trips and common words become single tokens.
+concepts: [byte-pair encoding, subword tokens, pre-tokenization, merges, special tokens, byte-level fallback]
+timeout: 120s

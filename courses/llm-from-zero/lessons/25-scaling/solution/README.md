@@ -1,0 +1,7 @@
+# Solution notes
+
+- The step budget is just `C / (6 N B T)`: halve the parameters and you can afford twice the steps. That trade is the whole experiment.
+- `fit_power_law` is linear regression in log-log space; the slope is the exponent and `exp(intercept)` the prefactor. It needs positive data because of the logarithm, hence the `ValueError`.
+- `run_one` fixes everything except the size (same seed, same learning rate, same batch), so differences in the table come from size and the number of steps the budget allows. In a more careful study the learning rate would be tuned per size.
+- What the reference run showed (validation loss, four sizes of 29k, 108k, 347k and 808k parameters; `scaling_run.py`, about 2.5 minutes): at 2e11 FLOPs 1.86, 2.16, 2.73, 3.07, and at 6e11 FLOPs 1.73, 1.84, 2.29, 2.61. So at these (tiny) budgets the *smallest* model wins both times: the bigger ones get 81 to 603 steps and are far from converged. The point is the trend: tripling the compute improves the smallest model by 0.14 but the largest by 0.46, and the gap between them shrinks from 1.20 to 0.88; the compute-optimal size moves right as the budget grows, and with a budget 10x or 100x larger a mid-sized model would win. Your numbers will differ a little; a result where the largest model wins at 2e11 FLOPs would be a surprise worth investigating (learning rate? a bug?).
+- One seed and one learning rate per point: do not read the third decimal. The honest summary is "smaller wins when starved, and less so as compute grows".

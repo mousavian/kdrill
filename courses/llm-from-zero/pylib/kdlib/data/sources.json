@@ -1,0 +1,131 @@
+{
+ "about": "Pinned Project Gutenberg texts for llm-from-zero. Files come from Gutenberg mirrors (the site asks bulk users to use mirrors, see https://www.gutenberg.org/policy/robot_access.html). The sha256 sums were recorded on 2026-11-24.",
+ "books": [
+  {
+   "id": 244,
+   "title": "A Study in Scarlet",
+   "author": "Arthur Conan Doyle",
+   "file": "244.txt",
+   "bytes": 244344,
+   "sha256": "5e36e579ff9a18a7517cccf1308385c7a355bf4764fc953adeb243dc19ec6858",
+   "urls": [
+    "https://gutenberg.pglaf.org/2/4/244/244-0.txt",
+    "https://mirrors.xmission.com/gutenberg/2/4/244/244-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/244",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 2097,
+   "title": "The Sign of the Four",
+   "author": "Arthur Conan Doyle",
+   "file": "2097.txt",
+   "bytes": 236945,
+   "sha256": "89b4113e6503583a82cf38966e2125fc2a45d61b0670cdf77dca3c7809bc362f",
+   "urls": [
+    "https://gutenberg.pglaf.org/2/0/9/2097/2097-0.txt",
+    "https://mirrors.xmission.com/gutenberg/2/0/9/2097/2097-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/2097",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 1661,
+   "title": "The Adventures of Sherlock Holmes",
+   "author": "Arthur Conan Doyle",
+   "file": "1661.txt",
+   "bytes": 607504,
+   "sha256": "b9c105a5c0cf9fcb37c7d0211658851ed56074519c9455d15e20f04c0c5a3174",
+   "urls": [
+    "https://gutenberg.pglaf.org/1/6/6/1661/1661-0.txt",
+    "https://mirrors.xmission.com/gutenberg/1/6/6/1661/1661-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/1661",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 834,
+   "title": "The Memoirs of Sherlock Holmes",
+   "author": "Arthur Conan Doyle",
+   "file": "834.txt",
+   "bytes": 612739,
+   "sha256": "a33be62b6c28282cfbb14b5c2f92e85d85bd85b03b38ea482cff8b450b4e51cc",
+   "urls": [
+    "https://gutenberg.pglaf.org/8/3/834/834-0.txt",
+    "https://mirrors.xmission.com/gutenberg/8/3/834/834-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/834",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 2852,
+   "title": "The Hound of the Baskervilles",
+   "author": "Arthur Conan Doyle",
+   "file": "2852.txt",
+   "bytes": 360970,
+   "sha256": "e448a2114815f10c77b3d138b4437f9e62ea94330ca8eb154721b97879984240",
+   "urls": [
+    "https://gutenberg.pglaf.org/2/8/5/2852/2852-0.txt",
+    "https://mirrors.xmission.com/gutenberg/2/8/5/2852/2852-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/2852",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 108,
+   "title": "The Return of Sherlock Holmes",
+   "author": "Arthur Conan Doyle",
+   "file": "108.txt",
+   "bytes": 686476,
+   "sha256": "63c93548e1d5678f9e5027ae72b9a6bdcde971d61f5569e721b3dfeb961312b2",
+   "urls": [
+    "https://gutenberg.pglaf.org/1/0/108/108-0.txt",
+    "https://mirrors.xmission.com/gutenberg/1/0/108/108-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/108",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 3289,
+   "title": "The Valley of Fear",
+   "author": "Arthur Conan Doyle",
+   "file": "3289.txt",
+   "bytes": 329585,
+   "sha256": "210f5ccdb7c3c20529c9e391ddc3c2994eeba48aaa0ec44d74e79749a0888408",
+   "urls": [
+    "https://gutenberg.pglaf.org/3/2/8/3289/3289-0.txt",
+    "https://mirrors.xmission.com/gutenberg/3/2/8/3289/3289-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/3289",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 2350,
+   "title": "His Last Bow",
+   "author": "Arthur Conan Doyle",
+   "file": "2350.txt",
+   "bytes": 338062,
+   "sha256": "d348612993241fea67d1fbb59ea76f189400249f41a003dd9b2d1c92c8763783",
+   "urls": [
+    "https://gutenberg.pglaf.org/2/3/5/2350/2350-0.txt",
+    "https://mirrors.xmission.com/gutenberg/2/3/5/2350/2350-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/2350",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  },
+  {
+   "id": 69700,
+   "title": "The Case-Book of Sherlock Holmes",
+   "author": "Arthur Conan Doyle",
+   "file": "69700.txt",
+   "bytes": 463887,
+   "sha256": "9c4e3f13c9c161c6c715c0a307817d75819564c5b3375243863ceef8a2813276",
+   "urls": [
+    "https://gutenberg.pglaf.org/6/9/7/0/69700/69700-0.txt",
+    "https://mirrors.xmission.com/gutenberg/6/9/7/0/69700/69700-0.txt"
+   ],
+   "page": "https://www.gutenberg.org/ebooks/69700",
+   "licence": "Public domain in the USA (author died 1930); distributed by Project Gutenberg under the Project Gutenberg License"
+  }
+ ]
+}

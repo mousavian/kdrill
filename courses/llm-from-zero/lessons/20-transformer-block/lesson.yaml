@@ -1,0 +1,6 @@
+title: The transformer block
+goal: >
+  Build multi-head attention, the feed-forward network and the pre-norm transformer block with
+  residual connections, and count its parameters by hand before counting them with code.
+concepts: [multi-head attention, feed-forward network, residual connections, pre-norm, layer norm, parameter counting]
+timeout: 90s

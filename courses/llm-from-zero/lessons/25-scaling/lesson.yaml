@@ -1,0 +1,6 @@
+title: A small scaling experiment
+goal: >
+  Compare model sizes at a fixed compute budget: compute FLOPs by the 6ND rule, turn a budget
+  into a step count, fit a power law, plot loss curves, and read the result honestly.
+concepts: [scaling laws, compute budget, FLOPs estimate, 6ND, power-law fit, loss curves, compute-optimal training]
+timeout: 120s

@@ -1,0 +1,7 @@
+title: Gather data for real
+goal: >
+  Write a polite, resumable fetcher (retries, cache, checksums, mirrors, manifest)
+  and use it to download nine pinned Sherlock Holmes books from Project Gutenberg.
+concepts: [data gathering, retries and backoff, checksums, caching, manifests, polite crawling]
+timeout: 120s
+network: true

@@ -1,0 +1,6 @@
+title: Autograd from scratch
+goal: >
+  Write a tiny scalar automatic-differentiation engine: a Value that records the graph
+  of operations and backward() that applies the chain rule, checked against finite differences.
+concepts: [automatic differentiation, computation graph, chain rule, reverse mode, topological order, gradient checking]
+timeout: 90s

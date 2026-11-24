@@ -1,0 +1,7 @@
+title: The full GPT
+goal: >
+  Assemble token and position embeddings, a stack of blocks, a final norm and a tied output
+  layer into a GPT; initialise it so the first loss is ln V; predict its size by formula; and
+  prove it works by overfitting one batch.
+concepts: [GPT architecture, token and position embeddings, weight tying, GPT-2 initialisation, parameter count, overfitting one batch]
+timeout: 120s

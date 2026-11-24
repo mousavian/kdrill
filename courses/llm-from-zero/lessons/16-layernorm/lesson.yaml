@@ -1,0 +1,6 @@
+title: Normalisation - layer norm by hand
+goal: >
+  Write layer normalisation with its backward pass in numpy, check it against finite
+  differences, and measure why normalised layers keep signals healthy at any weight scale.
+concepts: [layer normalisation, normalisation vs initialisation, gradient through normalisation, activation scale, deep networks]
+timeout: 90s

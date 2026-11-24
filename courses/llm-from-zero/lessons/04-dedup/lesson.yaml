@@ -1,0 +1,6 @@
+title: Filter and deduplicate
+goal: >
+  Remove junk paragraphs and exact and near-duplicates (hashing, word shingles,
+  Jaccard similarity, an inverted index) and report exactly what was removed and why.
+concepts: [deduplication, shingles, Jaccard similarity, inverted index, data filtering, measuring removals]
+timeout: 120s

@@ -35,6 +35,19 @@ be covered cleanly; one concept per lesson; lessons build on each other.
 - `real-light` / `real-compute` — the taint is removed; pods run as real containers on
   the single k3s node. Every image must be multi-arch (arm64), small, and pinned.
 
+## Local courses (`kind: local`)
+
+No cluster: lessons run the learner's Python in the course image (see `courses/llm-from-zero/`,
+`base/images/ml-dev/`). Per lesson: `starter/` (interfaces with TODOs, copied to the workspace only
+when absent), `solution/` (README + the same file names), hidden `tests/test_*.py` (pytest, run by
+`kd_pytest` in verify.sh), `hints.md`, `setup.sh` (`llm_setup <mode>` seeds data), `lesson.yaml`
+(`network: true` only where the lesson needs the internet). Rules: tests check behaviour on inputs
+the learner has not seen and reject cheats (library imports in hand-written lessons, `nn.MultiheadAttention`,
+training on validation data); verify output names the failing behaviour, never the answer; keep each
+verify under about 60 s on 2 CPUs; the reference solutions must pass all lessons in order from an empty
+workspace (`courses/llm-from-zero/hack/regression.sh`). Test with a temporary `KDRILL_WORK`,
+`KDRILL_STATE_DIR` and `KDRILL_CACHE`; the cluster is not needed.
+
 ## Machine limits (design for these)
 
 8 GB Apple Silicon Mac, Docker VM 4 GB, one k3s node (~0.6–1 GB by itself), system

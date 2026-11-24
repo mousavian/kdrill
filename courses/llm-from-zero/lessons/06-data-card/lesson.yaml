@@ -1,0 +1,7 @@
+title: Put it together and write the data card
+goal: >
+  Chain fetch output, cleaning, deduplication and the document split into one
+  reproducible build_dataset(), and generate a data card that states what is in the
+  dataset, where it came from, what was removed and what its limits are.
+concepts: [data pipeline, reproducibility, data card, documentation of datasets, bias and limitations]
+timeout: 120s

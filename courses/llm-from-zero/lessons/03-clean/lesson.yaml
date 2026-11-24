@@ -1,0 +1,7 @@
+title: Clean it
+goal: >
+  Strip Project Gutenberg headers and footers, drop tables of contents and
+  illustration tags, normalise unicode and whitespace and unwrap hard-wrapped
+  paragraphs, with tests on tricky samples you have not seen.
+concepts: [text cleaning, unicode normalisation, boilerplate removal, idempotence]
+timeout: 90s

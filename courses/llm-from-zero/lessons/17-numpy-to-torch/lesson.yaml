@@ -1,0 +1,6 @@
+title: From numpy to PyTorch
+goal: >
+  Port the MLP language model to PyTorch tensors and let autograd compute the gradients
+  you derived by hand; prove they agree and train with a few lines.
+concepts: [tensors, requires_grad, autograd, backward, torch.no_grad, cross_entropy, float64 vs float32, dtype of indices]
+timeout: 90s

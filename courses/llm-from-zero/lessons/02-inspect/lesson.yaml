@@ -1,0 +1,6 @@
+title: Look before you clean
+goal: >
+  Write a data report: encoding, BOM, line endings, character inventory and other
+  oddities of a raw text file, so you know what the cleaning step must handle.
+concepts: [encodings, BOM, line endings, character inventory, exploratory data analysis]
+timeout: 90s

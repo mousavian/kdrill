@@ -1,0 +1,16 @@
+title: Build a language model from zero
+description: >
+  Learn to train on data and build your own model, from nothing. You write the
+  ML code yourself: gather and clean real text (Sherlock Holmes from Project
+  Gutenberg), deduplicate and split it without leakage and describe it in a data
+  card; write a character tokenizer and byte-pair encoding; build language models
+  by hand in plain Python and numpy (a counting bigram, a scalar autograd engine,
+  a neural bigram and an MLP with every gradient written by you); then switch to
+  PyTorch for self-attention, the transformer block, a GPT, a real training loop
+  with checkpoints, regularisation, sampling, a small scaling experiment,
+  evaluation and a capstone that runs the whole pipeline end to end. Runs plain
+  Python in a container on your machine, no Kubernetes cluster needed. For
+  running training on Kubernetes see training-platform.
+kind: local
+image: kdrill.local/ml-dev:0.1.0
+image_build: base/images/ml-dev/build.sh

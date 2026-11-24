@@ -1,0 +1,6 @@
+title: Split without leakage
+goal: >
+  Split the corpus into train, validation and test by whole document, measure leakage
+  and out-of-vocabulary rates, and see why a random line split flatters the model.
+concepts: [train/validation/test split, data leakage, document-level splitting, OOV rate, n-gram overlap]
+timeout: 90s

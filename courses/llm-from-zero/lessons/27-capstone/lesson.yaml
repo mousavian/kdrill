@@ -1,0 +1,6 @@
+title: Capstone - the whole pipeline on a corpus of your choice
+goal: >
+  Chain everything you built (data pipeline, tokenizer, GPT, training, evaluation, sampling) into
+  one run that writes a checkpoint and a model card, and that the fine-tuning course can start from.
+concepts: [end-to-end pipeline, checkpoint contract, model card, reproducibility, test-set discipline, handoff]
+timeout: 150s

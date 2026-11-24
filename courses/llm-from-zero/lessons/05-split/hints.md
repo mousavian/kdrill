@@ -1,0 +1,5 @@
+`split_documents`: `names = sorted(docs); random.Random(seed).shuffle(names)`; then walk the shuffled names and give each document to the split that is furthest below its target, where the target is `fraction * total_characters` and "so far" is the number of characters already assigned. Keep running totals in a list of three numbers.
+---
+The "every split gets a document" rule: before choosing greedily, check which active splits (fraction > 0) are still empty; when the number of documents left equals the number of empty splits, the next document must go to one of the empty ones (pick the one with the largest deficit). Check `fractions` sum and the document count first and raise `ValueError`.
+---
+`ngram_overlap`: build the list of n-grams of `other_text` (tuples of consecutive words) and a `set` of the n-grams of `reference_text`; the answer is the share of the first list found in the set. `oov_rate` is the same idea with single words. `write_splits`: `"\n\n".join(docs[n].strip() for n in sorted(names)) + "\n"` per file, and `json.dump(assignment, f, indent=2)`.

@@ -9,7 +9,7 @@ Docker, and always (re)import, because a nuked cluster loses imported images.
 
 ## ml-tiny (`kdrill.local/ml-tiny:0.1.0`)
 
-Created by the training course; later courses (fine-tuning, kubeflow) reuse
+Created by the training-platform course (then called training); later courses (fine-tuning, kubeflow) reuse
 it and extend it without breaking it (bump `ML_TINY_VERSION` in `build.sh`
 when the contents change, because `build.sh` skips the build when the tag
 exists). The `ml-tiny-image` component runs `build.sh` on `course start`.
@@ -32,3 +32,18 @@ exists). The `ml-tiny-image` component runs `build.sh` on `course start`.
   400 MB RSS; batch 512 needs about 1.1 GB.
 - Behind a TLS-inspecting proxy: `KDRILL_BUILD_CA=/path/ca.pem` passes an extra
   CA bundle to pip as a build secret; `HTTPS_PROXY` is passed to the build.
+
+## ml-dev (`kdrill.local/ml-dev:0.1.0`)
+
+For **local courses** (`kind: local`, currently llm-from-zero): plain Python, no cluster. `build.sh`
+runs a plain `docker build` (skipped when the tag exists) and does **not** import anything into k3d;
+the engine runs it on demand (`image_build:` in `course.yaml`) before `kdrill start` and `kdrill py`.
+
+- `python:3.13-slim` (pinned by digest), PyTorch 2.15.0+cpu from the CPU wheel index, numpy 2.4.6,
+  pytest 9.2.0, tqdm 4.70.1, matplotlib 3.11.2 (headless, for saved plots only). No Jupyter.
+- `/opt/kdrill/kdreport.py`: the pytest plugin behind `kd_pytest` (one check line per test, no
+  tracebacks, a per-test time limit). Changing it needs a new image tag (bump `ML_DEV_VERSION` in
+  `build.sh` and `image:` in the course), because the build is skipped when the tag exists.
+- Measured (amd64 build, Linux host): about 1.1 GB unpacked in Docker, built in about 100 s on a
+  fast link. `kdrill py` runs it as the host user with `--cpus 2 --memory 1536m` (lite) and no network.
+- Behind a TLS-inspecting proxy: `KDRILL_BUILD_CA=/path/ca.pem` and `HTTPS_PROXY` work as for ml-tiny.

@@ -1,0 +1,6 @@
+title: A counting bigram model
+goal: >
+  Build the simplest language model there is, with numpy and no neural network: count
+  which token follows which, turn counts into probabilities, smooth them and sample text.
+concepts: [language model, bigram, counts to probabilities, smoothing, sampling, no deep-learning libraries]
+timeout: 60s

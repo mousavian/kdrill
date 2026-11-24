@@ -15,6 +15,7 @@ import (
 	"syscall"
 	"time"
 
+	"kdrill/internal/course"
 	"kdrill/internal/state"
 )
 
@@ -45,6 +46,11 @@ Status
 Courses
   course start|stop <course>   install / remove a course's components
 
+Local courses (kind: local; no cluster needed)
+  py [file.py] [args]          run Python in the course container with the
+                               workspace mounted at /work (no file: a shell);
+                               flags before the file: --course <c> --net
+
 Lesson loop (ref = <course>/<lesson>, e.g. k8s-scheduling/01)
   start <ref>                  set up a lesson
   show                         reprint the task
@@ -58,7 +64,8 @@ Lesson loop (ref = <course>/<lesson>, e.g. k8s-scheduling/01)
 verify, reset, hint, cleanup, next, solution and show accept an optional <ref>;
 all but solution/show fail if it is not the active lesson.
 
-Environment: KDRILL_HOME, KDRILL_CLUSTER (default kdrill), KDRILL_STATE_DIR (default ~/.kdrill)
+Environment: KDRILL_WORK (workspace root, default ~/kdrill-work), KDRILL_CACHE
+(default ~/.cache/kdrill), KDRILL_HOME, KDRILL_CLUSTER (default kdrill), KDRILL_STATE_DIR (default ~/.kdrill)
 `
 
 // Run executes a command line and returns the process exit code.
@@ -114,6 +121,9 @@ func (a *App) dispatch(cmd string, args []string, defaultHome string) error {
 	if a.st, err = state.Load(a.statePath()); err != nil {
 		return fmt.Errorf("reading %s: %w", a.statePath(), err)
 	}
+	if err := a.migrateFormerCourses(); err != nil {
+		return err
+	}
 	switch cmd {
 	case "cluster":
 		if len(args) != 1 {
@@ -149,6 +159,8 @@ func (a *App) dispatch(cmd string, args []string, defaultHome string) error {
 			return err
 		}
 		return a.profile(p)
+	case "py":
+		return a.pyCmd(args)
 	case "show", "solution":
 		ref, err := opt(cmd + " [<course>/<lesson>]")
 		if err != nil {
@@ -299,4 +311,23 @@ func (a *App) runScriptTo(script, dir, phase string, extra []string, timeout tim
 func fileExists(p string) bool {
 	fi, err := os.Stat(p)
 	return err == nil && !fi.IsDir()
+}
+
+// migrateFormerCourses applies `formerly:` renames from course.yaml files to
+// the loaded state and saves it when something moved.
+func (a *App) migrateFormerCourses() error {
+	cs, err := course.All(a.Home)
+	if err != nil {
+		return nil // a broken course.yaml is reported by the command that needs it
+	}
+	renames := map[string]string{}
+	for _, c := range cs {
+		for _, old := range c.Formerly {
+			renames[old] = c.ID
+		}
+	}
+	if len(renames) > 0 && a.st.Migrate(renames) {
+		return a.save()
+	}
+	return nil
 }

@@ -1,0 +1,6 @@
+title: An MLP language model with manual backprop
+goal: >
+  Predict the next character from the previous few with embeddings and a hidden layer,
+  writing the forward pass and the backward pass through every layer by hand in numpy.
+concepts: [embeddings, context window, hidden layer, backpropagation, minibatch SGD, gradient checking]
+timeout: 120s

@@ -1,0 +1,7 @@
+title: Self-attention, one causal head
+goal: >
+  Write scaled dot-product self-attention with a causal mask by hand: first the uniform
+  average of the past as a matrix product, then queries, keys and values, one head as an
+  nn.Module.
+concepts: [self-attention, queries keys values, causal mask, softmax, scaling, tensor shapes, matrix multiplication]
+timeout: 90s

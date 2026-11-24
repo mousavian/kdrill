@@ -1,0 +1,21 @@
+title: Running model training on Kubernetes
+formerly: [training]
+description: >
+  The platform side of training: run real (tiny) model training as Kubernetes
+  batch workloads and keep it alive. The model is ready-made and you write
+  Kubernetes objects; to build the model and its data pipeline yourself, take
+  llm-from-zero. A character-level GPT with about 350,000 parameters trains on CPU
+  in one to three minutes, so every lesson runs real PyTorch processes. Part A
+  (01-04) packages a run as a Job and sizes, configures and feeds it. Part B
+  (05-09) protects the work: checkpoints on a volume, kill and resume, Job
+  failure policies, graceful SIGTERM handling and checkpoints in object
+  storage (MinIO). Part C (10-14) runs more than one pod: a hyperparameter
+  sweep as an Indexed Job, PyTorch DDP across two pods by hand, shared
+  storage, restarting the whole group, and JobSet. Part D (15-17) queues
+  real jobs with Kueue: admission, priority and preemption with resume, gang
+  admission for a JobSet. Part E (18-20) operates it: metrics and CPU
+  throttling, results as versioned artifacts, and a capstone with planted
+  faults.
+kind: real-compute
+components: [ml-tiny-image, jobset, kueue]
+requires: [k8s-scheduling, gpu-scheduling]

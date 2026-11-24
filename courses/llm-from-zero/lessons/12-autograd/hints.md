@@ -1,0 +1,5 @@
+Every operation has the same shape: compute `out = Value(result, (self, other), "op")`, define a nested `_backward()` that does `self.grad += (local derivative) * out.grad` (and the same for `other`), set `out._backward = _backward`, return `out`. Wrap plain numbers first: `other = other if isinstance(other, Value) else Value(other)`. For `a * b`: `self.grad += other.data * out.grad`, `other.grad += self.data * out.grad`.
+---
+Local derivatives: `x ** k` -> `k * x ** (k - 1)`; `exp` -> the output itself; `log` -> `1 / x`; `tanh` -> `1 - t**2` with `t` the output; `relu` -> 1 if `x > 0` else 0. Build the rest from these: `-a` is `a * -1`, `a - b` is `a + (-b)`, `a / b` is `a * b ** -1`, `n - a` is `(-a) + n`, `n / a` is `Value(n) * a ** -1`.
+---
+`backward`: iterative depth-first search with a stack of `(node, expanded)` pairs. Pop; if `expanded`, append to `order`; else if unseen, mark it, push `(node, True)` and then each parent as `(parent, False)`. `order` then lists parents before children. Zero every `grad` in it, set `self.grad = 1.0`, and call `node._backward()` for `reversed(order)`.

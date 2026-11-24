@@ -1,0 +1,6 @@
+title: Generation - temperature, top-k, top-p
+goal: >
+  Turn a trained language model into a text generator and write the sampling controls
+  yourself: temperature, top-k, top-p (nucleus), a repetition penalty, context cropping and an end-of-text stop.
+concepts: [autoregressive generation, sampling, temperature, top-k, top-p, repetition penalty, context window, greedy decoding]
+timeout: 90s

@@ -1,0 +1,6 @@
+title: Overfitting and regularisation
+goal: >
+  Control overfitting: apply weight decay only to weight matrices, understand dropout, and stop
+  training on validation loss while restoring the best weights.
+concepts: [overfitting, weight decay, parameter groups, dropout, early stopping, best checkpoint, generalisation gap]
+timeout: 120s

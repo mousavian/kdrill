@@ -28,8 +28,13 @@ func (a *App) status(courseID string) error {
 	}
 
 	tw := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
-	fmt.Fprintf(tw, "cluster\t%s\n", a.clusterLine())
-	fmt.Fprintf(tw, "kubectl\t%s\n", a.contextLine())
+	if a.activeIsLocal() {
+		fmt.Fprintf(tw, "cluster\tnot needed for the active (local) lesson; %s\n", a.clusterLine())
+	} else {
+		fmt.Fprintf(tw, "cluster\t%s\n", a.clusterLine())
+		fmt.Fprintf(tw, "kubectl\t%s\n", a.contextLine())
+	}
+	fmt.Fprintf(tw, "workspace root\t%s\n", workRoot())
 	fmt.Fprintf(tw, "profile\t%s\n", a.st.Profile)
 	fmt.Fprintf(tw, "components\t%s\n", orNone(strings.Join(a.st.Components, ", ")))
 	fmt.Fprintf(tw, "courses started\t%s\n", orNone(strings.Join(a.st.Courses, ", ")))
@@ -43,6 +48,15 @@ func (a *App) status(courseID string) error {
 		return a.lessonTable(*only)
 	}
 	return a.courseTable()
+}
+
+// activeIsLocal reports whether the active lesson is a kind: local lesson.
+func (a *App) activeIsLocal() bool {
+	if a.st.Active == nil {
+		return false
+	}
+	x, err := a.loadActive()
+	return err == nil && x.lesson().IsLocal(x.c)
 }
 
 // clusterLine describes the k3d cluster and, when it runs, its nodes.
@@ -138,9 +152,16 @@ func (a *App) activeSection() {
 	if p := a.st.Progress[x.c.ID][l.ID]; p != nil && p.CompletedAt != nil {
 		verified = "passed " + ago(*p.CompletedAt)
 	}
-	fmt.Printf("  kind:      %s   namespace: %s   started: %s   hints: %d/%d\n",
-		l.EffectiveKind(x.c), l.NS(), ago(a.st.Active.StartedAt),
+	ns := "   namespace: " + l.NS()
+	if l.IsLocal(x.c) {
+		ns = "" // no cluster, no namespace
+	}
+	fmt.Printf("  kind:      %s%s   started: %s   hints: %d/%d\n",
+		l.EffectiveKind(x.c), ns, ago(a.st.Active.StartedAt),
 		a.st.Active.HintsShown, len(course.SplitHints(string(b))))
+	if l.IsLocal(x.c) {
+		fmt.Printf("  workspace: %s\n", a.workspace(x.c.ID))
+	}
 	fmt.Printf("  verified:  %s\n", verified)
 	if x.i+1 < len(x.ls) {
 		fmt.Printf("  next:      %s - %s\n", x.ls[x.i+1].Ref(), x.ls[x.i+1].Title)

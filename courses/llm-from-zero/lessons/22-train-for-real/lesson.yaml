@@ -1,0 +1,7 @@
+title: Train it for real
+goal: >
+  Write the pieces of a serious training run: warm-up plus cosine learning-rate schedule,
+  gradient clipping by hand, and checkpoint/resume that continues bit for bit exactly as an
+  uninterrupted run would.
+concepts: [learning-rate schedule, warm-up, cosine decay, gradient clipping, checkpointing, resuming, RNG state, reproducibility]
+timeout: 150s

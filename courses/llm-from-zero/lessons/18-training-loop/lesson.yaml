@@ -1,0 +1,7 @@
+title: Batches and the training loop properly
+goal: >
+  Cut token ids into (input, target) batches, evaluate without learning, and write a clean
+  training loop with AdamW, evaluation and logging; never let validation data leak into
+  training.
+concepts: [batching, next-token targets, nn.Module, AdamW, eval mode, torch.no_grad, evaluation loop, logging]
+timeout: 120s

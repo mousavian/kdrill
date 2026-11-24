@@ -126,3 +126,42 @@ func Remove(list []string, v string) []string {
 	}
 	return out
 }
+
+// Migrate moves everything recorded under a former course id to the new one:
+// progress, started-course entries and the active lesson. renames maps
+// old id -> new id. It reports whether anything changed.
+func (s *State) Migrate(renames map[string]string) bool {
+	changed := false
+	for old, nw := range renames {
+		if old == nw {
+			continue
+		}
+		if m, ok := s.Progress[old]; ok {
+			dst := s.Progress[nw]
+			if dst == nil {
+				dst = map[string]*Progress{}
+				s.Progress[nw] = dst
+			}
+			for lesson, p := range m {
+				// Keep what the new id already has unless the old record is better.
+				if cur := dst[lesson]; cur == nil || (cur.CompletedAt == nil && p.CompletedAt != nil) {
+					dst[lesson] = p
+				}
+			}
+			delete(s.Progress, old)
+			changed = true
+		}
+		if Has(s.Courses, old) {
+			s.Courses = Remove(s.Courses, old)
+			if !Has(s.Courses, nw) {
+				s.Courses = append(s.Courses, nw)
+			}
+			changed = true
+		}
+		if s.Active != nil && s.Active.Course == old {
+			s.Active.Course = nw
+			changed = true
+		}
+	}
+	return changed
+}

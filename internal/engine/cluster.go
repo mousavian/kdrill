@@ -203,9 +203,11 @@ func (a *App) doctor() error {
 		row(gb >= 3, true, fmt.Sprintf("docker VM memory %.1f GB", gb),
 			"raise it to at least 3-4 GB (Docker Desktop > Settings > Resources)")
 	}
+	// Cluster tools are optional while the learner works on a local course.
+	localOnly := a.doctorLocalOnly()
 	for _, t := range []string{"k3d", "kubectl"} {
 		_, err := exec.LookPath(t)
-		row(err == nil, false, t+" installed", "brew install "+t)
+		row(err == nil, localOnly, t+" installed"+ifLocal(localOnly), "brew install "+t)
 	}
 	_, err := exec.LookPath("helm")
 	row(err == nil, true, "helm installed (needed by the kyverno and karpenter courses)", "brew install helm")
@@ -216,9 +218,9 @@ func (a *App) doctor() error {
 		case err != nil:
 			row(false, false, "could not query k3d: "+err.Error(), "check k3d and Docker")
 		case !exists:
-			row(false, false, fmt.Sprintf("cluster %s exists", a.Cluster), "kdrill cluster up")
+			row(false, localOnly, fmt.Sprintf("cluster %s exists%s", a.Cluster, ifLocal(localOnly)), "kdrill cluster up")
 		case !running:
-			row(false, false, fmt.Sprintf("cluster %s running", a.Cluster), "kdrill cluster up")
+			row(false, localOnly, fmt.Sprintf("cluster %s running%s", a.Cluster, ifLocal(localOnly)), "kdrill cluster up")
 		default:
 			row(true, false, fmt.Sprintf("cluster %s running", a.Cluster), "")
 		}
@@ -233,6 +235,28 @@ func (a *App) doctor() error {
 		return exitError{1}
 	}
 	return nil
+}
+
+// doctorLocalOnly: the active lesson is local, so a stopped cluster is fine.
+func (a *App) doctorLocalOnly() bool {
+	home, err := resolveHome("")
+	if err != nil {
+		return false
+	}
+	a.Home = home
+	st, err := state.Load(a.statePath())
+	if err != nil {
+		return false
+	}
+	a.st = st
+	return a.activeIsLocal()
+}
+
+func ifLocal(localOnly bool) string {
+	if localOnly {
+		return " (not needed for local courses)"
+	}
+	return ""
 }
 
 func orNone(s string) string {

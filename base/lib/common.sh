@@ -237,6 +237,29 @@ pod_distribution() {
         END{for(k in c) print k":"c[k]}' | sort | paste -sd' ' -
 }
 
+
+# kd_pytest TESTFILE...  (local courses)
+#   Runs the lesson's hidden pytest file(s) from $KDRILL_LESSON_DIR/tests in the
+#   course container, against the learner's workspace mounted at /work. The
+#   reporter (base/images/ml-dev/kdreport.py) prints one check line per test.
+kd_pytest() {
+  local out rc=0 f
+  local -a files=()
+  for f in "$@"; do files+=("/tests/$f"); done
+  out="$("$KDRILL_BIN" py --tests "$KDRILL_LESSON_DIR/tests" -m pytest -p kdreport -p no:terminal -p no:cacheprovider \
+        -o addopts= --rootdir /tests "${files[@]}" 2>&1)" || rc=$?
+  printf '%s\n' "$out"
+  if (( rc == 0 )); then
+    _KD_PASS=$((_KD_PASS+1)); _KD_LAST=0
+  else
+    _KD_FAIL=$((_KD_FAIL+1)); _KD_LAST=1
+    if ! printf '%s\n' "$out" | grep -q '✗'; then
+      printf '  \033[31m✗\033[0m the tests could not run (exit %s); see the output above\n' "$rc"
+    fi
+  fi
+  return 0
+}
+
 if [[ "${KDRILL_PHASE:-}" == "verify" ]]; then
   trap '_kd_code=1; (( _KD_FAIL == 0 && _KD_PASS > 0 )) && _kd_code=0; exit $_kd_code' EXIT
 fi

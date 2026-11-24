@@ -1,0 +1,6 @@
+title: Vocabulary size trade-offs
+goal: >
+  Measure tokens per word, bytes per token and the share of rarely used merges for
+  several vocabulary sizes, and choose a size with numbers to back it.
+concepts: [vocabulary size, sequence length, compression, rare tokens, embedding cost, nested merges]
+timeout: 120s

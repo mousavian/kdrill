@@ -1,0 +1,5 @@
+Build in the order of the docstring and print as you go. Read each file with `open(p, encoding="utf-8").read()`, clean it, take `paragraphs(...)`, and keep a flat list of `(file_name, paragraph)` pairs in sorted file order. One call to `filter_and_dedup([p for _, p in flat])` gives you the survivors.
+---
+To know which document a surviving paragraph belongs to, walk the flat list with a second index into `kept`: whenever `kept[j] == paragraph`, that paragraph survived, so append it to its document's list and advance `j` (the survivors are a subsequence of the input, in order). Then each document's text is `"\n\n".join(paras) + "\n"`; call `split_documents` and `write_splits`, then read the three files back to compute the per-split numbers, so they describe what is really on disk.
+---
+`make_card`: build a list of lines and `"\n".join(lines) + "\n"`. Use f-strings or `%d` so integers appear as plain digits (no `{:,}`). A Markdown table row is `"| a | b |"`. Put each limitation on its own line as `"- " + text`. Write the limitations after you have run `prepare_run.py` and read the numbers.

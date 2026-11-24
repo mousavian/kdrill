@@ -53,7 +53,7 @@ lets lessons scale replica counts, model size, and node counts.
 
 ---
 
-## 3. Cluster shape: three kinds of lesson
+## 3. Cluster shape: three kinds of lesson, plus local
 
 One cluster, mixed nodes. Each lesson declares which kind it needs; setup arranges it.
 
@@ -61,7 +61,24 @@ One cluster, mixed nodes. Each lesson declares which kind it needs; setup arrang
 |---|---|---|
 | **sim** | KWOK fake nodes (incl. fake GPU nodes) | GPU scheduling, Karpenter, scale/capacity, GPU-scale inference |
 | **real-light** | Real k3s node(s), real containers + traffic | Istio, Envoy, Kyverno |
-| **real-compute** | Real k3s node, CPU+memory budget | Training, fine-tuning, real (tiny) inference |
+| **real-compute** | Real k3s node, CPU+memory budget | Training platform, fine-tuning, real (tiny) inference |
+| **local** | none: code runs in a container on the learner's machine, no cluster | llm-from-zero |
+
+**`kind: local`** (course or lesson) needs no cluster at all: `start`, `verify`, `reset`,
+`cleanup`, `next`, `hint`, `status` work with k3d stopped or not installed; there are no
+namespaces, taints or kubectl calls. The learner's code lives in a per-course
+**workspace** outside the repo, `~/kdrill-work/<course>/` (`KDRILL_WORK` moves the root);
+lessons build on each other there. `start` copies the lesson's `starter/` files into the
+workspace only if they are not already there, `reset` moves the learner's versions of
+that lesson's starter files to `<workspace>/.backup/<timestamp>/` and restores the starter,
+`cleanup` never deletes anything the learner wrote. `kdrill py [file.py] [args]` runs Python in
+the course image (`image:` in course.yaml, built on demand by `image_build:` with plain
+`docker build`, never pushed, never imported into a cluster) with the workspace at `/work`,
+the course's download cache at `/cache` (read-only), the course's `pylib/` at `/kdlib`,
+`--cpus`/`--memory` from the profile (lite: 2 CPUs, 1.5 GB) and **no network** unless the
+lesson says `network: true`. verify runs hidden pytest files from the lesson's `tests/`
+in the same container (`kd_pytest` in `base/lib/common.sh`, reporter in
+`base/images/ml-dev/kdreport.py`).
 
 Fake nodes are tainted (`kdrill.dev/fake=true:NoSchedule`) so real workloads
 never land on them by accident; sim lessons add the toleration.
@@ -115,9 +132,12 @@ Courses are plain files — readable, editable, and easy to generate. No recompi
 id: istio
 title: Istio service mesh
 description: Sidecars, ambient mode, traffic routing, mTLS, observability.
-kind: real-light            # default for lessons; a lesson can override
+kind: real-light            # default for lessons; a lesson can override (also: local)
 components: [istio]         # installed on course start, removed on course stop
 requires: []                # other courses recommended first (informational)
+formerly: []                # earlier ids of a renamed course: saved progress moves to this id
+image: kdrill.local/ml-dev:0.1.0   # kind: local only: image for `kdrill py`
+image_build: base/images/ml-dev/build.sh
 ```
 
 **lesson.yaml**
@@ -127,9 +147,10 @@ title: Enforce strict mTLS
 goal: >
   All traffic in namespace `shop` must be mTLS-only; plaintext from outside the
   mesh must be rejected.
-kind: real-light            # sim | real-light | real-compute
+kind: real-light            # sim | real-light | real-compute | local
 nodes: { real: 1, fake: 0 } # what setup ensures exists
 timeout: 120s               # max time for setup/verify
+network: false              # local lessons: may `kdrill py` use the network?
 concepts: [PeerAuthentication, mTLS modes]
 ```
 
@@ -215,12 +236,20 @@ injection/ambient · VirtualService/DestinationRule · canary · fault injection
 serve a tiny model on CPU · readiness/startup probes for model loading · autoscaling on custom metrics ·
 KV-cache/queue-aware routing · simulated GPU fleet: right-sizing, scale-to-zero, cold starts
 
-**training** (real-compute, tiny)
-train a tiny char-level GPT as a Job · checkpoint to PVC/MinIO · kill & resume ·
-2-pod distributed training with torchrun (gloo/CPU) · Kubeflow Trainer / JobSet · KubeRay RayJob · Kueue gang admission
+**training-platform** (real-compute, tiny; renamed from `training`, state migrates through `formerly:`)
+the platform side: train a tiny char-level GPT as a Job · checkpoint to PVC/MinIO · kill & resume ·
+2-pod distributed training with torchrun (gloo/CPU) · JobSet · Kueue gang admission. The model is ready-made.
+
+**llm-from-zero** (local: Python in a container, no cluster, 27 lessons)
+the ML side, from nothing: gather, inspect, clean, deduplicate, split and document data (Sherlock Holmes
+from Project Gutenberg) · character tokenizer, BPE, vocabulary size · counting bigram, loss and perplexity,
+scalar autograd, neural bigram, MLP with manual backprop, init and learning rate, layer norm (numpy, no PyTorch) ·
+PyTorch: port, training loop, attention, transformer block, GPT, real training run with checkpoint/resume,
+regularisation, generation, scaling experiment, evaluation, capstone with model card and a checkpoint contract
+that `fine-tuning` starts from.
 
 **fine-tuning** (real-compute, tiny)
-LoRA fine-tune of the model trained in the training course (no big downloads) ·
+LoRA fine-tune of the model trained in the llm-from-zero capstone (no big downloads) ·
 datasets from MinIO · artifacts & versioning · serve the fine-tuned model · compare base vs tuned
 
 ---
@@ -229,7 +258,7 @@ datasets from MinIO · artifacts & versioning · serve the fine-tuned model · c
 
 1. **Engine + base** — CLI skeleton, `doctor`, `cluster up/down`, KWOK + fake-node support, state, lesson runner, `check.sh`.
 2. **k8s-scheduling course** (~5 lessons first) — proves the full start/verify/reset loop end to end.
-3. Remaining courses one at a time, cheapest first: kyverno → karpenter → gpu-scheduling → envoy → istio → inference → training → fine-tuning.
+3. Remaining courses one at a time, cheapest first: kyverno → karpenter → gpu-scheduling → envoy → istio → inference → training-platform → llm-from-zero → fine-tuning.
 4. Measure real memory per course and tune the `lite` profile.
 5. Optional later: web view (terminal + live cluster/GPU map) per course or lesson.
 

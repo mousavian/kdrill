@@ -1,0 +1,6 @@
+title: Training dynamics - initialisation and learning rate
+goal: >
+  Look inside training: initialise so the first loss is ln V, measure tanh saturation and
+  update-to-weight ratios, and find a good learning rate with an exponential range test.
+concepts: [initialisation, Kaiming scaling, saturation, update ratio, learning rate range test, loss at initialisation]
+timeout: 120s

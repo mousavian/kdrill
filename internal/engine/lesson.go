@@ -22,6 +22,18 @@ func (a *App) courseCmd(sub, id string) error {
 	if err != nil {
 		return err
 	}
+	if sub == "start" && c.Kind == "local" {
+		if _, err := a.prepareLocal(c); err != nil {
+			return err
+		}
+		fmt.Printf("course %s ready (no cluster needed). Next: kdrill start %s/01\n", c.ID, c.ID)
+		return nil
+	}
+	if sub == "stop" && c.Kind == "local" {
+		a.st.Courses = state.Remove(a.st.Courses, c.ID)
+		fmt.Printf("course %s stopped (your workspace %s is untouched)\n", c.ID, a.workspace(c.ID))
+		return a.save()
+	}
 	if sub == "start" {
 		if err := a.requireCluster(); err != nil {
 			return err
@@ -36,6 +48,10 @@ func (a *App) courseCmd(sub, id string) error {
 }
 
 func (a *App) courseStart(c course.Course) error {
+	if c.Kind == "local" {
+		_, err := a.prepareLocal(c)
+		return err
+	}
 	for _, comp := range c.Components {
 		if err := a.installComponent(comp); err != nil {
 			return err
@@ -147,6 +163,9 @@ func (a *App) activeCmd(cmd, ref string) error {
 		if err != nil {
 			return err
 		}
+		if x.lesson().IsLocal(x.c) {
+			return a.resetLocal(x.c, x.lesson())
+		}
 		if err := a.cleanup(); err != nil {
 			return err
 		}
@@ -158,11 +177,15 @@ func (a *App) activeCmd(cmd, ref string) error {
 }
 
 func (a *App) lessonEnv(c course.Course, l course.Lesson) []string {
-	return []string{
+	env := []string{
 		"KDRILL_LESSON=" + l.Label(),
 		"KDRILL_LESSON_DIR=" + l.Dir,
 		"KDRILL_NS=" + l.NS(),
 	}
+	if l.IsLocal(c) {
+		env = append(env, a.localEnv(c)...)
+	}
+	return env
 }
 
 func (a *App) startRef(ref string) error {
@@ -174,6 +197,9 @@ func (a *App) startRef(ref string) error {
 }
 
 func (a *App) startLesson(c course.Course, l course.Lesson) error {
+	if l.IsLocal(c) {
+		return a.startLocal(c, l)
+	}
 	if err := a.requireCluster(); err != nil {
 		return err
 	}
@@ -222,13 +248,16 @@ func (a *App) startLesson(c course.Course, l course.Lesson) error {
 		}
 	}
 	fmt.Println()
-	a.printTask(l)
+	a.printTask(c, l)
 	fmt.Println("\n---\nkdrill verify | hint | reset | solution | show")
 	return nil
 }
 
-func (a *App) printTask(l course.Lesson) {
+func (a *App) printTask(c course.Course, l course.Lesson) {
 	fmt.Printf("%s\n", l.Title)
+	if l.IsLocal(c) {
+		fmt.Printf("Workspace: %s   (run code with: kdrill py <file.py>)\n", a.workspace(c.ID))
+	}
 	fmt.Printf("Goal: %s\n\n", strings.Join(strings.Fields(l.Goal), " "))
 	if b, err := os.ReadFile(filepath.Join(l.Dir, "README.md")); err == nil {
 		printMarkdown(string(b))
@@ -242,14 +271,14 @@ func (a *App) show(ref string) error {
 		if err != nil {
 			return err
 		}
-		a.printTask(x.lesson())
+		a.printTask(x.c, x.lesson())
 		return nil
 	}
-	_, ls, i, err := course.Resolve(a.Home, ref)
+	c, ls, i, err := course.Resolve(a.Home, ref)
 	if err != nil {
 		return err
 	}
-	a.printTask(ls[i])
+	a.printTask(c, ls[i])
 	return nil
 }
 
@@ -296,10 +325,12 @@ func (a *App) verify() error {
 	if err != nil {
 		return err
 	}
-	if err := a.requireCluster(); err != nil {
-		return err
-	}
 	l := x.lesson()
+	if !l.IsLocal(x.c) {
+		if err := a.requireCluster(); err != nil {
+			return err
+		}
+	}
 	script := filepath.Join(l.Dir, "verify.sh")
 	if !fileExists(script) {
 		return fmt.Errorf("lesson has no verify.sh")
@@ -325,6 +356,9 @@ func (a *App) verify() error {
 
 func (a *App) cleanup() error {
 	x, lerr := a.loadActive()
+	if lerr == nil && x.lesson().IsLocal(x.c) {
+		return a.cleanupLocal(x.c, x.lesson())
+	}
 	exists, running, err := a.clusterState()
 	if err != nil {
 		return err

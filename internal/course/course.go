@@ -22,7 +22,13 @@ type Course struct {
 	Kind        string   `yaml:"kind"`
 	Components  []string `yaml:"components"`
 	Requires    []string `yaml:"requires"`
-	Dir         string   `yaml:"-"`
+	// Formerly lists earlier ids of a renamed course; saved progress under
+	// those ids moves to this course (see state.Migrate).
+	Formerly []string `yaml:"formerly"`
+	Dir      string   `yaml:"-"`
+	// Local courses (kind: local) run code in a container and need no cluster.
+	Image      string `yaml:"image"`       // image tag used by `kdrill py`
+	ImageBuild string `yaml:"image_build"` // script (relative to the repo) that builds it
 }
 
 type Lesson struct {
@@ -35,6 +41,7 @@ type Lesson struct {
 	Concepts   []string `yaml:"concepts"`
 	Namespaces []string `yaml:"namespaces"`
 	Timeout    string   `yaml:"timeout"`
+	Network    bool     `yaml:"network"` // local lessons: `kdrill py` may use the network
 }
 
 // Label is the value of the kdrill.dev/lesson label.
@@ -62,6 +69,9 @@ func (l Lesson) EffectiveKind(c Course) string {
 	}
 	return "real-light"
 }
+
+// IsLocal reports whether the lesson needs no cluster (kind: local).
+func (l Lesson) IsLocal(c Course) bool { return l.EffectiveKind(c) == "local" }
 
 func readYAML(path string, v any) error {
 	b, err := os.ReadFile(path)

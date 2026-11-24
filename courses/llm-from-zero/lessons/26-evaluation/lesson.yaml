@@ -1,0 +1,6 @@
+title: Evaluation beyond a single loss
+goal: >
+  Evaluate a model honestly: test-set perplexity where every token is scored exactly once, bits
+  per character, targeted probes, a contamination check, and a blinded side-by-side sheet for human judges.
+concepts: [test set, perplexity, bits per character, sliding window evaluation, probes, contamination, human evaluation, benchmark limits]
+timeout: 120s

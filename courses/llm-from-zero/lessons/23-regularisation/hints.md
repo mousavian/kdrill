@@ -1,0 +1,5 @@
+`configure_optimizer`: iterate `model.parameters()` (it yields a tied parameter only once, but keep a `seen` set of `id(p)` anyway), skip `not p.requires_grad`, and append to `decay` when `p.ndim >= 2`, else to `no_decay`. Then `torch.optim.AdamW([{"params": decay, "weight_decay": wd}, {"params": no_decay, "weight_decay": 0.0}], lr=lr, betas=betas)`.
+---
+`EarlyStopping.update`: `if val_loss < self.best - self.min_delta:` set `best`, `best_step`, `bad_count = 0` and return `True`; else `bad_count += 1`, `should_stop = bad_count >= patience`, return `False`. Remember that a tiny improvement below `min_delta` is not an improvement and counts as a bad evaluation.
+---
+`train_with_early_stopping`: a normal loop with one data generator; after the update of step `s` (so `done = s + 1` updates) and when `done % eval_every == 0`, evaluate train and val with fresh `torch.Generator().manual_seed(1234)`, append `(done, train_loss, val_loss)`, and `if stopper.update(val_loss, done): best_state = copy.deepcopy(model.state_dict())` (a plain `state_dict()` returns references that keep changing!). `break` when `stopper.should_stop`, then `model.load_state_dict(best_state)`.

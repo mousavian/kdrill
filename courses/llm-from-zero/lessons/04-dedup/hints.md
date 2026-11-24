@@ -1,0 +1,5 @@
+Start with the small pure functions (`paragraphs`, `norm_key`, `shingles`, `jaccard`): each is a few lines and the tests for them have exact expected values. For `exact_dedup`, `hashlib.blake2b(key.encode(), digest_size=16).digest()` is a small, fast hash; keep a `set` of them.
+---
+`near_dedup`: keep a list of the kept paragraphs' shingle sets and a `dict` from shingle to the list of kept positions that contain it. For each new paragraph, collect candidates as the union of `index[s]` over its shingles, compute `jaccard` only for those, and take the best (iterate candidates in ascending order and use a strict `>` so ties go to the lowest index). If best >= threshold: record `(i, matched_input_index, sim)` and do NOT add it to the index; otherwise add it.
+---
+`filter_and_dedup`: count junk first (`junk_reason` returns the key to increment), then call `exact_dedup` on the survivors, then `near_dedup` on what is left. `near_duplicates` is `len(dropped)`; `kept` is the length of the final list. Check the invariant `input == sum of the other counts` yourself on a small example.

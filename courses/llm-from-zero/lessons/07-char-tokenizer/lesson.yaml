@@ -1,0 +1,6 @@
+title: A character tokenizer
+goal: >
+  Turn text into integer ids and back: a vocabulary built from the training split,
+  a lossless round trip, an explicit unknown token, and save/load.
+concepts: [tokenization, vocabulary, unknown token, round trip, special tokens]
+timeout: 60s

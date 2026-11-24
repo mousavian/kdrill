@@ -1,0 +1,6 @@
+title: A neural bigram
+goal: >
+  Learn the bigram table by gradient descent instead of counting: one weight matrix,
+  softmax, cross-entropy and a hand-derived gradient in numpy, until it matches the counting model.
+concepts: [softmax, cross-entropy, gradient derivation, logits, gradient descent, neural nets vs counting]
+timeout: 90s

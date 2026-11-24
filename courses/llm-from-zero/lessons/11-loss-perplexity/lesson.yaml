@@ -1,0 +1,6 @@
+title: Loss and perplexity
+goal: >
+  Measure a language model: average negative log-likelihood and perplexity on held-out
+  tokens, pick the smoothing on validation data and see why training loss lies.
+concepts: [negative log-likelihood, cross-entropy, perplexity, validation loss, overfitting, hyperparameter selection]
+timeout: 60s

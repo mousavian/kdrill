@@ -7,7 +7,7 @@ COURSE  := $(notdir $(abspath $(CURDIR)/../..))
 REF     := $(COURSE)/$(LESSON)
 
 .DEFAULT_GOAL := help
-.PHONY: help setup verify hint reset cleanup solution show next status
+.PHONY: help setup verify hint reset cleanup solution show next status py
 
 $(KDRILL):
 	$(MAKE) -C $(ROOT) build
@@ -23,6 +23,7 @@ help:
 	@echo "  make show      reprint the task"
 	@echo "  make next      clean up and start the next lesson"
 	@echo "  make status    cluster, active lesson and this course's progress"
+	@echo "  make py F=x.py run Python in the course container (local courses only)"
 
 setup: $(KDRILL)
 	@$(KDRILL) start $(REF)
@@ -33,3 +34,6 @@ next: $(KDRILL)
 	@$(KDRILL) next $(REF)
 status: $(KDRILL)
 	@$(KDRILL) status $(COURSE)
+# Local courses: run Python in the course container. make py F=file.py ARGS="..."
+py: $(KDRILL)
+	@$(KDRILL) py $(F) $(ARGS)
