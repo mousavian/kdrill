@@ -658,7 +658,7 @@ function updateShare(){
  $('#s-x').href=`https://x.com/intent/tweet?text=${E(t)}&url=${E(SURL)}`;
  $('#s-bs').href=`https://bsky.app/intent/compose?text=${E(t+' '+SURL)}`;
 }
-if(navigator.share){const sb=$('#sharebtn');sb.hidden=false;$('#sharefall').hidden=true;sb.addEventListener('click',()=>{navigator.share({title:'kdrill',text:shareText(),url:SURL}).catch(()=>{})})}
+if(navigator.share){const sb=$('#sharebtn');sb.hidden=false;sb.addEventListener('click',()=>{navigator.share({title:'kdrill',text:shareText(),url:SURL}).catch(()=>{})})}
 
 /* terminal playback */
 const termIn=$('#term'),cur=$('.cur'),wait=ms=>new Promise(r=>setTimeout(r,ms));let playId=0;
