@@ -8,6 +8,8 @@ topics, real containers and traffic for the gateway and service-mesh courses,
 real tiny models for the inference and training courses), sized for an 8 GB
 laptop. See [DESIGN.md](DESIGN.md) for the full plan.
 
+Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/), from [site/](site/).
+
 ## Prerequisites
 
 - Docker (Docker Desktop, OrbStack or Colima), with the VM given at least 3-4 GB

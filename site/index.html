@@ -1,0 +1,797 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>kdrill</title>
+<meta name="description" content="kdrill is a free, open-source Kubernetes practice lab for your laptop. 141 lessons hand you a broken cluster and a goal; you fix it with your own kubectl.">
+<meta property="og:title" content="kdrill">
+<meta property="og:description" content="The K-8 cordless cluster drill. Breaks Kubernetes on your laptop, on purpose. 141 lessons, free and open source.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://kdrill.5xx.tech/">
+<meta property="og:image" content="https://kdrill.5xx.tech/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="An orange cordless drill called kdrill, model K-8, with an 8 GB battery. Breaks Kubernetes on your laptop, on purpose.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://kdrill.5xx.tech/">
+<meta name="theme-color" content="#C8A27A">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23C8A27A'/%3E%3Cpath d='M8 18h30a9 9 0 0 1 9 9v3a9 9 0 0 1-9 9H29l-4 15H14l3-15H8z' fill='%23FF5A1F' stroke='%231D2A5B' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M47 25h9l5 3.5-5 3.5h-9z' fill='%23D9DDE3' stroke='%231D2A5B' stroke-width='2.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Big+Shoulders+Stencil+Display:wght@800;900&family=Martian+Mono:wdth,wght@75..112.5,400..700&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('live');</script>
+<style>
+:root{--kraft:#C8A27A;--kraft-d:#A98058;--kraft-l:#DDBF98;--fibre:#EBDCC2;--ink:#1D2A5B;--orange:#FF5A1F;--yellow:#FFD23F;--steel:#8A8F98;--steel-l:#D9DDE3;--plastic:#2E3238;--paper:#F5F5F1;
+--f-box:'Big Shoulders Stencil Display',Impact,'Arial Narrow Bold',sans-serif;--f-body:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;--f-mono:'Martian Mono',ui-monospace,Menlo,Consolas,monospace;--gut:clamp(16px,4vw,48px);
+--grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .18 0 0 0 0 .06 0 0 0 1.3 -.58'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");color-scheme:light}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
+body{margin:0;background-color:var(--kraft);background-image:var(--grain),repeating-linear-gradient(90deg,rgba(74,46,18,.05) 0 2px,rgba(255,236,205,.04) 2px 5px,rgba(0,0,0,0) 5px 10px);color:var(--ink);font:400 17px/1.55 var(--f-body);font-stretch:100%}
+a{color:var(--ink);text-decoration-thickness:2px;text-underline-offset:3px}
+a:hover{text-decoration-thickness:3px}
+code{font-family:var(--f-mono);font-size:.86em;font-stretch:87.5%}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.stage{overflow-x:clip}
+.panel{position:relative}
+.panel+.panel,.bore-track+.panel,.bore{border-top:2px solid rgba(74,46,18,.3);box-shadow:inset 0 1px 0 rgba(255,238,210,.35)}
+.wrap{max-width:1200px;margin:0 auto;padding:clamp(64px,9vw,120px) var(--gut)}
+.boxh{font:900 clamp(46px,6.6vw,88px)/.86 var(--f-box);text-transform:uppercase;letter-spacing:.005em;margin:0 0 .28em}
+.intro{font-size:clamp(18px,1.6vw,20px);max-width:36em;margin:0 0 28px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:12px 22px;border:3px solid var(--ink);border-radius:6px;background:transparent;color:var(--ink);font:800 19px/1.1 var(--f-body);font-stretch:112%;text-decoration:none;cursor:pointer;transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.btn:active{transform:none;box-shadow:none}
+.btn-go{background:var(--orange)}
+.btn-small{min-height:40px;padding:7px 14px;border-width:2px;font-size:15px}
+
+/* hero: the box front */
+.hero{z-index:1;min-height:max(620px,100svh);display:flex;align-items:center}
+.tape{position:absolute;left:-52px;top:30px;width:240px;height:50px;transform:rotate(-38deg);background:linear-gradient(180deg,rgba(255,250,235,.34),rgba(255,250,235,0) 45%,rgba(90,60,25,.12)),rgba(176,134,82,.5);clip-path:polygon(2% 0,98% 0,100% 12%,97.6% 25%,100% 38%,97.6% 50%,100% 62%,97.6% 75%,100% 88%,98% 100%,2% 100%,0 88%,2.4% 75%,0 62%,2.4% 50%,0 38%,2.4% 25%,0 12%);pointer-events:none}
+.hero-in{width:100%;max-width:1320px;margin:0 auto;padding:clamp(96px,10vw,128px) var(--gut) 56px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:40px clamp(24px,4vw,64px);align-items:center}
+.wordmark{font:900 min(15vw,214px)/.8 var(--f-box);text-transform:uppercase;letter-spacing:.004em;margin:0 0 18px -.03em}
+.model{font:800 clamp(19px,1.9vw,25px)/1.15 var(--f-body);font-stretch:125%;margin:0}
+.domain{font:600 16px/1.3 var(--f-body);font-stretch:125%;margin:6px 0 0}
+.tagline{font:780 clamp(30px,3.5vw,48px)/1.03 var(--f-body);letter-spacing:-.012em;max-width:15ch;margin:30px 0 16px;text-wrap:balance}
+.lede{max-width:31em;font-size:18px;margin:0 0 28px}
+.ctas{display:flex;flex-wrap:wrap;gap:14px}
+.drill-col{position:relative;padding-top:clamp(64px,6.4vw,88px)}
+.drill-slot{position:relative;width:100%;aspect-ratio:774/410}
+.drill{position:relative;width:100%;aspect-ratio:774/410;pointer-events:none}
+.drill>svg{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 8px 9px rgba(29,42,91,.26))}
+.drill.flying{position:absolute;left:0;top:0;width:774px;height:410px;aspect-ratio:auto;z-index:3;transform-origin:764px 84px;will-change:transform}
+.d-logo{font:900 52px var(--f-box)}
+.d-model{font:800 17px var(--f-body);font-stretch:112%}
+.d-8gb{font:900 30px var(--f-box)}
+.d-trig{transition:transform .08s}
+.held .d-trig{transform:translateX(-5px)}
+.bitwin{position:absolute;left:76.227%;top:18.293%;width:19.638%;height:4.39%;overflow:hidden}
+.flutes{position:absolute;left:0;top:0;width:164.474%;height:100%;background:linear-gradient(#F1F3F6,#CDD1D7 45%,#8A8F98);will-change:transform}
+.flutes svg{display:block;width:100%;height:100%}
+.flutes path{fill:#4F555E}
+.bitblur{position:absolute;inset:0;opacity:0;background:linear-gradient(#E6E9ED,#AFB4BB 48%,#7E838C)}
+.bitshade{position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.4),rgba(255,255,255,0) 32%,rgba(0,0,0,0) 58%,rgba(18,24,48,.32));border-top:2px solid var(--ink);border-bottom:2px solid var(--ink)}
+.burst{position:absolute;right:0;top:0;width:clamp(104px,10.5vw,146px);aspect-ratio:1;transform:rotate(11deg);z-index:2;display:grid;place-items:center;text-align:center}
+.burst svg{position:absolute;inset:0;width:100%;height:100%}
+.burst p{position:relative;margin:0;font:800 clamp(11px,.95vw,13px)/1.05 var(--f-body)}
+.burst b{display:block;font:900 clamp(38px,3.8vw,52px)/.85 var(--f-box)}
+.tryme{position:absolute;left:51%;top:67%;transform:translateY(-50%) rotate(-8deg);width:clamp(92px,9vw,118px);aspect-ratio:1;border-radius:50%;border:3px solid var(--ink);background:var(--yellow);color:var(--ink);display:grid;place-content:center;gap:3px;text-align:center;cursor:pointer;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;box-shadow:inset 0 0 0 3px var(--yellow),inset 0 0 0 5px var(--ink),0 6px 0 -1px rgba(29,42,91,.35);transition:transform .1s,box-shadow .1s;z-index:4}
+.tryme:hover{transform:translateY(-50%) rotate(-8deg) scale(1.04)}
+.tryme.on{transform:translateY(-50%) rotate(-8deg) scale(.95);box-shadow:inset 0 0 0 3px var(--yellow),inset 0 0 0 5px var(--ink),0 2px 0 -1px rgba(29,42,91,.35)}
+.tm-big{font:900 clamp(24px,2.4vw,31px)/.85 var(--f-box);text-transform:uppercase}
+.tm-small{font:800 12px/1.1 var(--f-body);font-stretch:100%;padding:0 10px}
+.tm-arrow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.fine{font-size:13px;line-height:1.4;margin:22px 0 0;max-width:30em}
+
+/* the bore: the panel the bit goes through */
+.bore{z-index:2;background-color:var(--kraft);background-image:var(--grain),repeating-linear-gradient(90deg,rgba(74,46,18,.05) 0 2px,rgba(255,236,205,.04) 2px 5px,rgba(0,0,0,0) 5px 10px)}
+.live .bore-track{height:calc(100vh + 110vh);height:calc(100svh + 110svh)}
+.live .bore{position:sticky;top:0;height:100vh;height:100svh}
+.bore-in{max-width:1200px;height:100%;margin:0 auto;padding:clamp(28px,5vh,56px) var(--gut) clamp(16px,3vh,32px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.62fr);grid-template-rows:auto minmax(0,1fr) auto;column-gap:32px}
+.bore-copy{grid-area:1/1}
+.bore-copy .boxh{font-size:clamp(40px,5vw,72px)}
+.bore-copy p{margin:0 0 18px;max-width:34em}
+.park{grid-area:1/2;min-height:180px}
+.hole-box{grid-area:2/1/3/3;position:relative;justify-self:center;width:min(100%,980px);height:clamp(320px,62vh,540px)}
+.live .hole-box{height:auto;min-height:240px}
+.target{position:absolute;left:50%;top:50%;width:136px;height:136px;margin:-68px 0 0 -68px;border:3px dashed var(--ink);border-radius:50%;display:grid;place-items:center;text-align:center;font:900 25px/.86 var(--f-box);text-transform:uppercase}
+.hole{position:absolute;inset:0;will-change:transform}
+.live .hole{opacity:0}
+.hole>div{position:absolute;inset:0;-webkit-mask:var(--m) center/100% 100% no-repeat;mask:var(--m) center/100% 100% no-repeat}
+.tear-fibre{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' preserveAspectRatio='none'%3E%3Cpath d='M972 500 965 552 972 579 961 599 959 616 950 630 961 649 964 664 952 673 950 685 953 699 943 706 950 721 954 734 943 740 934 745 937 758 929 763 941 781 938 790 932 796 920 797 928 814 920 817 919 826 922 839 912 841 911 851 906 857 905 866 899 872 887 871 877 872 881 886 870 887 866 893 861 898 855 904 855 916 848 920 831 911 827 920 827 933 826 945 815 945 810 952 796 949 791 957 778 953 767 953 760 959 752 965 742 968 732 973 717 967 704 966 700 986 679 968 668 976 657 988 642 990 620 974 603 980 582 989 555 988 500 990 445 991 418 986 396 987 377 986 361 980 342 991 328 986 311 992 303 978 287 986 269 997 264 980 252 981 243 975 229 979 220 974 207 978 188 989 184 978 182 965 171 965 170 951 151 961 149 950 144 943 134 941 124 941 133 918 116 924 108 921 104 913 99 907 94 900 99 884 86 886 96 865 87 863 76 862 79 849 74 843 70 835 64 830 58 823 55 815 55 804 52 796 50 787 44 780 30 777 34 764 45 746 35 740 22 735 29 719 25 709 27 694 15 686 19 670 15 656 6 643 10 624 22 602 18 581 13 554 18 500 5 445 9 417 2 394 3 374 25 363 21 346 16 329 10 312 24 304 25 292 32 282 23 266 28 256 33 247 40 240 44 231 46 222 41 207 44 199 45 189 45 178 51 171 56 165 65 161 79 162 85 156 80 141 94 143 101 139 114 140 110 126 111 117 128 123 130 114 138 111 142 105 151 103 154 95 163 94 176 97 174 81 180 76 192 80 203 80 203 66 217 72 215 53 229 58 240 58 249 56 250 38 268 51 274 40 284 37 296 35 311 42 322 37 332 26 347 27 362 24 380 27 399 28 418 13 446 20 500 17 552 32 582 15 603 17 620 25 636 29 653 26 666 31 678 34 697 22 707 27 718 31 727 37 743 30 756 27 764 32 778 28 782 41 792 41 801 45 811 46 820 48 833 45 840 50 852 49 859 54 863 61 872 65 881 67 892 67 893 78 899 84 918 76 918 88 918 99 920 109 927 113 943 111 944 121 951 126 946 141 963 139 962 151 965 160 979 161 973 176 985 179 977 196 982 204 987 213 987 225 997 231 995 245 994 257 990 272 981 289 985 301 990 312 985 329 990 342 986 359 983 377 984 396 988 418 979 446Z'/%3E%3C/svg%3E");background:var(--fibre)}
+.tear-flute{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' preserveAspectRatio='none'%3E%3Cpath d='M959 500 950 570 944 603 944 632 941 655 939 677 931 694 928 712 929 731 927 748 916 758 918 777 909 787 910 805 898 813 897 829 890 840 879 847 872 859 867 872 856 879 845 885 837 896 825 902 813 909 805 921 791 926 775 929 765 941 750 947 733 951 714 954 693 953 675 964 651 964 623 963 592 971 548 971 451 973 407 976 375 969 348 969 324 966 299 971 280 965 256 972 241 964 221 964 206 959 190 954 173 952 165 938 154 929 146 916 131 912 126 898 118 887 110 876 107 860 103 846 93 837 87 825 81 812 74 800 69 786 61 773 63 753 54 740 43 726 40 707 38 686 42 661 40 636 30 610 35 572 32 500 27 427 30 391 34 362 39 338 37 314 38 292 46 276 43 254 49 239 55 223 63 211 73 200 80 187 86 174 97 166 107 157 119 150 126 140 140 135 148 126 159 119 174 116 179 103 192 97 206 94 212 79 229 78 239 65 256 63 271 57 286 47 308 50 329 46 353 46 377 37 411 45 452 38 548 37 590 44 622 41 647 47 672 44 693 47 716 43 732 50 749 55 771 48 790 48 803 56 814 67 832 66 847 71 856 81 874 82 878 98 894 101 909 106 911 123 924 130 936 138 937 156 954 162 952 182 964 193 968 209 971 227 975 245 972 267 973 287 970 311 972 334 967 362 963 392 960 429Z'/%3E%3C/svg%3E");background:linear-gradient(180deg,rgba(70,40,12,.5),rgba(70,40,12,0) 34%,rgba(0,0,0,0) 70%,rgba(255,240,215,.25)),repeating-linear-gradient(90deg,#9C744A 0 2px,#CDA77A 2px 5px,#DEBF95 5px 7px,#B08657 7px 9px)}
+.pit{--m:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 1000' preserveAspectRatio='none'%3E%3Cpath d='M927 500 916 613 908 668 902 712 890 748 881 783 869 814 847 836 823 856 803 881 773 896 738 909 699 922 650 934 578 934 422 931 347 943 298 930 250 930 211 919 175 909 160 874 141 847 121 823 108 791 93 759 86 718 69 677 65 618 57 500 71 384 74 325 74 275 83 235 101 204 128 183 156 167 176 144 206 131 234 113 261 90 304 84 354 77 424 76 576 78 648 71 702 72 741 86 783 89 816 103 852 113 869 142 892 166 911 195 926 229 944 266 944 318 940 381Z'/%3E%3C/svg%3E");background:linear-gradient(180deg,rgba(0,0,0,.65),rgba(0,0,0,0) 24%),linear-gradient(90deg,rgba(0,0,0,.4),rgba(0,0,0,0) 12%,rgba(0,0,0,0) 88%,rgba(0,0,0,.35)),radial-gradient(120% 95% at 50% 62%,#1E2126,#121417 62%,#08090B)}
+.term{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;will-change:transform}
+.term-in{width:min(80%,790px);height:80%;padding-bottom:7%;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;font:400 13.5px/1.62 var(--f-mono);font-stretch:87.5%;color:var(--steel-l)}
+.tl{margin:0;padding-left:2ch;white-space:pre-wrap}
+.tl.cmd{padding-left:0;color:#F1F3F6}
+.tl.in2{padding-left:6ch}
+.tl.hint{padding-left:8ch;text-indent:-2ch;color:var(--yellow)}
+.tl.off{display:none}
+.ps{color:var(--steel)}
+.cm .tx{color:#9AA0A9}
+.ok{color:#7EDC96}
+.no{color:#FF7A66}
+.cur{display:inline-block;width:.62em;height:1.1em;vertical-align:-.2em;background:#D9DDE3}
+@media (prefers-reduced-motion:no-preference){.cur{animation:blink 1.06s steps(1) infinite}}
+@keyframes blink{50%{opacity:0}}
+.bore-foot{grid-area:3/1/4/3;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px 24px;padding-top:14px}
+.bore-foot p{margin:0;font-size:15px;max-width:44em}
+.flecks{position:absolute;left:0;top:0;width:0;height:0;z-index:2;pointer-events:none}
+.flecks i{position:absolute;left:0;top:0;opacity:0;will-change:transform}
+
+/* what's in the box */
+.inside{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.3fr);grid-template-areas:"h fig" "list fig";gap:0 clamp(24px,4vw,64px);align-items:start}
+.inside>header{grid-area:h}
+.parts-fig{grid-area:fig;margin:0;position:sticky;top:32px}
+.parts{display:block;width:100%;height:auto;overflow:visible}
+.partlist{grid-area:list;list-style:none;margin:0;padding:0}
+.partlist li{display:grid;grid-template-columns:40px 1fr;gap:14px;padding:12px 0;border-top:2px solid rgba(29,42,91,.85)}
+.partlist li:last-child{border-bottom:2px solid rgba(29,42,91,.85)}
+.pn{display:grid;place-items:center;width:34px;height:34px;border:2.5px solid var(--ink);border-radius:50%;font-weight:800}
+.partlist b{display:block;font-weight:800;font-stretch:112%}
+.partlist span:not(.pn){display:block;font-size:16px;line-height:1.45}
+.pt,.pd,.ph,.pk,.pend{stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.pt,.pk,.pend{fill:var(--kraft)}
+.pd{fill:url(#pdots)}
+.ph{fill:url(#hatch)}
+.pend{stroke-dasharray:4 3}
+.taint{fill:url(#haz);stroke:var(--ink);stroke-width:1.5}
+.crack,.str,.hl,.tk,.ndl,.ld,.arw{fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round}
+.ndl{stroke-width:3}
+.arw{stroke-width:2.6}
+.arwh{fill:var(--ink)}
+.ax path{fill:none;stroke:var(--ink);stroke-width:1.3;stroke-dasharray:14 5 3 5}
+.parts text{fill:var(--ink);font-family:var(--f-body)}
+.tg{font:400 11px var(--f-mono);font-stretch:75%}
+.tg-h{font-weight:800;font-size:15px;font-stretch:112%}
+.kc{font:700 20px var(--f-mono);text-anchor:middle}
+.dl0{font-weight:800;font-size:14px}
+.dlt{font-size:9px;font-weight:600}
+.hc{font-weight:800;font-size:16px}
+.refs circle{fill:var(--kraft);stroke:var(--ink);stroke-width:2.5;transition:fill .15s}
+.refs text{font-weight:800;font-size:17px;text-anchor:middle}
+.part{transition:transform .2s}
+.parts[data-hl="1"] [data-ref="1"] circle,.parts[data-hl="2"] [data-ref="2"] circle,.parts[data-hl="3"] [data-ref="3"] circle,.parts[data-hl="4"] [data-ref="4"] circle,.parts[data-hl="5"] [data-ref="5"] circle,.parts[data-hl="6"] [data-ref="6"] circle{fill:var(--yellow)}
+.parts[data-hl="1"] #part-1,.parts[data-hl="2"] #part-2,.parts[data-hl="3"] #part-3,.parts[data-hl="4"] #part-4,.parts[data-hl="5"] #part-5,.parts[data-hl="6"] #part-6{transform:translateY(-6px)}
+
+/* the bit set */
+.bitset{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(24px,4vw,56px);align-items:start}
+.case{border-radius:28px;padding:14px 16px 20px;background:linear-gradient(180deg,#40454D,var(--plastic) 9%,#272A2F);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -4px 0 rgba(0,0,0,.35),0 22px 34px -16px rgba(50,30,10,.7)}
+.case-lid{display:flex;justify-content:space-between;gap:12px;padding:4px 10px 12px;font:900 22px/1 var(--f-box);text-transform:uppercase;color:#43484F;text-shadow:0 1px 0 rgba(255,255,255,.08),0 -1px 0 rgba(0,0,0,.55)}
+.tray{display:grid;gap:4px;padding:12px 10px;border-radius:18px;background:#24272B;box-shadow:inset 0 4px 10px rgba(0,0,0,.55),inset 0 -1px 0 rgba(255,255,255,.05)}
+.bit{--d:calc(15px + var(--n,6) * .36px);--sh:150px;--tp:calc(var(--d) * .8);--fl:calc(20px + (100% - 20px - var(--sh) - 64px) * var(--n,6) / 38);position:relative;display:block;width:100%;height:48px;padding:0;margin:0;border:0;border-radius:12px;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.recess{position:absolute;left:4px;top:50%;width:calc(var(--sh) + var(--fl) + var(--tp) + 14px);height:calc(var(--d) + 12px);transform:translateY(-50%);border-radius:999px;background:#191B1F;box-shadow:inset 0 3px 5px rgba(0,0,0,.75),0 1px 0 rgba(255,255,255,.07)}
+.bitbody{position:absolute;left:11px;right:10px;top:50%;height:var(--d);margin-top:calc(var(--d) / -2);display:flex;transition:transform .22s cubic-bezier(.3,1.4,.5,1),filter .22s}
+.shank{flex:0 0 var(--sh);display:flex;align-items:center;gap:6px;padding:0 8px;border-radius:4px 0 0 4px;background:linear-gradient(#F4F6F8,#D9DDE3 50%,#A9AEB6);color:#1F2733;font:700 11px/1 var(--f-body);white-space:nowrap;overflow:hidden;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+.shank i{font-style:normal;font-weight:900;margin-left:auto}
+.flute,.btip{background:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,0) 34%,rgba(0,0,0,0) 58%,rgba(10,14,30,.4)),repeating-linear-gradient(118deg,#555B64 0 5px,#DADEE4 5px 11px)}
+.flute{flex:0 0 var(--fl)}
+.btip{flex:0 0 var(--tp);clip-path:polygon(0 0,100% 50%,0 100%)}
+.bit:hover .bitbody{transform:translateY(-2px)}
+.bit[aria-pressed="true"] .bitbody{transform:translate(8px,-8px) rotate(-1.4deg);filter:drop-shadow(0 10px 6px rgba(0,0,0,.6))}
+.bit:focus-visible{outline-color:var(--yellow)}
+.bit.empty{cursor:default;--n:20}
+.bit.empty .recess{background:#1D1F23;box-shadow:inset 0 3px 5px rgba(0,0,0,.6);outline:1.5px dashed #5A6069;outline-offset:-5px}
+.mould{position:absolute;left:24px;top:50%;transform:translateY(-50%);font:700 13px/1 var(--f-body);font-stretch:112%;color:#B4B9C0}
+.mould b{color:#D9DDE3;margin-right:6px}
+.speccard{position:relative;padding:34px clamp(20px,2.4vw,30px) 24px;background:var(--paper);border-radius:4px;box-shadow:0 1px 0 rgba(0,0,0,.06),0 18px 28px -16px rgba(60,35,10,.65);transform:rotate(.7deg)}
+.speccard::before{content:"";position:absolute;top:13px;left:50%;width:30px;height:12px;margin-left:-15px;border-radius:999px;background:var(--kraft);box-shadow:inset 0 2px 3px rgba(0,0,0,.35)}
+.sc-kind{display:inline-block;margin:0 0 12px;padding:3px 9px;border:2px solid var(--ink);border-radius:3px;font:800 13px/1.3 var(--f-body);font-stretch:125%}
+.sc-title{margin:0 0 6px;font:800 clamp(22px,2.3vw,28px)/1.1 var(--f-body);font-stretch:112%}
+.sc-meta,.sc-line{margin:0 0 6px;font-size:16px}
+.sc-list{max-height:min(330px,46vh);overflow-y:auto;overscroll-behavior:contain;scrollbar-color:var(--ink) transparent;margin:14px 0 16px;padding:8px 10px 8px 3.3em;border-top:3px solid var(--ink);border-bottom:2px solid var(--ink);font-size:15px;line-height:1.45}
+.sc-list li{padding:3px 0}
+.sc-list li::marker{content:counter(list-item,decimal-leading-zero) "  ";font:600 12px var(--f-mono)}
+.sc-cmd{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:#E7E8E2;border-radius:4px}
+.sc-cmd code{font-size:13.5px;overflow-wrap:anywhere}
+
+/* specifications */
+.specs{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:start}
+.spec{width:100%;border-collapse:collapse;font-size:16.5px;line-height:1.4}
+.spec tr{border-bottom:2px solid var(--ink)}
+.spec tbody tr:first-child{border-top:8px solid var(--ink)}
+.spec th{width:38%;padding:11px 16px 11px 0;text-align:left;vertical-align:top;font-weight:800;font-stretch:112%}
+.spec td{padding:11px 0}
+.picto{list-style:none;margin:6px 0 40px;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.picto li{display:flex;flex-direction:column;align-items:flex-start;gap:8px;font-weight:800;font-size:15px;line-height:1.25;font-stretch:112%}
+.picto svg{width:76px;height:76px}
+.picto svg *{fill:none;stroke:var(--ink);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.picto svg text{fill:var(--ink);stroke:none;font:800 13px var(--f-body)}
+.warn{position:relative;margin:0 0 36px;padding:20px 22px 20px 96px;background:var(--yellow);border:3px solid var(--ink);box-shadow:inset 0 0 0 4px var(--yellow),inset 0 0 0 6px var(--ink),0 12px 18px -12px rgba(50,30,10,.75);transform:rotate(-2deg)}
+.warn svg{position:absolute;left:20px;top:22px;width:58px;height:52px}
+.warn h3{margin:0 0 4px;font:900 34px/.9 var(--f-box);text-transform:uppercase}
+.warn p{margin:0;font-weight:600}
+.warn .small{margin-top:8px;font-size:14px}
+.req{font-size:15px;max-width:30em;margin:0}
+
+/* instruction leaflet */
+.leaflet{display:grid;grid-template-columns:1fr 1fr;background:linear-gradient(90deg,#EEEEE9,#F7F7F3 22%,#F3F3EE 49.6%,#E2E2DC 50%,#F8F8F4 51%,#F4F4EF 80%,#ECECE6);box-shadow:0 2px 0 rgba(0,0,0,.05),0 30px 44px -26px rgba(55,32,10,.8);transform:rotate(-.5deg)}
+.leaf-p{padding:clamp(26px,4vw,52px)}
+.leaf-h{margin:0 0 22px;font:900 clamp(38px,4.4vw,56px)/.88 var(--f-box);text-transform:uppercase}
+.leaf-p h3{margin:0 0 12px;font:800 19px/1.2 var(--f-body);font-stretch:125%}
+.leaf-p h3:not(:first-child){margin-top:30px}
+.steps{list-style:none;margin:0 0 20px;padding:0;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:8px 0 8px 44px;border-bottom:1.5px solid rgba(29,42,91,.25)}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:800 15px/1 var(--f-body)}
+.steps code{display:block;font-size:13.5px;overflow-wrap:anywhere}
+.steps .cmt{display:block;font-size:14.5px;color:#3A4466}
+.needs{margin:0;padding-left:1.1em}
+.needs li{margin-bottom:6px}
+.loop{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;margin:0}
+.loop dt code{font-size:13px;white-space:nowrap}
+.loop dd{margin:0;font-size:15.5px}
+
+/* footer: bottom flap */
+.foot .wrap{padding-bottom:56px}
+.foot-in{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:40px clamp(32px,5vw,72px);align-items:start}
+.coupon{position:relative;padding:28px clamp(20px,3vw,32px) 24px;border:2.5px dashed var(--ink);background:rgba(221,191,152,.55)}
+.coupon::before{content:"\2702";position:absolute;top:-17px;left:22px;padding:0 6px;background:var(--kraft);font-size:24px;line-height:1}
+.coupon h2{margin:0 0 10px;font:900 40px/.9 var(--f-box);text-transform:uppercase}
+.share-text{margin:0 0 18px;font:700 clamp(19px,1.8vw,22px)/1.3 var(--f-body);max-width:28em}
+.share-row{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.share-row a{font-weight:700}
+.marks{display:flex;flex-wrap:wrap;align-items:flex-end;gap:28px 36px}
+.barcode{position:relative;display:block;padding:12px 16px 8px;background:var(--paper);border-radius:2px;cursor:crosshair}
+.barcode svg{display:block;width:210px;height:62px}
+.barcode .bc-t{display:block;margin-top:4px;text-align:center;font:500 12px/1 var(--f-mono);letter-spacing:.06em}
+.laser{position:absolute;left:-8px;right:-8px;top:10px;height:2px;background:#FF2A1A;box-shadow:0 0 7px 2px rgba(255,42,26,.55);opacity:0;pointer-events:none}
+.price{position:absolute;right:-18px;top:-22px;padding:3px 9px;background:var(--yellow);border:2px solid var(--ink);font:900 26px/1 var(--f-box);transform:rotate(7deg) scale(.4);opacity:0;transition:opacity .2s .5s,transform .25s .5s cubic-bezier(.2,1.6,.4,1);pointer-events:none}
+.barcode:hover .price,.barcode:focus-visible .price{opacity:1;transform:rotate(7deg)}
+.barcode:hover .laser,.barcode:focus-visible .laser{animation:scan 1.1s ease-in-out}
+@keyframes scan{0%{opacity:1;transform:translateY(0)}45%{opacity:1;transform:translateY(58px)}90%{opacity:1;transform:translateY(0)}100%{opacity:0}}
+.recyc{display:flex;align-items:center;gap:12px;max-width:16em;font-size:14px;line-height:1.35}
+.recyc svg{flex:0 0 66px;width:66px;height:66px}
+.foot-text{grid-column:1/-1;display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 32px;padding-top:24px;border-top:2px solid var(--ink);font-size:15px}
+.foot-text p{margin:0}
+.made{font:900 24px/1 var(--f-box);text-transform:uppercase}
+
+/* torque readout */
+.readout{position:fixed;left:16px;bottom:16px;z-index:60;width:min(340px,calc(100vw - 32px));padding:16px 18px 14px;background:var(--yellow);border:3px solid var(--ink);box-shadow:inset 0 0 0 3px var(--yellow),inset 0 0 0 5px var(--ink),0 16px 26px -12px rgba(40,25,10,.75);transform:rotate(-1.5deg)}
+.readout.pop{animation:pop .34s cubic-bezier(.2,1.5,.4,1)}
+@keyframes pop{from{opacity:0;transform:rotate(-7deg) scale(.6)}}
+.ro-k{margin:0;font:800 14px/1.2 var(--f-body);font-stretch:125%}
+.ro-v{margin:2px 0 6px;font:900 58px/.9 var(--f-box)}
+.ro-t{margin:0 0 12px;font-size:15px;line-height:1.4}
+.ro-a{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;font-weight:700;font-size:15px}
+
+@media (max-width:899px){
+ .hero{min-height:0}
+ .hero-in{grid-template-columns:1fr;padding-top:104px}
+ .wordmark{font-size:min(26vw,190px)}
+ .tagline{max-width:16ch}
+ .drill-col{max-width:640px}
+ .inside{grid-template-columns:1fr;grid-template-areas:"h" "fig" "list"}
+ .parts-fig{position:static;margin:0 -6px 24px}
+ .bitset,.specs,.foot-in{grid-template-columns:1fr}
+ .speccard{transform:none}
+}
+@media (max-width:719px){
+ body{font-size:16px}
+ .tape{left:-62px;top:14px;width:200px;height:42px}
+ .lede{font-size:17px}
+ .bore-in{grid-template-columns:1fr;padding-top:24px}
+ .bore-copy .boxh{font-size:clamp(38px,11vw,56px)}
+ .bore-copy p{font-size:15.5px;line-height:1.45;margin-bottom:12px}
+ .park{grid-area:2/1;align-self:start;justify-self:end;width:62%;height:96px;min-height:0;margin-top:-26px;position:relative;z-index:1}
+ .hole-box{grid-area:2/1;height:clamp(300px,58vh,480px)}
+ .bore-foot{grid-area:3/1}
+ .bore-foot p{font-size:14px}
+ .term-in{width:84%;height:82%;font-size:10.5px;font-stretch:75%}
+ .target{width:110px;height:110px;margin:-55px 0 0 -55px;font-size:21px}
+ .bit{--sh:124px;height:44px}
+ .drill-col{padding-top:80px}
+ .shank{font-size:10px;padding:0 6px}
+ .mould{font-size:12px;left:18px}
+ .picto{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+ .picto svg{width:60px;height:60px}
+ .picto li{font-size:13.5px}
+ .warn{padding:18px 16px 18px 78px}
+ .warn svg{left:14px;width:50px;height:45px}
+ .leaflet{grid-template-columns:1fr;background:linear-gradient(180deg,#F4F4EF,#F8F8F4 49.6%,#E2E2DC 50%,#F7F7F3 50.6%,#EFEFEA);transform:none}
+ .loop{grid-template-columns:1fr;gap:2px}
+ .loop dd{margin-bottom:10px}
+ .barcode svg{width:180px;height:54px}
+}
+@media (prefers-reduced-motion:reduce){
+ .btn,.tryme,.bitbody,.part,.price,.d-trig{transition:none}
+ .readout.pop{animation:none}
+ .barcode:hover .laser,.barcode:focus-visible .laser{animation:none;opacity:1;transform:translateY(28px)}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+<header class="hero panel">
+ <div class="tape" aria-hidden="true"></div>
+ <div class="hero-in">
+  <div class="hero-copy">
+   <h1 class="wordmark">kdrill</h1>
+   <p class="model">K-8 cordless cluster drill</p>
+   <p class="domain">kdrill.5xx.tech</p>
+   <p class="tagline">Breaks Kubernetes on your laptop, on purpose.</p>
+   <p class="lede">141 broken clusters to fix with your own <code>kubectl</code>. Free and open source. Runs on your laptop: no cloud account, no GPU, no bill.</p>
+   <div class="ctas"><a class="btn btn-go" href="https://github.com/mousavian/kdrill">Get it on GitHub</a><a class="btn" href="#bits">See the bit set</a></div>
+  </div>
+  <div class="drill-col">
+   <div class="burst"><svg viewBox="0 0 160 160" aria-hidden="true"><path d="M80 2L91.1 17L106.7 6.7L112 24.6L130.1 20.2L129 38.9L147.5 41L140.1 58.1L156.8 66.5L144 80L156.8 93.5L140.1 101.9L147.5 119L129 121.1L130.1 139.8L112 135.4L106.7 153.3L91.1 143L80 158L68.9 143L53.3 153.3L48 135.4L29.9 139.8L31 121.1L12.5 119L19.9 101.9L3.2 93.5L16 80L3.2 66.5L19.9 58.1L12.5 41L31 38.9L29.9 20.2L48 24.6L53.3 6.7L68.9 17Z" fill="#FFD23F" stroke="#1D2A5B" stroke-width="3" stroke-linejoin="round"/></svg><p><b>141</b>bits<br>included</p></div>
+   <div class="drill-slot">
+    <div class="drill" role="img" aria-label="An orange cordless drill, model K-8, with an 8 GB battery pack and a fluted drill bit in the chuck">
+<svg viewBox="110 56 774 410" aria-hidden="true">
+<defs>
+<pattern id="dots" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><circle cx="3.5" cy="3.5" r="1.7" fill="#1D2A5B"/></pattern>
+<pattern id="ribs" width="8" height="9" patternUnits="userSpaceOnUse"><rect y="3" width="8" height="3" fill="#15171A"/></pattern>
+<linearGradient id="stl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F3F5F8"/><stop offset=".38" stop-color="#D9DDE3"/><stop offset=".62" stop-color="#8A8F98"/><stop offset="1" stop-color="#5B6068"/></linearGradient>
+<linearGradient id="pls" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4A5059"/><stop offset=".3" stop-color="#2E3238"/><stop offset="1" stop-color="#202328"/></linearGradient>
+<clipPath id="shellc"><path id="shellp" d="M486 88C440 78 330 68 236 70C168 72 120 102 120 142C120 184 156 212 214 214L252 214C248 262 238 312 224 346C220 354 200 356 194 366L190 384C189 390 192 393 198 393L430 393C438 393 442 388 440 381L434 362C431 353 422 349 410 349L340 349C326 349 318 340 320 326C324 296 334 262 346 232L352 214L478 206C487 205 493 199 493 190L493 101C493 93 491 89 486 88Z"/></clipPath>
+</defs>
+<g stroke="#1D2A5B" stroke-linejoin="round" stroke-linecap="round">
+<path d="M196 393L432 393L434 446C434 454 428 458 420 458L210 458C202 458 196 454 196 446Z" fill="url(#pls)" stroke-width="3"/>
+<path d="M199 404H431M207 414V448M214 414V448" stroke="#4A5059" stroke-width="2.5"/>
+<rect x="228" y="412" width="118" height="36" rx="3" fill="#FFD23F" stroke-width="2"/>
+<text x="287" y="441" text-anchor="middle" class="d-8gb" stroke="none" fill="#1D2A5B">8 GB</text>
+<g stroke="none"><rect x="370" y="424" width="10" height="6" rx="2" fill="#FFD23F"/><rect x="384" y="424" width="10" height="6" rx="2" fill="#FFD23F"/><rect x="398" y="424" width="10" height="6" rx="2" fill="#FFD23F"/><rect x="412" y="424" width="10" height="6" rx="2" fill="#4A5059"/></g>
+<path d="M434 401L441 403V415L434 417Z" fill="url(#pls)" stroke-width="2"/>
+<use href="#shellp" fill="#FF5A1F" stroke="none"/>
+<g clip-path="url(#shellc)" stroke="none">
+<path d="M112 168C150 206 200 216 262 214L480 206L500 186L500 160C420 178 300 186 200 178Z" fill="url(#dots)" opacity=".42"/>
+<path d="M306 214H362L350 232C338 262 328 298 324 330L330 352H300C296 300 300 252 306 214Z" fill="url(#dots)" opacity=".42"/>
+<path d="M180 378H450V400H180Z" fill="url(#dots)" opacity=".5"/>
+<rect x="452" y="60" width="14" height="160" fill="#1D2A5B"/>
+</g>
+<path d="M256 84C330 80 410 84 446 91" stroke="#FFF" stroke-opacity=".5" stroke-width="7" fill="none"/>
+<path d="M150 112C140 126 137 146 141 162" stroke="#FFF" stroke-opacity=".4" stroke-width="6" fill="none"/>
+<use href="#shellp" fill="none" stroke-width="3.5"/>
+<path d="M170 100V126M184 97V125M198 95V124M212 94V124" stroke="#202328" stroke-width="7"/>
+<path d="M252 222C248 266 238 314 226 344L262 344C272 314 282 268 286 224Z" fill="url(#pls)" stroke-width="2.5"/>
+<path d="M252 222C248 266 238 314 226 344L262 344C272 314 282 268 286 224Z" fill="url(#ribs)" stroke="none" opacity=".7"/>
+<rect x="326" y="203" width="30" height="11" rx="5" fill="url(#pls)" stroke-width="2.5"/>
+<path class="d-trig" d="M350 217H371C378 217 382 222 381 229L377 258C376 265 371 268 365 268H341L346 232Z" fill="url(#pls)" stroke-width="3"/>
+<g fill="#E04A12" stroke-width="2"><circle cx="200" cy="168" r="5.5"/><circle cx="418" cy="188" r="5.5"/><circle cx="240" cy="330" r="5.5"/><circle cx="404" cy="372" r="5.5"/></g>
+<circle cx="431" cy="372" r="4.5" fill="#FFF6D8" stroke-width="2"/>
+<text x="244" y="161" class="d-logo" stroke="none" fill="#1D2A5B">KDRILL</text>
+<rect x="390" y="126" width="50" height="26" rx="4" fill="none" stroke-width="2.5"/>
+<text x="415" y="145" text-anchor="middle" class="d-model" stroke="none" fill="#1D2A5B">K-8</text>
+<rect x="493" y="94" width="36" height="92" rx="7" fill="url(#pls)" stroke-width="3"/>
+<path d="M501 101V179M508 101V179M515 101V179M522 101V179" stroke="#4A5059" stroke-width="3"/>
+<rect x="529" y="106" width="13" height="68" fill="url(#stl)" stroke-width="2.5"/>
+<rect x="542" y="99" width="80" height="82" rx="9" fill="url(#pls)" stroke-width="3"/>
+<path d="M552 106V174M558 106V174M564 106V174M570 106V174M576 106V174M582 106V174M588 106V174M594 106V174M600 106V174M606 106V174M612 106V174" stroke="#4A5059" stroke-width="2.4"/>
+<rect x="547" y="108" width="70" height="6" rx="3" fill="#FFF" fill-opacity=".14" stroke="none"/>
+<rect x="622" y="106" width="10" height="68" fill="url(#stl)" stroke-width="2.5"/>
+<path d="M632 110L652 123V157L632 170Z" fill="url(#stl)" stroke-width="2.5"/>
+<rect x="652" y="131" width="52" height="18" fill="url(#stl)" stroke-width="2.5"/>
+<path d="M652 123L664 129V131.5H652ZM652 157L664 151V148.5H652Z" fill="#8A8F98" stroke-width="2"/>
+<path d="M700 131H852L874 140L852 149H700Z" fill="url(#stl)" stroke-width="2.5"/>
+<path stroke="none" fill="#4F555E" d="M852 131L862 135.5C858 140 855 145 852 149Z"/>
+<path d="M852 140H872" stroke-width="1.5"/>
+</g>
+</svg>
+     <div class="bitwin" aria-hidden="true"><div class="flutes"><svg viewBox="0 0 250 18" preserveAspectRatio="none"><path d="M-49 0C-31 0 -18 18 0 18H22C4 18 -9 0 -27 0ZM0 0C18 0 31 18 49 18H71C53 18 40 0 22 0ZM49 0C67 0 80 18 98 18H120C102 18 89 0 71 0ZM98 0C116 0 129 18 147 18H169C151 18 138 0 120 0ZM147 0C165 0 178 18 196 18H218C200 18 187 0 169 0ZM196 0C214 0 227 18 245 18H267C249 18 236 0 218 0ZM245 0C263 0 276 18 294 18H316C298 18 285 0 267 0ZM294 0C312 0 325 18 343 18H365C347 18 334 0 316 0Z"/></svg></div><div class="bitblur"></div><div class="bitshade"></div></div>
+    </div>
+    <svg class="tm-arrow" viewBox="0 0 774 410" aria-hidden="true"><path d="M392 262C352 258 314 246 294 214" fill="none" stroke="#1D2A5B" stroke-width="3.5" stroke-linecap="round"/><path d="M290 205L306 219L290 224Z" fill="#1D2A5B" stroke="#1D2A5B" stroke-width="2" stroke-linejoin="round"/></svg>
+    <button class="tryme" id="tryme" type="button" aria-label="Try me. Hold the trigger."><span class="tm-big" aria-hidden="true">Try me</span><span class="tm-small" id="rpm" aria-hidden="true">Hold the trigger</span></button>
+   </div>
+   <p class="fine">Shown larger than actual size. Battery is your laptop's RAM.</p>
+  </div>
+ </div>
+</header>
+
+<div class="bore-track">
+ <section class="bore" id="open-here" aria-labelledby="open-h">
+  <div class="bore-in">
+   <div class="bore-copy">
+    <h2 class="boxh" id="open-h">The cluster is the exam</h2>
+    <p>Every lesson is a small cluster that is broken or unfinished, plus a goal. You fix it with your own <code>kubectl</code>. Nothing is multiple choice: <code>kdrill verify</code> checks the cluster and says exactly what is still wrong.</p>
+   </div>
+   <div class="park" aria-hidden="true"></div>
+   <div class="hole-box">
+    <div class="target" aria-hidden="true">Open<br>here</div>
+    <div class="hole">
+     <div class="tear-fibre"></div>
+     <div class="tear-flute"></div>
+     <div class="pit">
+      <div class="term">
+       <p class="sr">Recorded terminal session. kdrill verify passes five checks and fails one: all 3 replicas Running and ready, expected 3, got 2, with a hint to describe the Pending pod. After the fix, all six checks pass and verify exits 0.</p>
+       <div class="term-in" id="term" aria-hidden="true">
+<p class="tl cmd" data-c="kdrill verify"><span class="ps">$ </span><span class="tx">kdrill verify</span></p>
+<p class="tl"><span class="ok">✓</span> Deployment web still asks for 3 replicas</p>
+<p class="tl"><span class="no">✗</span> All 3 replicas are Running and ready</p>
+<p class="tl in2">expected: 3   got: 2</p>
+<p class="tl hint">→ Look at the Pending pod: kubectl describe pod &lt;name&gt;, then read the Events at the bottom.</p>
+<p class="tl"><span class="ok">✓</span> Each pod requests at least 1 CPU (1000m)</p>
+<p class="tl"><span class="ok">✓</span> There are still exactly 2 worker nodes</p>
+<p class="tl"><span class="ok">✓</span> node-a still has 4 allocatable CPUs</p>
+<p class="tl"><span class="ok">✓</span> node-b still has 4 allocatable CPUs</p>
+<p class="tl cmd cm" data-c="# a few kubectl commands later"><span class="ps">$ </span><span class="tx"># a few kubectl commands later</span></p>
+<p class="tl cmd" data-c="kdrill verify"><span class="ps">$ </span><span class="tx">kdrill verify</span></p>
+<p class="tl"><span class="ok">✓</span> Deployment web still asks for 3 replicas</p>
+<p class="tl"><span class="ok">✓</span> All 3 replicas are Running and ready</p>
+<p class="tl"><span class="ok">✓</span> Each pod requests at least 1 CPU (1000m)</p>
+<p class="tl"><span class="ok">✓</span> There are still exactly 2 worker nodes</p>
+<p class="tl"><span class="ok">✓</span> node-a still has 4 allocatable CPUs</p>
+<p class="tl"><span class="ok">✓</span> node-b still has 4 allocatable CPUs</p>
+<p class="tl cmd" data-c="echo $?"><span class="ps">$ </span><span class="tx">echo $?</span></p>
+<p class="tl">0</p>
+<p class="tl cmd end"><span class="ps">$ </span><span class="cur"></span></p>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+   <div class="bore-foot">
+    <p>Real <code>kdrill verify</code> output from <code>k8s-scheduling/01</code>, before and after the fix.</p>
+    <button class="btn btn-small" id="replay" type="button">Run it again</button>
+   </div>
+  </div>
+  <div class="flecks" aria-hidden="true"></div>
+ </section>
+</div>
+</div>
+
+<section class="panel" id="inside" aria-labelledby="inside-h">
+ <div class="wrap inside">
+  <header>
+   <h2 class="boxh" id="inside-h">What's in the box</h2>
+   <p class="intro">One lesson, taken apart. Parts are not sold separately.</p>
+  </header>
+  <figure class="parts-fig">
+<svg class="parts" viewBox="0 0 760 540" role="img" aria-labelledby="parts-t"><title id="parts-t">Exploded view of one kdrill lesson: a broken cluster, a goal tag, a kubectl key, a verify gauge, three hint cards and a reset button.</title>
+<defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#C8A27A"/><path d="M0 0V6" stroke="#1D2A5B" stroke-width="1.4"/></pattern><pattern id="pdots" width="6" height="6" patternUnits="userSpaceOnUse"><rect width="6" height="6" fill="#C8A27A"/><circle cx="3" cy="3" r="1.15" fill="#1D2A5B"/></pattern><pattern id="haz" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)"><rect width="10" height="10" fill="#FFD23F"/><rect width="5" height="10" fill="#1D2A5B"/></pattern></defs>
+<g class="ax"><path d="M214 112L292 226M566 150L448 232M584 302L480 318M206 446L246 404M516 432L452 390"/></g>
+<g id="part-2" class="part" transform="translate(64 40) rotate(-7)"><path class="str" d="M14 56C-12 62 -34 38 -16 14"/><path class="pt" d="M0 22L22 0H204V112H22L0 90Z"/><circle class="pk" cx="20" cy="56" r="7"/><text class="tg-h" x="40" y="30">Goal</text><text class="tg" x="40" y="55">3/3 replicas Running</text><text class="tg" x="40" y="75">on the 2 existing nodes</text><text class="tg" x="40" y="95">each still asks 1 CPU</text></g>
+<g id="part-1" class="part"><path class="pd" d="M187.4 327.0 L360.6 427.0 L360.6 415.0 L187.4 315.0 Z"/><path class="ph" d="M473.2 362.0 L360.6 427.0 L360.6 415.0 L473.2 350.0 Z"/><path class="pt" d="M300.0 250.0 L473.2 350.0 L360.6 415.0 L187.4 315.0 Z"/><path class="crack" d="M213.4 330.0 L244.6 330.0 L249.8 319.0 L280.9 323.0 L289.6 314.0 L319.1 319.0"/><path class="pd" d="M253.2 291.0 L294.8 315.0 L294.8 253.0 L253.2 229.0 Z"/><path class="ph" d="M336.4 291.0 L294.8 315.0 L294.8 253.0 L336.4 229.0 Z"/><path class="pt" d="M294.8 205.0 L336.4 229.0 L294.8 253.0 L253.2 229.0 Z"/><path class="taint" d="M253.2 255.0 L294.8 279.0 L294.8 287.0 L253.2 263.0 Z"/><path class="pd" d="M306.9 322.0 L348.5 346.0 L348.5 284.0 L306.9 260.0 Z"/><path class="ph" d="M390.1 322.0 L348.5 346.0 L348.5 284.0 L390.1 260.0 Z"/><path class="pt" d="M348.5 236.0 L390.1 260.0 L348.5 284.0 L306.9 260.0 Z"/><path class="pd" d="M333.8 250.5 L346.8 258.0 L346.8 243.0 L333.8 235.5 Z"/><path class="ph" d="M359.8 250.5 L346.8 258.0 L346.8 243.0 L359.8 235.5 Z"/><path class="pt" d="M346.8 228.0 L359.8 235.5 L346.8 243.0 L333.8 235.5 Z"/><path class="pd" d="M351.1 260.5 L364.1 268.0 L364.1 253.0 L351.1 245.5 Z"/><path class="ph" d="M377.1 260.5 L364.1 268.0 L364.1 253.0 L377.1 245.5 Z"/><path class="pt" d="M364.1 238.0 L377.1 245.5 L364.1 253.0 L351.1 245.5 Z"/><path class="pd" d="M360.6 353.0 L402.2 377.0 L402.2 315.0 L360.6 291.0 Z"/><path class="ph" d="M443.8 353.0 L402.2 377.0 L402.2 315.0 L443.8 291.0 Z"/><path class="pt" d="M402.2 267.0 L443.8 291.0 L402.2 315.0 L360.6 291.0 Z"/><path class="pd" d="M387.5 281.5 L400.5 289.0 L400.5 274.0 L387.5 266.5 Z"/><path class="ph" d="M413.4 281.5 L400.5 289.0 L400.5 274.0 L413.4 266.5 Z"/><path class="pt" d="M400.5 259.0 L413.4 266.5 L400.5 274.0 L387.5 266.5 Z"/><path class="pd" d="M404.8 291.5 L417.8 299.0 L417.8 284.0 L404.8 276.5 Z"/><path class="ph" d="M430.8 291.5 L417.8 299.0 L417.8 284.0 L430.8 276.5 Z"/><path class="pt" d="M417.8 269.0 L430.8 276.5 L417.8 284.0 L404.8 276.5 Z"/><path class="pend" d="M362.4 248.0 L377.9 257.0 L377.9 239.0 L362.4 230.0 Z"/><path class="pend" d="M393.5 248.0 L377.9 257.0 L377.9 239.0 L393.5 230.0 Z"/><path class="pend" d="M377.9 221.0 L393.5 230.0 L377.9 239.0 L362.4 230.0 Z"/></g>
+<g id="part-3" class="part"><path class="pd" d="M549.8 121.0 L600.0 150.0 L600.0 115.0 L565.4 95.0 Z"/><path class="ph" d="M650.2 121.0 L600.0 150.0 L600.0 115.0 L634.6 95.0 Z"/><path class="pt" d="M600.0 75.0 L634.6 95.0 L600.0 115.0 L565.4 95.0 Z"/><text class="kc" transform="matrix(0.866 0.500 -0.866 0.500 600.0 95.0)" x="0" y="6" text-anchor="middle">k</text></g>
+<g id="part-4" class="part"><rect class="ph" x="631" y="352" width="18" height="32"/><rect class="pt" x="635" y="384" width="10" height="20"/><circle class="pd" cx="640" cy="300" r="54"/><circle class="pt" cx="640" cy="300" r="45"/><path class="tk" d="M640.0 264.0 L640.0 256.0 M648.3 260.9 L649.1 257.0 M656.3 263.5 L657.9 259.8 M663.5 267.6 L665.9 264.4 M669.7 273.2 L672.7 270.6 M671.2 282.0 L678.1 278.0 M678.0 287.6 L681.8 286.4 M679.8 295.8 L683.8 295.4 M679.8 304.2 L683.8 304.6 M678.0 312.4 L681.8 313.6 M671.2 318.0 L678.1 322.0 M669.7 326.8 L672.7 329.4 M663.5 332.4 L665.9 335.6 M656.3 336.5 L657.9 340.2 M648.3 339.1 L649.1 343.0 M640.0 336.0 L640.0 344.0 M631.7 339.1 L630.9 343.0 M623.7 336.5 L622.1 340.2 M616.5 332.4 L614.1 335.6 M610.3 326.8 L607.3 329.4 M608.8 318.0 L601.9 322.0 M602.0 312.4 L598.2 313.6 M600.2 304.2 L596.2 304.6 M600.2 295.8 L596.2 295.4 M602.0 287.6 L598.2 286.4 M608.8 282.0 L601.9 278.0 M610.3 273.2 L607.3 270.6 M616.5 267.6 L614.1 264.4 M623.7 263.5 L622.1 259.8 M631.7 260.9 L630.9 257.0"/><text class="dl0" x="650" y="282">0</text><text class="dlt" x="640" y="330" text-anchor="middle">exit code</text><path class="ndl" d="M640 304L640 266"/><circle cx="640" cy="300" r="5" class="pk"/></g>
+<g id="part-5" class="part"><g transform="rotate(-14 130 520)"><rect class="pt" x="80" y="392" width="100" height="128" rx="6"/><text class="hc" x="92" y="418">1</text><path class="hl" d="M94 446H160"/></g><g transform="rotate(-2 146 520)"><rect class="pt" x="96" y="392" width="100" height="128" rx="6"/><text class="hc" x="108" y="418">2</text><path class="hl" d="M110 446H180M110 462H160"/></g><g transform="rotate(10 162 520)"><rect class="pt" x="112" y="392" width="100" height="128" rx="6"/><text class="hc" x="124" y="418">3</text><path class="hl" d="M126 446H196M126 462H196M126 478H170M126 494H188"/></g></g>
+<g id="part-6" class="part"><path class="pd" d="M495.4 439.0 L556.0 474.0 L556.0 452.0 L495.4 417.0 Z"/><path class="ph" d="M616.6 439.0 L556.0 474.0 L556.0 452.0 L616.6 417.0 Z"/><path class="pt" d="M556.0 382.0 L616.6 417.0 L556.0 452.0 L495.4 417.0 Z"/><path class="ph" d="M526.6 417.0 L526.6 401.0 A29.4 17.0 0 0 1 585.4 401.0 L585.4 417.0 A29.4 17.0 0 0 1 526.6 417.0 Z"/><ellipse class="pt" cx="556.0" cy="401.0" rx="29.4" ry="17.0"/><g transform="matrix(0.866 0.500 -0.866 0.500 556.0 401.0)"><path class="arw" d="M6.5 -11.26A13 13 0 1 1 -8.36 -9.96"/><path class="arwh" d="M-3 -14.5L-11.6 -13.8L-5.2 -6.1Z"/></g></g>
+<g class="refs"><path class="ld" d="M392 488L366 424M44 168L74 126M712 54L664 108M720 226L688 266M44 380L60 408M702 500L608 452"/>
+<g data-ref="1"><circle cx="392" cy="504" r="17"/><text x="392" y="510">1</text></g><g data-ref="2"><circle cx="40" cy="184" r="17"/><text x="40" y="190">2</text></g><g data-ref="3"><circle cx="716" cy="38" r="17"/><text x="716" y="44">3</text></g><g data-ref="4"><circle cx="726" cy="210" r="17"/><text x="726" y="216">4</text></g><g data-ref="5"><circle cx="38" cy="364" r="17"/><text x="38" y="370">5</text></g><g data-ref="6"><circle cx="716" cy="510" r="17"/><text x="716" y="516">6</text></g></g>
+</svg>
+  </figure>
+  <ol class="partlist">
+   <li data-ref="1"><span class="pn" aria-hidden="true">1</span><div><b>A broken cluster</b><span>A small k3d cluster, broken or unfinished on purpose. One pod is Pending and nobody has said why.</span></div></li>
+   <li data-ref="2"><span class="pn" aria-hidden="true">2</span><div><b>A goal</b><span>What done looks like, in one sentence: all 3 replicas Running, on the 2 existing nodes, each pod still requesting 1 CPU.</span></div></li>
+   <li data-ref="3"><span class="pn" aria-hidden="true">3</span><div><b>Your own kubectl</b><span>Not included. You already have one, and probably an alias for it.</span></div></li>
+   <li data-ref="4"><span class="pn" aria-hidden="true">4</span><div><b>kdrill verify</b><span>Checks the real cluster and tells you exactly what is still wrong. Exits 0 when you are done.</span></div></li>
+   <li data-ref="5"><span class="pn" aria-hidden="true">5</span><div><b>Progressive hints</b><span><code>kdrill hint</code> gives a little more away each time. <code>kdrill solution</code> has the reference answer.</span></div></li>
+   <li data-ref="6"><span class="pn" aria-hidden="true">6</span><div><b>A reset button</b><span><code>kdrill reset</code> puts the lesson back the way it started. Break it as often as you like.</span></div></li>
+  </ol>
+ </div>
+</section>
+
+<section class="panel" id="bits" aria-labelledby="bits-h">
+ <div class="wrap">
+  <h2 class="boxh" id="bits-h">The bit set</h2>
+  <p class="intro">Eight courses, 141 lessons. The more lessons, the bigger the bit. Press one to lift it out of the case.</p>
+  <div class="bitset">
+   <div class="case">
+    <div class="case-lid" aria-hidden="true"><span>K-8 bit set</span><span>141 pcs</span></div>
+    <div class="tray" id="tray" role="group" aria-label="Courses, smallest to largest"><button class="bit" type="button" style="--n:6" data-id="k8s-scheduling" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>k8s-scheduling</b><i>6</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">k8s-scheduling, 6 lessons</span></button><button class="bit" type="button" style="--n:12" data-id="gpu-scheduling" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>gpu-scheduling</b><i>12</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">gpu-scheduling, 12 lessons</span></button><button class="bit" type="button" style="--n:12" data-id="karpenter" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>karpenter</b><i>12</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">karpenter, 12 lessons</span></button><button class="bit" type="button" style="--n:13" data-id="kyverno" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>kyverno</b><i>13</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">kyverno, 13 lessons</span></button><button class="bit" type="button" style="--n:14" data-id="istio" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>istio</b><i>14</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">istio, 14 lessons</span></button><button class="bit" type="button" style="--n:20" data-id="training" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>training</b><i>20</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">training, 20 lessons</span></button><button class="bit" type="button" style="--n:26" data-id="inference" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>inference</b><i>26</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">inference, 26 lessons</span></button><button class="bit" type="button" style="--n:38" data-id="envoy" aria-pressed="false" aria-controls="speccard"><span class="recess"></span><span class="bitbody" aria-hidden="true"><span class="shank"><b>envoy</b><i>38</i></span><span class="flute"></span><span class="btip"></span></span><span class="sr">envoy, 38 lessons</span></button><div class="bit empty"><span class="recess"></span><span class="mould"><b>fine-tuning</b>not in this box yet</span></div><div class="bit empty"><span class="recess"></span><span class="mould"><b>kubeflow</b>not in this box yet</span></div></div>
+   </div>
+   <article class="speccard" id="speccard"><p>Press a bit to see its lessons.</p></article>
+  </div>
+ </div>
+</section>
+
+<section class="panel" id="specs" aria-labelledby="specs-h">
+ <div class="wrap specs">
+  <div>
+   <h2 class="boxh" id="specs-h">Specifications</h2>
+   <table class="spec">
+    <tbody>
+     <tr><th scope="row">Power source</th><td>Your laptop</td></tr>
+     <tr><th scope="row">Memory</th><td>8 GB (give Docker 4)</td></tr>
+     <tr><th scope="row">Cluster</th><td>One k3d (k3s) cluster called <code>kdrill</code></td></tr>
+     <tr><th scope="row">Cloud bill</th><td>$0.00</td></tr>
+     <tr><th scope="row">GPUs required</th><td>0 (simulated: as many as you like)</td></tr>
+     <tr><th scope="row">Fake nodes</th><td>KWOK. Dozens of “H100 nodes” cost a few MB of RAM</td></tr>
+     <tr><th scope="row">Real traffic</th><td>Real containers for the Envoy and Istio courses</td></tr>
+     <tr><th scope="row">Real model</th><td>SmolLM2-135M on llama.cpp, CPU only, about 57 tokens/s</td></tr>
+     <tr><th scope="row">Training run</th><td>A 354k-parameter GPT in PyTorch, 1 to 3 minutes</td></tr>
+     <tr><th scope="row">Lessons</th><td>141</td></tr>
+     <tr><th scope="row">Courses</th><td>8, 2 more planned</td></tr>
+     <tr><th scope="row">Pager</th><td>Not included</td></tr>
+     <tr><th scope="row">Verify</th><td>Exits 0 when you are done</td></tr>
+    </tbody>
+   </table>
+  </div>
+  <div>
+   <ul class="picto">
+    <li><svg viewBox="0 0 76 76" aria-hidden="true"><rect x="3" y="3" width="70" height="70" rx="12"/><path d="M22 50h31a10 10 0 0 0 0-20 14 14 0 0 0-26-4 12 12 0 0 0-5 24z"/><path d="M14 62L62 14"/></svg>No cloud account</li>
+    <li><svg viewBox="0 0 76 76" aria-hidden="true"><rect x="3" y="3" width="70" height="70" rx="12"/><rect x="12" y="24" width="52" height="24" rx="2"/><path d="M17 48v7M24 48v7M31 48v7M45 48v7M52 48v7M59 48v7"/><text x="38" y="41" text-anchor="middle">8 GB</text></svg>Fits in 8 GB</li>
+    <li><svg viewBox="0 0 76 76" aria-hidden="true"><rect x="3" y="3" width="70" height="70" rx="12"/><rect x="12" y="16" width="52" height="44" rx="4"/><path d="M12 26h52M20 37l8 6-8 6M33 50h14"/></svg>Your own kubectl</li>
+   </ul>
+   <div class="warn" role="note">
+    <svg viewBox="0 0 58 52" aria-hidden="true"><path d="M29 3L55 49H3Z" fill="none" stroke="#1D2A5B" stroke-width="4" stroke-linejoin="round"/><path d="M29 18V34" stroke="#1D2A5B" stroke-width="5" stroke-linecap="round"/><circle cx="29" cy="41.5" r="3" fill="#1D2A5B"/></svg>
+    <h3>Caution</h3>
+    <p>Will break your cluster. <code>kdrill reset</code> puts it back.</p>
+    <p class="small">Do not point at production.</p>
+   </div>
+   <p class="req">Requires Docker (Docker Desktop, OrbStack or Colima), k3d, kubectl, Go and helm. Sold separately, for free.</p>
+  </div>
+ </div>
+</section>
+
+<section class="panel" id="start" aria-labelledby="start-h">
+ <div class="wrap">
+  <div class="leaflet">
+   <div class="leaf-p">
+    <h2 class="leaf-h" id="start-h">Instructions for use</h2>
+    <h3>Quick start</h3>
+    <ol class="steps">
+     <li><code>git clone https://github.com/mousavian/kdrill</code></li>
+     <li><code>cd kdrill &amp;&amp; make build</code></li>
+     <li><code>bin/kdrill doctor</code><span class="cmt">Checks docker, memory, k3d, kubectl.</span></li>
+     <li><code>bin/kdrill cluster up</code><span class="cmt">One k3d cluster called “kdrill”.</span></li>
+     <li><code>bin/kdrill start k8s-scheduling/01</code><span class="cmt">Your first broken cluster.</span></li>
+    </ol>
+    <button class="btn btn-small" type="button" data-copy="git clone https://github.com/mousavian/kdrill&#10;cd kdrill &amp;&amp; make build&#10;bin/kdrill doctor        # checks docker, memory, k3d, kubectl&#10;bin/kdrill cluster up    # one k3d cluster called &quot;kdrill&quot;&#10;bin/kdrill start k8s-scheduling/01">Copy the commands</button>
+   </div>
+   <div class="leaf-p">
+    <h3>Before you start</h3>
+    <ul class="needs">
+     <li>Docker (Docker Desktop, OrbStack or Colima), k3d, kubectl, Go and helm.</li>
+     <li>Give Docker about 4 GB of memory. The whole lab fits on an 8 GB laptop.</li>
+     <li>No cloud account, no cloud bill, no GPU.</li>
+    </ul>
+    <h3>Every lesson</h3>
+    <dl class="loop">
+     <dt><code>kubectl get pods</code></dt><dd>Look around. Something is Pending.</dd>
+     <dt><code>kdrill verify</code></dt><dd>What is still wrong, line by line.</dd>
+     <dt><code>kdrill hint</code></dt><dd>A little more help each time.</dd>
+     <dt><code>kdrill solution</code></dt><dd>The reference answer.</dd>
+     <dt><code>kdrill reset</code></dt><dd>Start the lesson over.</dd>
+     <dt><code>kdrill next</code></dt><dd>Clean up and start the next lesson.</dd>
+    </dl>
+   </div>
+  </div>
+ </div>
+</section>
+
+<footer class="panel foot">
+ <div class="wrap foot-in">
+  <section class="coupon" id="share" aria-labelledby="share-h">
+   <h2 id="share-h">Pass it on</h2>
+   <p class="share-text" id="sharetext">“Found a power tool for Kubernetes. 141 bits, breaks your cluster on purpose, $0.”</p>
+   <div class="share-row">
+    <button class="btn btn-small" id="sharebtn" type="button" hidden>Share kdrill</button>
+    <div class="share-row" id="sharefall">
+     <button class="btn btn-small" type="button" data-copy="https://kdrill.5xx.tech/">Copy the link</button>
+     <a id="s-x" href="https://x.com/intent/tweet?text=Found%20a%20power%20tool%20for%20Kubernetes.%20141%20bits%2C%20breaks%20your%20cluster%20on%20purpose%2C%20%240.&amp;url=https%3A%2F%2Fkdrill.5xx.tech%2F">Post on X</a>
+     <a id="s-bs" href="https://bsky.app/intent/compose?text=Found%20a%20power%20tool%20for%20Kubernetes.%20141%20bits%2C%20breaks%20your%20cluster%20on%20purpose%2C%20%240.%20https%3A%2F%2Fkdrill.5xx.tech%2F">Post on Bluesky</a>
+     <a id="s-li" href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fkdrill.5xx.tech%2F">Share on LinkedIn</a>
+     <a id="s-hn" href="https://news.ycombinator.com/submitlink?u=https%3A%2F%2Fkdrill.5xx.tech%2F&amp;t=kdrill%3A%20break%20Kubernetes%20on%20your%20laptop%2C%20on%20purpose">Submit to Hacker News</a>
+    </div>
+   </div>
+  </section>
+  <div class="marks">
+   <div class="barcode" tabindex="0" role="img" aria-label="Barcode for kdrill.5xx.tech. Price: $0.00.">
+    <svg viewBox="0 0 220 56" preserveAspectRatio="none" aria-hidden="true"><path d="M10 0h2v56h-2zM13 0h1v56h-1zM16 0h1v56h-1zM21 0h2v56h-2zM27 0h1v56h-1zM30 0h1v56h-1zM32 0h1v56h-1zM37 0h1v56h-1zM40 0h2v56h-2zM43 0h1v56h-1zM46 0h1v56h-1zM49 0h4v56h-4zM54 0h1v56h-1zM59 0h2v56h-2zM62 0h1v56h-1zM65 0h2v56h-2zM69 0h1v56h-1zM71 0h1v56h-1zM76 0h2v56h-2zM80 0h1v56h-1zM82 0h1v56h-1zM87 0h1v56h-1zM90 0h2v56h-2zM94 0h3v56h-3zM98 0h2v56h-2zM101 0h3v56h-3zM106 0h1v56h-1zM109 0h4v56h-4zM115 0h1v56h-1zM118 0h1v56h-1zM120 0h4v56h-4zM126 0h1v56h-1zM129 0h1v56h-1zM131 0h1v56h-1zM134 0h2v56h-2zM138 0h3v56h-3zM142 0h1v56h-1zM145 0h4v56h-4zM150 0h1v56h-1zM153 0h1v56h-1zM155 0h2v56h-2zM159 0h1v56h-1zM164 0h1v56h-1zM169 0h1v56h-1zM171 0h2v56h-2zM175 0h1v56h-1zM178 0h2v56h-2zM184 0h1v56h-1zM186 0h1v56h-1zM189 0h1v56h-1zM192 0h4v56h-4zM197 0h2v56h-2zM202 0h3v56h-3zM206 0h1v56h-1zM208 0h2v56h-2z" fill="#1D2A5B"/></svg>
+    <span class="bc-t" aria-hidden="true">kdrill.5xx.tech</span>
+    <span class="laser" aria-hidden="true"></span>
+    <span class="price" aria-hidden="true">$0.00</span>
+   </div>
+   <div class="recyc">
+    <svg viewBox="0 0 72 72" aria-hidden="true"><g fill="none" stroke="#1D2A5B" stroke-width="5" stroke-linecap="round"><path d="M42.21 12.82A24 24 0 0 1 59.18 42.21"/><path d="M52.97 52.97A24 24 0 0 1 19.03 52.97"/><path d="M12.82 42.21A24 24 0 0 1 29.79 12.82"/></g><g fill="#1D2A5B"><path d="M57.4 49L64 43.5 54.4 40.9Z"/><path d="M14.1 48L15.5 56.5 22.6 49.4Z"/><path d="M36.6 11L28.5 8 31.1 17.7Z"/></g><text x="36" y="40" text-anchor="middle" font-family="Archivo,sans-serif" font-weight="800" font-size="11" fill="#1D2A5B">reset</text></svg>
+    <span>Reset and reuse. As often as you like.</span>
+   </div>
+  </div>
+  <div class="foot-text">
+   <p class="made">Made in a terminal</p>
+   <p>kdrill is open source under the MIT licence. <a href="https://github.com/mousavian/kdrill">kdrill on GitHub</a></p>
+   <p>kdrill.5xx.tech</p>
+  </div>
+ </div>
+</footer>
+
+<div class="readout" id="readout" hidden>
+ <p class="ro-k">Torque</p>
+ <p class="ro-v" id="ro-v">0 Nm</p>
+ <p class="ro-t" id="ro-t"></p>
+ <div class="ro-a"><a href="#share">Share your torque</a><button class="btn btn-small" type="button" id="ro-x">Dismiss</button></div>
+</div>
+<p class="sr" id="ro-live" aria-live="polite"></p>
+<p class="sr" id="bit-live" aria-live="polite"></p>
+
+<script>
+(()=>{
+'use strict';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const root=document.documentElement,LIVE=root.classList.contains('live'),RM=!LIVE;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const COURSES=[
+["k8s-scheduling","Kubernetes scheduling fundamentals","sim",[],"Why pods go Pending: requests, taints, spread, priority, GPUs. Start here.",6,["Why is my pod Pending?", "Put the database on SSD", "Run the trainer on the ML pool", "Spread the API across zones", "Let critical work preempt batch work", "Give the LLM its GPUs"]],
+["gpu-scheduling","GPU scheduling for AI workloads","sim",["k8s-scheduling"],"Bin-packing, time-slicing, MIG, quotas, Kueue, gang admission, DRA.",12,["Read the GPU labels, pick the right GPU", "Bin-pack GPUs to stop fragmentation", "Share GPUs with time-slicing (and know its limits)", "Right-size inference onto MIG slices", "Inference preempts training, eval waits its turn", "Cap each team's GPUs with ResourceQuota", "Queue GPU jobs with Kueue", "Borrow idle GPUs across teams, reclaim them on demand", "All-or-nothing admission for distributed training", "Dynamic Resource Allocation (DRA) fundamentals", "Pick devices with CEL, claim several, share one", "Capstone: why is my GPU workload not running?"]],
+["karpenter","Karpenter node autoscaling","sim",["k8s-scheduling","gpu-scheduling"],"Real Karpenter launching fake nodes: NodePools, spot, consolidation, drift.",12,["Your first NodePool", "Pick instance types with NodePool requirements", "Zones and topology spread drive where nodes appear", "Cap a NodePool with limits", "Spot first, on-demand as fallback", "A dedicated GPU pool with taints", "Right-size GPU instances", "Consolidation shrinks the fleet after scale-down", "Disruption controls before you turn consolidation on", "Drift and expiration roll the fleet for you", "Team NodePools that don't overlap", "Capstone: why won't Karpenter do what I want?"]],
+["kyverno","Kyverno policy as code","sim",["k8s-scheduling"],"Admission policy as code: validate, mutate, generate, exceptions, CEL.",13,["How Kyverno works: your first policy, Audit vs Enforce", "Validate patterns: tags, registries, resources", "Match and exclude precisely; autogen for Pod controllers", "Mutate: GPU scheduling defaults", "Generate: default NetworkPolicy, GPU quota and CA bundle per tenant namespace", "Mutate existing resources: propagate a namespace label to its Deployments", "External data: ConfigMap and API lookups in policies", "Verify image signatures (supply chain)", "Background scans and PolicyReports: find existing violations", "PolicyExceptions: a narrow, reviewed exemption", "CEL policies: rewrite a rule as a ValidatingPolicy, run it as a native VAP", "Test policies offline with the kyverno CLI", "Capstone: policies that don't do what they say"]],
+["envoy","Envoy, from proxy to Kubernetes gateway","real-light",["k8s-scheduling"],"Envoy from a config file to Envoy Gateway and the Gateway API.",38,["Your first Envoy: listener, connection manager, route, cluster", "The admin interface: what is Envoy actually doing?", "Virtual hosts and routes: matching Host, path and headers", "Service discovery: let Envoy see every pod", "Load balancing policies: sticky users with consistent hashing", "Active health checking (and the panic threshold)", "Outlier detection: eject the pod that keeps failing", "Timeouts: fail fast where it matters", "Retries: hide a bad host from users, safely", "Circuit breaking: protect a fragile backend from bursts", "Traffic splitting: a 90/10 canary with an opt-in header", "Header manipulation and URL rewrites", "Direct responses and redirects: answers without a backend", "Access logs: structured, filtered, with response flags", "Local rate limiting: a token bucket per route", "TLS termination with SNI: two sites, two certificates", "Upstream TLS and mTLS: Envoy as a TLS client", "TCP proxying and TLS passthrough by SNI", "JWT authentication at the proxy", "Authorization with the RBAC filter (and JWT claims)", "Dynamic configuration: xDS from files (LDS and CDS)", "Envoy Gateway and the Gateway API: GatewayClass, Gateway, HTTPRoute", "Under the hood: from Gateway API objects to Envoy xDS", "HTTPRoute matching: paths, headers, methods, query params, precedence", "Canary releases with HTTPRoute weights", "HTTPRoute filters: rewrites, header modifiers, redirects, mirroring", "Timeouts on HTTPRoutes, retries with a BackendTrafficPolicy", "BackendTrafficPolicy: sticky load balancing and passive health checks", "TLS on the Gateway: HTTPS listeners, redirects, ClientTrafficPolicy", "Rate limiting with BackendTrafficPolicy (local)", "SecurityPolicy: JWT authentication and claim-based authorization", "ClientTrafficPolicy: who is the client? (X-Forwarded-For and IP allow-lists)", "EnvoyProxy: customise the Gateway's Envoy fleet", "TLS passthrough with TLSRoute", "Bridge to AI inference routing: endpoint picking", "Capstone: five sites, five different failures", "Shared Gateways: cross-namespace routes and ReferenceGrant", "SecurityPolicy: basic auth for one route"]],
+["istio","Istio service mesh","real-light",["k8s-scheduling"],"Sidecars, canaries, mTLS, authorization, ambient mode.",14,["Sidecar injection: putting workloads into the mesh", "Inside the sidecar: listeners, routes, clusters and protocol selection", "Ingress with the Gateway API: Gateway and HTTPRoute", "Version routing: DestinationRule subsets and header matches", "Canary releases: weighted routing and traffic mirroring", "Resilience: timeouts and retries", "Chaos testing: fault injection", "Circuit breaking and outlier detection", "Strict mTLS with PeerAuthentication", "Authorization: deny by default, allow by identity, path and method", "End-user authentication: JWT at the ingress gateway", "Observability: access logs and metrics with the Telemetry API", "Ambient mode: ztunnel and a waypoint instead of sidecars", "Capstone: a mesh that doesn't do what it says"]],
+["inference","Serving LLMs on Kubernetes","real-compute",["envoy","gpu-scheduling"],"Serve an LLM: probes, KEDA on queue depth, endpoint picking, GPU capacity.",26,["First completion: a model server behind a Service", "Getting weights to the pod: an image volume", "Honest startup: startup, liveness and readiness probes", "Sizing: weights plus KV cache, and threads vs CPU", "Streaming and timeouts: do not cut long generations", "The metrics that matter: queue, throughput, cache", "Server-side concurrency: slots, batching and context", "Why a CPU-based HPA is blind to a model server", "Autoscaling on in-flight requests with KEDA", "Cold starts: what scale-to-zero costs", "Graceful shutdown: zero dropped requests during a rollout", "Rolling out a new model version when capacity is scarce", "One endpoint, several models: route by the model in the request body", "Why round-robin is bad for LLMs: least-request balancing", "Load-aware routing: the Inference Extension endpoint picker", "LoRA adapters as models: route to the replicas that have them loaded", "Priorities: shed batch traffic when the pool is saturated", "Protecting the fleet: a rate limit per client", "Canary a new model version by weight", "Replicas on GPU nodes: one GPU per replica, and fragmentation", "Packing small models: MIG slices instead of whole GPUs", "Serving and training on shared GPUs: priority and preemption", "Rolling a model when every GPU is in use", "Spreading replicas across zones and surviving a node loss", "Capacity math: from requests per second to GPUs and autoscaler bounds", "Capstone: a two-model service with five planted faults"]],
+["training","Training models on Kubernetes","real-compute",["k8s-scheduling","gpu-scheduling"],"Real PyTorch runs as Jobs: checkpoints, preemption, JobSet, Kueue.",20,["A training run is a Job, not a Deployment", "Size it: memory, CPU and threads", "Hyperparameters in a ConfigMap, reproducible with a seed", "Data in: a prepared dataset on a volume", "Checkpoints on a volume, and a Job that uses them", "Kill and resume", "Failure policy: retry disruptions, fail fast on bugs", "Graceful preemption: a last checkpoint on SIGTERM", "Checkpoints in object storage (MinIO)", "A hyperparameter sweep as an Indexed Job", "Distributed training by hand: two pods, one model", "One checkpoint volume for all workers", "When one worker goes: restart the whole group", "JobSet: the worker group as one object", "Queue real training jobs with Kueue", "Priority: an urgent job preempts a long run, which resumes", "Gang admission: a JobSet is queued whole", "Watching a run: metrics, and why it is slow", "Results as artifacts: named runs, a model, and cleanup", "Capstone: a queued, resumable two-worker run with a planted fault"]],
+["fine-tuning","Fine-tuning models on Kubernetes","real-compute",["training"],"LoRA on the tiny model, eval gates, adapter serving.",0,[]],
+["kubeflow","Kubeflow (Trainer, KServe, Katib, Pipelines)","real-compute",["training","inference"],"Trainer, KServe, Katib, Pipelines.",0,[]]
+];
+const KIND={sim:'Simulated nodes','real-light':'Real traffic','real-compute':'Real model'};
+
+/* copy buttons */
+async function copyText(t){
+ try{await navigator.clipboard.writeText(t);return true}
+ catch(e){const a=document.createElement('textarea');a.value=t;a.setAttribute('readonly','');a.style.cssText='position:fixed;top:0;opacity:0';document.body.append(a);a.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}a.remove();return ok}
+}
+document.addEventListener('click',async e=>{
+ const b=e.target.closest('[data-copy]');if(!b)return;
+ const ok=await copyText(b.dataset.copy),l=b.dataset.l||(b.dataset.l=b.textContent);
+ b.textContent=ok?'Copied':'Copy failed: select the text';clearTimeout(b._t);b._t=setTimeout(()=>{b.textContent=l},1800);
+});
+
+/* the bit set */
+const tray=$('#tray'),card=$('#speccard');
+let said=false;
+function show(id){
+ const c=COURSES.find(x=>x[0]===id),n=c[5];
+ const needs=c[3].length?'Needs '+c[3].map(r=>`<code>${r}</code>`).join(' and ')+'.':'Needs nothing else.';
+ card.innerHTML=`<p class="sc-kind">${KIND[c[2]]}</p><h3 class="sc-title">${esc(c[1])}</h3><p class="sc-meta"><code>${c[0]}</code>, ${n} lessons. ${needs}</p><p class="sc-line">${esc(c[4])}</p><ol class="sc-list" tabindex="0" aria-label="All ${n} lessons in ${c[0]}">${c[6].map(t=>`<li>${esc(t)}</li>`).join('')}</ol><div class="sc-cmd"><code>kdrill start ${c[0]}/01</code><button class="btn btn-small" type="button" data-copy="kdrill start ${c[0]}/01">Copy the command</button></div>`;
+ $$('.bit[data-id]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===id)));
+ if(said)$('#bit-live').textContent=`${c[0]}: ${n} lessons. The list is below the case.`;said=true;
+}
+tray.addEventListener('click',e=>{
+ const b=e.target.closest('.bit[data-id]');if(!b)return;show(b.dataset.id);
+ if(innerWidth<900&&card.getBoundingClientRect().top>innerHeight*.7)card.scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});
+});
+show('k8s-scheduling');
+
+/* parts diagram: point at a part */
+const parts=$('.parts');
+$$('.partlist li').forEach(li=>{li.addEventListener('mouseenter',()=>{parts.dataset.hl=li.dataset.ref});li.addEventListener('mouseleave',()=>{delete parts.dataset.hl})});
+
+/* share */
+const SURL='https://kdrill.5xx.tech/';let torque=0;
+const shareText=()=>(torque?`I revved the kdrill to ${torque} Nm. `:'')+'Found a power tool for Kubernetes. 141 bits, breaks your cluster on purpose, $0.';
+function updateShare(){
+ const t=shareText(),E=encodeURIComponent;$('#sharetext').textContent='“'+t+'”';
+ $('#s-x').href=`https://x.com/intent/tweet?text=${E(t)}&url=${E(SURL)}`;
+ $('#s-bs').href=`https://bsky.app/intent/compose?text=${E(t+' '+SURL)}`;
+}
+if(navigator.share){const sb=$('#sharebtn');sb.hidden=false;$('#sharefall').hidden=true;sb.addEventListener('click',()=>{navigator.share({title:'kdrill',text:shareText(),url:SURL}).catch(()=>{})})}
+
+/* terminal playback */
+const termIn=$('#term'),cur=$('.cur'),wait=ms=>new Promise(r=>setTimeout(r,ms));let playId=0;
+async function playTerm(){
+ const id=++playId,L=[...termIn.children];L.forEach(l=>l.classList.add('off'));
+ for(const l of L){
+  if(id!==playId)return;
+  const tx=l.querySelector('.tx');
+  if(tx&&l.dataset.c){
+   if(l.classList.contains('cm'))await wait(900);
+   tx.textContent='';l.classList.remove('off');tx.after(cur);
+   for(let i=1;i<=l.dataset.c.length;i++){if(id!==playId)return;tx.textContent=l.dataset.c.slice(0,i);await wait(32+Math.random()*44)}
+   await wait(340);
+  }else{
+   l.classList.remove('off');if(l.classList.contains('end'))l.append(cur);
+   await wait(l.classList.contains('hint')?420:80);
+  }
+ }
+}
+$('#replay').addEventListener('click',playTerm);
+
+/* the drill: hold the trigger */
+const tryme=$('#tryme'),rpmEl=$('#rpm'),drill=$('.drill'),ro=$('#readout');
+let holding=false,holdT0=0,rev=0,blip=0,drilled=false,roTimer=0;
+function press(e){
+ if(holding)return;
+ if(e.type==='pointerdown'){if(e.button)return;e.preventDefault();try{tryme.setPointerCapture(e.pointerId)}catch(_){}}
+ holding=true;holdT0=performance.now();drilled=false;tryme.classList.add('on');drill.classList.add('held');kick();
+}
+function release(){
+ if(!holding)return;holding=false;tryme.classList.remove('on');drill.classList.remove('held');
+ rpmEl.textContent='Hold the trigger';rpmEl.dataset.v='';torqueOut((performance.now()-holdT0)/1000);kick();
+}
+function torqueOut(s){
+ const nm=Math.round(6+66*(1-Math.exp(-s/1.1)));torque=nm;
+ const msg=nm<16?'Barely a tap. The pod is still Pending.':nm<36?'Enough to evict a pod.':nm<56?'Enough to drain a node.':'Enough to take down prod. kdrill reset puts it back.';
+ $('#ro-v').textContent=nm+' Nm';$('#ro-t').textContent=`Held for ${s.toFixed(1)} s. ${msg}`;$('#ro-live').textContent=`Torque: ${nm} newton metres. ${msg}`;
+ ro.hidden=false;ro.classList.remove('pop');void ro.offsetWidth;ro.classList.add('pop');updateShare();
+ clearTimeout(roTimer);roTimer=setTimeout(()=>{ro.hidden=true},12000);
+}
+tryme.addEventListener('pointerdown',press);
+['pointerup','pointercancel','lostpointercapture','blur'].forEach(t=>tryme.addEventListener(t,release));
+tryme.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();if(!e.repeat)press(e)}});
+tryme.addEventListener('keyup',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();release()}});
+tryme.addEventListener('contextmenu',e=>e.preventDefault());
+$('#ro-x').addEventListener('click',()=>{ro.hidden=true});
+
+/* the bore: scroll-driven drilling */
+const track=$('.bore-track'),panel=$('.bore'),hbox=$('.hole-box'),hole=$('.hole'),term=$('.term'),slot=$('.drill-slot'),park=$('.park'),strip=$('.flutes'),blurL=$('.bitblur'),fbox=$('.flecks');
+const DW=774,DH=410,TX=764,TY=84,D2R=Math.PI/180;
+const clamp=(v,a,b)=>v<a?a:v>b?b:v,mix=(a,b,t)=>a+(b-a)*t,eio=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2,eo=t=>1-Math.pow(1-t,3);
+let M=null,uc=scrollY,phase=0,raf=0,lastT=0,auto=null,termOn=false,alive=0;
+const FL=[];
+function fit(x,y,w,h,deg,kmax){
+ const c=Math.cos(deg*D2R),s=Math.sin(deg*D2R);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+ for(const[px,py]of[[0,0],[DW,0],[DW,DH],[0,DH]]){const dx=px-TX,dy=py-TY,X=dx*c-dy*s,Y=dx*s+dy*c;x0=Math.min(x0,X);x1=Math.max(x1,X);y0=Math.min(y0,Y);y1=Math.max(y1,Y)}
+ const k=Math.min(w/(x1-x0),h/(y1-y0),kmax);return{x:x+w/2-k*(x0+x1)/2,y:y+h/2-k*(y0+y1)/2,r:deg,k};
+}
+function measure(){
+ const sy=scrollY,vh=innerHeight,pr=panel.getBoundingClientRect(),tt=track.getBoundingClientRect().top+sy;
+ const sr=slot.getBoundingClientRect(),hr=hbox.getBoundingClientRect(),kr=park.getBoundingClientRect();
+ const p0=fit(sr.left-pr.left,sr.top+sy-tt,sr.width,sr.height,-6,2);
+ const hx=hr.left-pr.left+hr.width/2,hy=hr.top-pr.top+hr.height/2;
+ M={tt,p0,hx,hy,u0:clamp(sr.top+sy+sr.height/2-vh*.55,0,Math.max(0,tt-240)),pin:Math.max(1,track.offsetHeight-panel.offsetHeight),
+  k1:Math.min(p0.k,(hy-16)/TX,(hx-8)/(DH-TY),.62),pk:fit(kr.left-pr.left,kr.top-pr.top,kr.width,kr.height,8,.55),gap:Math.min(90,hr.height*.18)};
+}
+function pose(u){
+ const m=M,a=clamp((u-m.u0)/Math.max(1,m.tt-m.u0),0,1),q=clamp((u-m.tt)/m.pin,0,1),hy0=m.hy-m.gap;let x,y,r,k,s=0;
+ if(q<=0){const e=eio(a);x=mix(m.p0.x,m.hx,e);y=mix(m.p0.y,hy0,e);r=mix(m.p0.r,90,eio(clamp(a*1.2,0,1)));k=mix(m.p0.k,m.k1,e)}
+ else if(q<.16){x=m.hx;y=mix(hy0,m.hy,eio(q/.16));r=90;k=m.k1}
+ else if(q<.58){const b=(q-.16)/.42;x=m.hx;y=m.hy;r=90;k=m.k1*(1-.1*b);s=.012+.19*b*b}
+ else if(q<.84){const o=(q-.58)/.26,e=eio(o),lift=Math.sin(Math.PI*e);x=mix(m.hx,m.pk.x,e);y=mix(m.hy,m.pk.y,e)-lift*m.hy*.25;r=mix(90,m.pk.r,e);k=mix(m.k1*.9,m.pk.k,e)*(1+.14*lift);s=.202+.798*eo(o)}
+ else{x=m.pk.x;y=m.pk.y;r=m.pk.r;k=m.pk.k;s=1}
+ return{x,y,r,k,s,q};
+}
+function spawn(){
+ const f=FL.find(f=>f.l<=0);if(!f)return;
+ Object.assign(f,{l:1,x:M.hx+(Math.random()-.5)*16,y:M.hy-4,vx:(Math.random()-.5)*7,vy:-1.5-Math.random()*4,r:Math.random()*360,vr:(Math.random()-.5)*30});
+}
+function stepFlecks(f){
+ alive=0;
+ for(const p of FL){
+  if(p.l<=0)continue;p.vy+=.42*f;p.x+=p.vx*f;p.y+=p.vy*f;p.r+=p.vr*f;p.l-=.013*f;
+  if(p.l<=0){p.e.style.opacity=0;continue}
+  alive++;p.e.style.transform=`translate(${p.x.toFixed(1)}px,${p.y.toFixed(1)}px) rotate(${p.r|0}deg)`;p.e.style.opacity=Math.min(1,p.l*4).toFixed(2);
+ }
+}
+function drillDown(){
+ if(RM||!M){$('#open-here').scrollIntoView({block:'start',behavior:'auto'});return}
+ const from=scrollY,d=M.tt+M.pin*.9-from;if(d<40)return;
+ auto={t0:performance.now(),from,d,dur:Math.min(2800,900+d*.8)};
+ const stop=()=>{auto=null};addEventListener('wheel',stop,{passive:true,once:true});addEventListener('touchmove',stop,{passive:true,once:true});
+}
+function tick(t){
+ raf=0;const dt=lastT?Math.min(48,t-lastT):16.7,f=dt/16.7;lastT=t;
+ if(auto){const p=clamp((t-auto.t0)/auto.dur,0,1);scrollTo({top:auto.from+auto.d*eio(p),behavior:'instant'});if(p>=1)auto=null}
+ const on=holding||t<blip;rev=on?Math.min(1,rev+dt/(holding?1500:700)):Math.max(0,rev-dt/420);
+ if(holding){
+  const v=Math.round(rev*175)*10;if(String(v)!==rpmEl.dataset.v){rpmEl.dataset.v=v;rpmEl.textContent=v.toLocaleString('en-US')+' rpm'}
+  if(rev>=1&&!drilled){drilled=true;drillDown()}
+ }
+ let du=0;
+ if(LIVE&&M){
+  const ut=scrollY;du=(ut-uc)*(1-Math.pow(.8,f));uc+=du;if(Math.abs(ut-uc)<.15){du+=ut-uc;uc=ut}
+  const P=pose(uc),boring=P.q>.16&&P.q<.58;
+  phase+=du*(boring?2.4:.8)+rev*rev*21*f;
+  strip.style.transform=`translateX(${(-(((phase%49)+49)%49)/2.5).toFixed(3)}%)`;
+  blurL.style.opacity=(rev*rev*.8).toFixed(3);
+  const sh=rev*rev*2.8+(boring&&du>.3?1:0),jx=(Math.random()-.5)*sh,jy=(Math.random()-.5)*sh,jr=(Math.random()-.5)*sh*.4;
+  drill.style.transform=`translate(${(P.x-TX+jx).toFixed(2)}px,${(P.y-TY+jy).toFixed(2)}px) rotate(${(P.r+jr).toFixed(3)}deg) scale(${P.k.toFixed(4)})`;
+  const s=Math.max(P.s,.001);hole.style.transform=`scale(${s.toFixed(4)})`;hole.style.opacity=P.s>.004?'1':'0';term.style.transform=`scale(${(1/s).toFixed(3)})`;
+  if(boring&&du>.25&&Math.random()<Math.min(.9,du/7))spawn();
+  stepFlecks(f);
+  if(!termOn&&P.s>.97){termOn=true;playTerm()}
+ }
+ if((LIVE&&M&&Math.abs(scrollY-uc)>.15)||holding||rev>0||alive||auto||t<blip)raf=requestAnimationFrame(tick);else lastT=0;
+}
+function kick(){if(!raf)raf=requestAnimationFrame(tick)}
+
+if(LIVE){
+ panel.append(drill);drill.classList.add('flying');
+ $$('.tl',termIn).forEach(l=>{if(!l.classList.contains('end'))l.classList.add('off')});
+ for(let i=0;i<18;i++){
+  const e=document.createElement('i'),w=3+Math.random()*6,h=2+Math.random()*4,q=()=>Math.round(Math.random()*40);
+  e.style.cssText=`width:${w.toFixed(1)}px;height:${h.toFixed(1)}px;background:${['#DDBF98','#A98058','#EBDCC2','#C8A27A'][i%4]};clip-path:polygon(${q()}% ${q()}%,${60+q()}% ${q()}%,${60+q()}% ${60+q()}%,${q()}% ${60+q()}%)`;
+  fbox.append(e);FL.push({e,l:0});
+ }
+ const re=()=>{measure();kick()};re();
+ addEventListener('resize',re);addEventListener('load',re);addEventListener('scroll',kick,{passive:true});
+ if('ResizeObserver'in window)new ResizeObserver(re).observe($('.stage'));
+ if(document.fonts)document.fonts.ready.then(re);
+ setTimeout(()=>{blip=performance.now()+520;kick()},1100);
+}else{
+ $('#replay').hidden=true;
+}
+})();
+</script>
+</body>
+</html>

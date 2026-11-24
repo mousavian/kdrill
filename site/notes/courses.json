@@ -1,0 +1,809 @@
+[
+ {
+  "id": "k8s-scheduling",
+  "title": "Kubernetes scheduling fundamentals",
+  "kind": "sim",
+  "requires": [],
+  "lessons": [
+   {
+    "id": "01-requests-and-pending",
+    "n": "01",
+    "title": "Why is my pod Pending?"
+   },
+   {
+    "id": "02-node-selection",
+    "n": "02",
+    "title": "Put the database on SSD"
+   },
+   {
+    "id": "03-taints-and-tolerations",
+    "n": "03",
+    "title": "Run the trainer on the ML pool"
+   },
+   {
+    "id": "04-topology-spread",
+    "n": "04",
+    "title": "Spread the API across zones"
+   },
+   {
+    "id": "05-priority-and-preemption",
+    "n": "05",
+    "title": "Let critical work preempt batch work"
+   },
+   {
+    "id": "06-extended-resources-gpu",
+    "n": "06",
+    "title": "Give the LLM its GPUs"
+   }
+  ]
+ },
+ {
+  "id": "gpu-scheduling",
+  "title": "GPU scheduling for AI workloads",
+  "kind": "sim",
+  "requires": [
+   "k8s-scheduling"
+  ],
+  "lessons": [
+   {
+    "id": "01-gpu-node-labels",
+    "n": "01",
+    "title": "Read the GPU labels, pick the right GPU"
+   },
+   {
+    "id": "02-gpu-binpacking",
+    "n": "02",
+    "title": "Bin-pack GPUs to stop fragmentation"
+   },
+   {
+    "id": "03-time-slicing",
+    "n": "03",
+    "title": "Share GPUs with time-slicing (and know its limits)"
+   },
+   {
+    "id": "04-mig-partitions",
+    "n": "04",
+    "title": "Right-size inference onto MIG slices"
+   },
+   {
+    "id": "05-inference-preempts-training",
+    "n": "05",
+    "title": "Inference preempts training, eval waits its turn"
+   },
+   {
+    "id": "06-gpu-quota",
+    "n": "06",
+    "title": "Cap each team's GPUs with ResourceQuota"
+   },
+   {
+    "id": "07-kueue-basics",
+    "n": "07",
+    "title": "Queue GPU jobs with Kueue"
+   },
+   {
+    "id": "08-kueue-cohorts",
+    "n": "08",
+    "title": "Borrow idle GPUs across teams, reclaim them on demand"
+   },
+   {
+    "id": "09-gang-admission",
+    "n": "09",
+    "title": "All-or-nothing admission for distributed training"
+   },
+   {
+    "id": "10-dra-basics",
+    "n": "10",
+    "title": "Dynamic Resource Allocation (DRA) fundamentals"
+   },
+   {
+    "id": "11-dra-cel-selection",
+    "n": "11",
+    "title": "Pick devices with CEL, claim several, share one"
+   },
+   {
+    "id": "12-why-pending-capstone",
+    "n": "12",
+    "title": "Capstone: why is my GPU workload not running?"
+   }
+  ]
+ },
+ {
+  "id": "karpenter",
+  "title": "Karpenter node autoscaling",
+  "kind": "sim",
+  "requires": [
+   "k8s-scheduling",
+   "gpu-scheduling"
+  ],
+  "lessons": [
+   {
+    "id": "01-first-nodepool",
+    "n": "01",
+    "title": "Your first NodePool"
+   },
+   {
+    "id": "02-instance-selection",
+    "n": "02",
+    "title": "Pick instance types with NodePool requirements"
+   },
+   {
+    "id": "03-zones-and-spread",
+    "n": "03",
+    "title": "Zones and topology spread drive where nodes appear"
+   },
+   {
+    "id": "04-nodepool-limits",
+    "n": "04",
+    "title": "Cap a NodePool with limits"
+   },
+   {
+    "id": "05-spot-and-weights",
+    "n": "05",
+    "title": "Spot first, on-demand as fallback"
+   },
+   {
+    "id": "06-dedicated-gpu-pool",
+    "n": "06",
+    "title": "A dedicated GPU pool with taints"
+   },
+   {
+    "id": "07-gpu-right-sizing",
+    "n": "07",
+    "title": "Right-size GPU instances"
+   },
+   {
+    "id": "08-consolidation",
+    "n": "08",
+    "title": "Consolidation shrinks the fleet after scale-down"
+   },
+   {
+    "id": "09-disruption-controls",
+    "n": "09",
+    "title": "Disruption controls before you turn consolidation on"
+   },
+   {
+    "id": "10-drift-and-expiration",
+    "n": "10",
+    "title": "Drift and expiration roll the fleet for you"
+   },
+   {
+    "id": "11-team-nodepools",
+    "n": "11",
+    "title": "Team NodePools that don't overlap"
+   },
+   {
+    "id": "12-capstone",
+    "n": "12",
+    "title": "Capstone: why won't Karpenter do what I want?"
+   }
+  ]
+ },
+ {
+  "id": "kyverno",
+  "title": "Kyverno policy as code",
+  "kind": "sim",
+  "requires": [
+   "k8s-scheduling"
+  ],
+  "lessons": [
+   {
+    "id": "01-first-policy",
+    "n": "01",
+    "title": "How Kyverno works: your first policy, Audit vs Enforce"
+   },
+   {
+    "id": "02-validate-patterns",
+    "n": "02",
+    "title": "Validate patterns: tags, registries, resources"
+   },
+   {
+    "id": "03-match-exclude-autogen",
+    "n": "03",
+    "title": "Match and exclude precisely; autogen for Pod controllers"
+   },
+   {
+    "id": "04-mutate-gpu-defaults",
+    "n": "04",
+    "title": "Mutate: GPU scheduling defaults"
+   },
+   {
+    "id": "05-generate-namespace-defaults",
+    "n": "05",
+    "title": "Generate: default NetworkPolicy, GPU quota and CA bundle per tenant namespace"
+   },
+   {
+    "id": "06-mutate-existing",
+    "n": "06",
+    "title": "Mutate existing resources: propagate a namespace label to its Deployments"
+   },
+   {
+    "id": "07-external-data",
+    "n": "07",
+    "title": "External data: ConfigMap and API lookups in policies"
+   },
+   {
+    "id": "08-verify-images",
+    "n": "08",
+    "title": "Verify image signatures (supply chain)"
+   },
+   {
+    "id": "09-policy-reports",
+    "n": "09",
+    "title": "Background scans and PolicyReports: find existing violations"
+   },
+   {
+    "id": "10-policy-exceptions",
+    "n": "10",
+    "title": "PolicyExceptions: a narrow, reviewed exemption"
+   },
+   {
+    "id": "11-cel-validatingpolicy",
+    "n": "11",
+    "title": "CEL policies: rewrite a rule as a ValidatingPolicy, run it as a native VAP"
+   },
+   {
+    "id": "12-cli-testing",
+    "n": "12",
+    "title": "Test policies offline with the kyverno CLI"
+   },
+   {
+    "id": "13-capstone-debugging",
+    "n": "13",
+    "title": "Capstone: policies that don't do what they say"
+   }
+  ]
+ },
+ {
+  "id": "envoy",
+  "title": "Envoy, from proxy to Kubernetes gateway",
+  "kind": "real-light",
+  "requires": [
+   "k8s-scheduling"
+  ],
+  "lessons": [
+   {
+    "id": "01-first-proxy",
+    "n": "01",
+    "title": "Your first Envoy: listener, connection manager, route, cluster"
+   },
+   {
+    "id": "02-admin-debugging",
+    "n": "02",
+    "title": "The admin interface: what is Envoy actually doing?"
+   },
+   {
+    "id": "03-routes-and-vhosts",
+    "n": "03",
+    "title": "Virtual hosts and routes: matching Host, path and headers"
+   },
+   {
+    "id": "04-service-discovery",
+    "n": "04",
+    "title": "Service discovery: let Envoy see every pod"
+   },
+   {
+    "id": "05-load-balancing",
+    "n": "05",
+    "title": "Load balancing policies: sticky users with consistent hashing"
+   },
+   {
+    "id": "06-active-health-checks",
+    "n": "06",
+    "title": "Active health checking (and the panic threshold)"
+   },
+   {
+    "id": "07-outlier-detection",
+    "n": "07",
+    "title": "Outlier detection: eject the pod that keeps failing"
+   },
+   {
+    "id": "08-timeouts",
+    "n": "08",
+    "title": "Timeouts: fail fast where it matters"
+   },
+   {
+    "id": "09-retries",
+    "n": "09",
+    "title": "Retries: hide a bad host from users, safely"
+   },
+   {
+    "id": "10-circuit-breaking",
+    "n": "10",
+    "title": "Circuit breaking: protect a fragile backend from bursts"
+   },
+   {
+    "id": "11-traffic-splitting",
+    "n": "11",
+    "title": "Traffic splitting: a 90/10 canary with an opt-in header"
+   },
+   {
+    "id": "12-headers-and-rewrites",
+    "n": "12",
+    "title": "Header manipulation and URL rewrites"
+   },
+   {
+    "id": "13-direct-responses-redirects",
+    "n": "13",
+    "title": "Direct responses and redirects: answers without a backend"
+   },
+   {
+    "id": "14-access-logs",
+    "n": "14",
+    "title": "Access logs: structured, filtered, with response flags"
+   },
+   {
+    "id": "15-local-rate-limit",
+    "n": "15",
+    "title": "Local rate limiting: a token bucket per route"
+   },
+   {
+    "id": "16-tls-termination",
+    "n": "16",
+    "title": "TLS termination with SNI: two sites, two certificates"
+   },
+   {
+    "id": "17-upstream-mtls",
+    "n": "17",
+    "title": "Upstream TLS and mTLS: Envoy as a TLS client"
+   },
+   {
+    "id": "18-tcp-sni-passthrough",
+    "n": "18",
+    "title": "TCP proxying and TLS passthrough by SNI"
+   },
+   {
+    "id": "19-jwt-authn",
+    "n": "19",
+    "title": "JWT authentication at the proxy"
+   },
+   {
+    "id": "20-rbac",
+    "n": "20",
+    "title": "Authorization with the RBAC filter (and JWT claims)"
+   },
+   {
+    "id": "21-dynamic-config",
+    "n": "21",
+    "title": "Dynamic configuration: xDS from files (LDS and CDS)"
+   },
+   {
+    "id": "22-gateway-api-basics",
+    "n": "22",
+    "title": "Envoy Gateway and the Gateway API: GatewayClass, Gateway, HTTPRoute"
+   },
+   {
+    "id": "23-gateway-under-the-hood",
+    "n": "23",
+    "title": "Under the hood: from Gateway API objects to Envoy xDS"
+   },
+   {
+    "id": "24-gateway-matching",
+    "n": "24",
+    "title": "HTTPRoute matching: paths, headers, methods, query params, precedence"
+   },
+   {
+    "id": "25-gateway-canary",
+    "n": "25",
+    "title": "Canary releases with HTTPRoute weights"
+   },
+   {
+    "id": "26-gateway-filters",
+    "n": "26",
+    "title": "HTTPRoute filters: rewrites, header modifiers, redirects, mirroring"
+   },
+   {
+    "id": "27-gateway-timeouts-retries",
+    "n": "27",
+    "title": "Timeouts on HTTPRoutes, retries with a BackendTrafficPolicy"
+   },
+   {
+    "id": "28-backend-traffic-policy",
+    "n": "28",
+    "title": "BackendTrafficPolicy: sticky load balancing and passive health checks"
+   },
+   {
+    "id": "29-gateway-tls",
+    "n": "29",
+    "title": "TLS on the Gateway: HTTPS listeners, redirects, ClientTrafficPolicy"
+   },
+   {
+    "id": "30-gateway-rate-limit",
+    "n": "30",
+    "title": "Rate limiting with BackendTrafficPolicy (local)"
+   },
+   {
+    "id": "31-gateway-jwt-auth",
+    "n": "31",
+    "title": "SecurityPolicy: JWT authentication and claim-based authorization"
+   },
+   {
+    "id": "32-gateway-client-ip",
+    "n": "32",
+    "title": "ClientTrafficPolicy: who is the client? (X-Forwarded-For and IP allow-lists)"
+   },
+   {
+    "id": "33-gateway-envoyproxy",
+    "n": "33",
+    "title": "EnvoyProxy: customise the Gateway's Envoy fleet"
+   },
+   {
+    "id": "34-gateway-tls-passthrough",
+    "n": "34",
+    "title": "TLS passthrough with TLSRoute"
+   },
+   {
+    "id": "35-inference-routing-bridge",
+    "n": "35",
+    "title": "Bridge to AI inference routing: endpoint picking"
+   },
+   {
+    "id": "36-capstone-debugging",
+    "n": "36",
+    "title": "Capstone: five sites, five different failures"
+   },
+   {
+    "id": "37-gateway-cross-namespace",
+    "n": "37",
+    "title": "Shared Gateways: cross-namespace routes and ReferenceGrant"
+   },
+   {
+    "id": "38-gateway-basic-auth",
+    "n": "38",
+    "title": "SecurityPolicy: basic auth for one route"
+   }
+  ]
+ },
+ {
+  "id": "istio",
+  "title": "Istio service mesh",
+  "kind": "real-light",
+  "requires": [
+   "k8s-scheduling"
+  ],
+  "lessons": [
+   {
+    "id": "01-sidecar-injection",
+    "n": "01",
+    "title": "Sidecar injection: putting workloads into the mesh"
+   },
+   {
+    "id": "02-protocols-and-proxy-config",
+    "n": "02",
+    "title": "Inside the sidecar: listeners, routes, clusters and protocol selection"
+   },
+   {
+    "id": "03-ingress-gateway",
+    "n": "03",
+    "title": "Ingress with the Gateway API: Gateway and HTTPRoute"
+   },
+   {
+    "id": "04-subsets-and-header-routing",
+    "n": "04",
+    "title": "Version routing: DestinationRule subsets and header matches"
+   },
+   {
+    "id": "05-weighted-canary",
+    "n": "05",
+    "title": "Canary releases: weighted routing and traffic mirroring"
+   },
+   {
+    "id": "06-timeouts-and-retries",
+    "n": "06",
+    "title": "Resilience: timeouts and retries"
+   },
+   {
+    "id": "07-fault-injection",
+    "n": "07",
+    "title": "Chaos testing: fault injection"
+   },
+   {
+    "id": "08-circuit-breaking",
+    "n": "08",
+    "title": "Circuit breaking and outlier detection"
+   },
+   {
+    "id": "09-mtls-strict",
+    "n": "09",
+    "title": "Strict mTLS with PeerAuthentication"
+   },
+   {
+    "id": "10-authorization-policy",
+    "n": "10",
+    "title": "Authorization: deny by default, allow by identity, path and method"
+   },
+   {
+    "id": "11-jwt-authentication",
+    "n": "11",
+    "title": "End-user authentication: JWT at the ingress gateway"
+   },
+   {
+    "id": "12-observability",
+    "n": "12",
+    "title": "Observability: access logs and metrics with the Telemetry API"
+   },
+   {
+    "id": "13-ambient-mode",
+    "n": "13",
+    "title": "Ambient mode: ztunnel and a waypoint instead of sidecars"
+   },
+   {
+    "id": "14-capstone-debugging",
+    "n": "14",
+    "title": "Capstone: a mesh that doesn't do what it says"
+   }
+  ]
+ },
+ {
+  "id": "inference",
+  "title": "Serving LLMs on Kubernetes",
+  "kind": "real-compute",
+  "requires": [
+   "envoy",
+   "gpu-scheduling"
+  ],
+  "lessons": [
+   {
+    "id": "01-first-completion",
+    "n": "01",
+    "title": "First completion: a model server behind a Service"
+   },
+   {
+    "id": "02-weights-as-image-volume",
+    "n": "02",
+    "title": "Getting weights to the pod: an image volume"
+   },
+   {
+    "id": "03-honest-startup",
+    "n": "03",
+    "title": "Honest startup: startup, liveness and readiness probes"
+   },
+   {
+    "id": "04-sizing-memory-and-threads",
+    "n": "04",
+    "title": "Sizing: weights plus KV cache, and threads vs CPU"
+   },
+   {
+    "id": "05-streaming-and-timeouts",
+    "n": "05",
+    "title": "Streaming and timeouts: do not cut long generations"
+   },
+   {
+    "id": "06-metrics-that-matter",
+    "n": "06",
+    "title": "The metrics that matter: queue, throughput, cache"
+   },
+   {
+    "id": "07-slots-and-batching",
+    "n": "07",
+    "title": "Server-side concurrency: slots, batching and context"
+   },
+   {
+    "id": "08-cpu-hpa-is-blind",
+    "n": "08",
+    "title": "Why a CPU-based HPA is blind to a model server"
+   },
+   {
+    "id": "09-keda-queue-autoscaling",
+    "n": "09",
+    "title": "Autoscaling on in-flight requests with KEDA"
+   },
+   {
+    "id": "10-cold-starts",
+    "n": "10",
+    "title": "Cold starts: what scale-to-zero costs"
+   },
+   {
+    "id": "11-graceful-shutdown",
+    "n": "11",
+    "title": "Graceful shutdown: zero dropped requests during a rollout"
+   },
+   {
+    "id": "12-rollout-scarce-capacity",
+    "n": "12",
+    "title": "Rolling out a new model version when capacity is scarce"
+   },
+   {
+    "id": "13-route-by-model-name",
+    "n": "13",
+    "title": "One endpoint, several models: route by the model in the request body"
+   },
+   {
+    "id": "14-least-request",
+    "n": "14",
+    "title": "Why round-robin is bad for LLMs: least-request balancing"
+   },
+   {
+    "id": "15-endpoint-picker",
+    "n": "15",
+    "title": "Load-aware routing: the Inference Extension endpoint picker"
+   },
+   {
+    "id": "16-lora-adapters",
+    "n": "16",
+    "title": "LoRA adapters as models: route to the replicas that have them loaded"
+   },
+   {
+    "id": "17-priorities-and-shedding",
+    "n": "17",
+    "title": "Priorities: shed batch traffic when the pool is saturated"
+   },
+   {
+    "id": "18-rate-limits-per-client",
+    "n": "18",
+    "title": "Protecting the fleet: a rate limit per client"
+   },
+   {
+    "id": "19-canary-model-version",
+    "n": "19",
+    "title": "Canary a new model version by weight"
+   },
+   {
+    "id": "20-gpu-fragmentation",
+    "n": "20",
+    "title": "Replicas on GPU nodes: one GPU per replica, and fragmentation"
+   },
+   {
+    "id": "21-fractional-gpus",
+    "n": "21",
+    "title": "Packing small models: MIG slices instead of whole GPUs"
+   },
+   {
+    "id": "22-serving-beats-training",
+    "n": "22",
+    "title": "Serving and training on shared GPUs: priority and preemption"
+   },
+   {
+    "id": "23-rollout-on-full-gpus",
+    "n": "23",
+    "title": "Rolling a model when every GPU is in use"
+   },
+   {
+    "id": "24-zones-and-node-loss",
+    "n": "24",
+    "title": "Spreading replicas across zones and surviving a node loss"
+   },
+   {
+    "id": "25-capacity-math",
+    "n": "25",
+    "title": "Capacity math: from requests per second to GPUs and autoscaler bounds"
+   },
+   {
+    "id": "26-capstone-two-model-service",
+    "n": "26",
+    "title": "Capstone: a two-model service with five planted faults"
+   }
+  ]
+ },
+ {
+  "id": "training",
+  "title": "Training models on Kubernetes",
+  "kind": "real-compute",
+  "requires": [
+   "k8s-scheduling",
+   "gpu-scheduling"
+  ],
+  "lessons": [
+   {
+    "id": "01-run-as-a-job",
+    "n": "01",
+    "title": "A training run is a Job, not a Deployment"
+   },
+   {
+    "id": "02-size-it",
+    "n": "02",
+    "title": "Size it: memory, CPU and threads"
+   },
+   {
+    "id": "03-config-and-seed",
+    "n": "03",
+    "title": "Hyperparameters in a ConfigMap, reproducible with a seed"
+   },
+   {
+    "id": "04-data-on-a-volume",
+    "n": "04",
+    "title": "Data in: a prepared dataset on a volume"
+   },
+   {
+    "id": "05-checkpoints-on-a-pvc",
+    "n": "05",
+    "title": "Checkpoints on a volume, and a Job that uses them"
+   },
+   {
+    "id": "06-kill-and-resume",
+    "n": "06",
+    "title": "Kill and resume"
+   },
+   {
+    "id": "07-failure-policy",
+    "n": "07",
+    "title": "Failure policy: retry disruptions, fail fast on bugs"
+   },
+   {
+    "id": "08-graceful-sigterm",
+    "n": "08",
+    "title": "Graceful preemption: a last checkpoint on SIGTERM"
+   },
+   {
+    "id": "09-checkpoints-in-object-storage",
+    "n": "09",
+    "title": "Checkpoints in object storage (MinIO)"
+   },
+   {
+    "id": "10-sweep-indexed-job",
+    "n": "10",
+    "title": "A hyperparameter sweep as an Indexed Job"
+   },
+   {
+    "id": "11-ddp-by-hand",
+    "n": "11",
+    "title": "Distributed training by hand: two pods, one model"
+   },
+   {
+    "id": "12-shared-checkpoints",
+    "n": "12",
+    "title": "One checkpoint volume for all workers"
+   },
+   {
+    "id": "13-restart-the-group",
+    "n": "13",
+    "title": "When one worker goes: restart the whole group"
+   },
+   {
+    "id": "14-jobset",
+    "n": "14",
+    "title": "JobSet: the worker group as one object"
+   },
+   {
+    "id": "15-kueue-queue",
+    "n": "15",
+    "title": "Queue real training jobs with Kueue"
+   },
+   {
+    "id": "16-priority-preemption",
+    "n": "16",
+    "title": "Priority: an urgent job preempts a long run, which resumes"
+   },
+   {
+    "id": "17-gang-admission-jobset",
+    "n": "17",
+    "title": "Gang admission: a JobSet is queued whole"
+   },
+   {
+    "id": "18-watch-a-run",
+    "n": "18",
+    "title": "Watching a run: metrics, and why it is slow"
+   },
+   {
+    "id": "19-results-as-artifacts",
+    "n": "19",
+    "title": "Results as artifacts: named runs, a model, and cleanup"
+   },
+   {
+    "id": "20-capstone",
+    "n": "20",
+    "title": "Capstone: a queued, resumable two-worker run with a planted fault"
+   }
+  ]
+ },
+ {
+  "id": "fine-tuning",
+  "title": "Fine-tuning models on Kubernetes",
+  "kind": "real-compute",
+  "requires": [
+   "training"
+  ],
+  "lessons": [],
+  "status": "planned"
+ },
+ {
+  "id": "kubeflow",
+  "title": "Kubeflow (Trainer, KServe, Katib, Pipelines)",
+  "kind": "real-compute",
+  "requires": [
+   "training",
+   "inference"
+  ],
+  "lessons": [],
+  "status": "planned"
+ }
+]
