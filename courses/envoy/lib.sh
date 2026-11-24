@@ -549,3 +549,14 @@ gw_wait_config() {
   _gw_has() { gw_admin "$gw" "/config_dump?resource=$res" | grep -q "$text"; }
   wait_until "${4:-25}" _gw_has
 }
+
+# The client pod is lab equipment, not part of any task. A bare pod does not
+# come back after a cluster restart (or if it is deleted by mistake), and then
+# every traffic check would fail with no explanation, so verify recreates it.
+_client_ok() { [[ "$(kubectl get pod client -o jsonpath='{.status.phase}' 2>/dev/null)" == Running ]]; }
+if [[ "${KDRILL_PHASE:-}" == verify ]] && ! _client_ok; then
+  echo "  (the client pod was missing; recreating it for the checks)"
+  kubectl delete pod client --ignore-not-found --wait=true >/dev/null 2>&1 || true
+  client_up >/dev/null 2>&1 || true
+  kubectl wait pod/client --for=condition=Ready --timeout=90s >/dev/null 2>&1 || true
+fi
