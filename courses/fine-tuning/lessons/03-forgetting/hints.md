@@ -1,0 +1,5 @@
+`mixed_batch`: `n_old = int(round(replay * batch_size))`, `n_new = batch_size - n_old`. Call `get_batch(new_ids, block_size, n_new, generator)` first and `get_batch(old_ids, block_size, n_old, generator)` second, skipping a call whose count is 0 (so replay=0 draws exactly what `get_batch` alone would), then `torch.cat` the two x parts and the two y parts. Check `0 <= replay <= 1` first.
+---
+`finetune_mixed` is your `finetune` with one line changed: the batch comes from `mixed_batch(new_ids, old_ids, batch_size, block_size, replay, g)`. Keep everything else identical (AdamW, betas, weight decay 0, `lr_at`, seeded generator, clearing gradients), because the test compares it with `finetune` at replay=0.
+---
+If the outcome test says replay did not help, check that the old rows really are in the batch (print `x.shape` and the share of old rows) and that you pass `old_ids` of Holmes text, not Alice. If the mixed run does not learn the style, you probably replace the new rows instead of adding old ones: `n_new + n_old` must equal `batch_size`.

@@ -1,0 +1,5 @@
+`merged_weight(layer)` is one line: `layer.base.weight.detach() + layer.scale * (layer.lora_B.detach() @ layer.lora_A.detach())`; shapes: `(out, r) @ (r, in) = (out, in)`, which is the shape of the base weight. Use `scale` (that is `alpha / r`), not `alpha`.
+---
+`merge_lora`: walk `list(model.named_modules())` and for each `list(mod.named_children())`; when a child is a `LoRALinear`, build `nn.Linear(in, out, bias=child.base.bias is not None)`, copy the merged weight and the bias into it under `torch.no_grad()`, and `setattr(mod, cname, new)`. Count them. At the end set `requires_grad = True` on every parameter, so the result is an ordinary model.
+---
+`save_merged_checkpoint`: `ck = torch.load(base_checkpoint, weights_only=False)`; take `m = merged_copy(model)` only if the model still has `LoRALinear` modules (do not merge the caller's model); `ck["model_state"] = {k: v.detach().clone() for k, v in m.state_dict().items()}`; `ck["merged_from"] = note`; `torch.save(ck, out_path)` after `os.makedirs(..., exist_ok=True)`; return `os.path.getsize(out_path)`. `max_logit_difference` needs `torch.no_grad()` and eval mode for both models (restore the modes).

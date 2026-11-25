@@ -1,0 +1,5 @@
+`select_targets` is a dictionary lookup in `GROUPS` that raises `ValueError` with the valid names when the key is missing. `predict_trainable` is a loop: `for _, mod in model.named_modules(): for cname, child in mod.named_children(): if isinstance(child, nn.Linear) and cname in targets: total += r * (child.in_features + child.out_features)`.
+---
+`compare_targets`: for each group name call `select_targets`, compute the prediction on the *untouched* `base`, then `m = clone(base)`, `add_lora(m, targets, r, alpha, seed)`, `n = trainable_count(m)`, `train_sft(m, items, steps, lr, seed=seed)`, `evaluate_qa(m, tok, qa_rows)`, and append the row dict with the keys `group`, `trainable`, `predicted`, `format`, `exact`.
+---
+If `predicted` and `trainable` differ, look at which layers each of them counts: the tied output layer is not a target, and a `LoRALinear` contains a `base` child that must not be counted again. If the outcome test fails by a hair, run `run_targets.py` and look at the table: the two placements should differ by 0.2 or more at these settings.

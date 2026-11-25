@@ -1,0 +1,16 @@
+title: Fine-tune a language model
+description: >
+  Take the small GPT you built in llm-from-zero and change what it does, by hand. You write the
+  fine-tuning code yourself, in plain PyTorch (no peft, no trl): an evaluation harness; full fine-tuning,
+  catastrophic forgetting and freezing; instruction data (templates, cleaning, deduplication, splitting
+  without leakage, loss masking on the answer tokens, noisy versus clean data); LoRA from scratch (rank and
+  alpha, which layers, merging an adapter into the weights, several adapters on one base) and int8
+  quantisation of the frozen base (the idea of QLoRA); preference data and DPO written from its formula;
+  evaluation you can trust (held-out sets, contamination checks, seeds and variance); and a capstone with a
+  task of your own and a model card with the numbers. Every lesson measures an improvement on a tiny model
+  with a number. Runs plain Python in a container on your machine, no Kubernetes cluster and no internet
+  needed after the first image build. If you skipped the llm-from-zero capstone, a reference base model ships
+  with the course.
+kind: local
+image: kdrill.local/ml-dev:0.1.0
+image_build: base/images/ml-dev/build.sh

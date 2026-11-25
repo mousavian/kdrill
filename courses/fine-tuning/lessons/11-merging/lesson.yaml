@@ -1,0 +1,6 @@
+title: Merging an adapter into the weights
+goal: >
+  Fold a trained LoRA adapter into the base weights so the model is an ordinary GPT again, prove numerically that
+  the outputs are the same before and after, and write the merged model as a normal checkpoint.
+concepts: [LoRA merge, W + (alpha/r) B A, numerical equivalence, state dict compatibility, serving, keeping adapters separate]
+timeout: 150s

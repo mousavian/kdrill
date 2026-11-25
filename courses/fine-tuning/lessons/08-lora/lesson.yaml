@@ -1,0 +1,6 @@
+title: LoRA from scratch
+goal: >
+  Write a low-rank adapter wrapper (A and B matrices scaled by alpha/r around a frozen linear layer), add it to
+  the attention projections of the GPT, count what is trainable, train it, and save the adapter as a small file.
+concepts: [LoRA, low-rank update, alpha over r scaling, zero initialisation of B, frozen base, adapter file, parameter counts]
+timeout: 150s

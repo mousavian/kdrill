@@ -1,0 +1,5 @@
+Start with `text_loss`. For each start `s` in `range(0, len(ids) - 1, window)` take `x = ids[s:s+window]` and `y = ids[s+1:s+window+1]`; near the end `y` is shorter than `x`, so cut `x` to `len(y)`. `model(x[None])` returns `(logits, loss)`; use the logits and `F.cross_entropy(logits[0], y, reduction="sum")`, add up the sums and the number of targets, and divide once at the end.
+---
+`complete`: keep a Python list `out` of generated ids. Each step feed `torch.tensor([(ids + out)[-model.block_size:]])`, take `logits[0, -1].argmax()`; if it equals `tok.special_ids[EOS]` stop with `finished = True` (without appending it). Use `tok.decode(out)`. Remember `@torch.no_grad()` and `model.eval()` (restore `model.training` afterwards).
+---
+`format_ok` is one boolean expression: `finished and text.startswith(" ") and text.strip() != "" and "\n" not in text`. In `evaluate_qa` the exact-match count must also require `format_ok`; build the prompt with `PROMPT.format(q=row["question"])` and call `complete` (not a copy of its code), because the test replaces it.

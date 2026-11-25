@@ -1,0 +1,6 @@
+title: Catastrophic forgetting
+goal: >
+  Measure what fine-tuning on the new style costs on the original text, and reduce it by mixing a share of
+  the original data into every batch (replay), without giving up the gain on the new style.
+concepts: [catastrophic forgetting, replay, data mixing, learning rate, trade-off, relative degradation]
+timeout: 120s

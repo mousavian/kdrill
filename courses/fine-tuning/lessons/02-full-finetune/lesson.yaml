@@ -1,0 +1,6 @@
+title: Full fine-tuning
+goal: >
+  Continue training every weight of the base model on text in a new style, with a learning rate and a step
+  count far below pre-training, and see what changes: style loss down, and what happens as the learning rate goes up.
+concepts: [full fine-tuning, learning rate, warm-up, cosine decay, AdamW, held-out loss, overfitting a small dataset]
+timeout: 120s

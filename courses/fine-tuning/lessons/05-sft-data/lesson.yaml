@@ -1,0 +1,7 @@
+title: Instruction data - template, cleaning, splitting
+goal: >
+  Turn a messy raw question-answer file into training data: a fixed prompt template with an end-of-text
+  marker, cleaning and deduplication, a split with no question on both sides, and token ids with the
+  prompt length recorded.
+concepts: [SFT data, prompt template, end-of-text token, cleaning, deduplication, train/eval split, leakage, tokenization boundary]
+timeout: 120s

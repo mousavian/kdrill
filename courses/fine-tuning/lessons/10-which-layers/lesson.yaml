@@ -1,0 +1,6 @@
+title: Which layers to adapt
+goal: >
+  Predict the number of trainable parameters of an adapter placement before building it, then compare attention-only,
+  MLP-only and attention-plus-MLP adapters on the question-answer task.
+concepts: [target modules, attention versus MLP, trainable parameter prediction, capacity, knowledge storage, ablation]
+timeout: 150s

@@ -12,7 +12,7 @@ LLM_DATA="$LLM_DIR/pylib/kdlib/data"
 # checksum-verified, or (offline) the small bundled public-domain subset.
 llm_prefetch() {
   mkdir -p "$KDRILL_CACHE_DIR"
-  "$KDRILL_BIN" py --net --cache-rw -m kdlib.prefetch || info "(could not prepare the data cache; the bundled data will be used)"
+  "$KDRILL_BIN" py --course llm-from-zero --net --cache-rw -m kdlib.prefetch || info "(could not prepare the data cache; the bundled data will be used)"
 }
 
 # llm_seed_raw - copy the cached raw books to data/raw in the workspace when the

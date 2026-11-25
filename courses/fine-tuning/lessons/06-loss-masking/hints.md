@@ -1,0 +1,5 @@
+`make_batch`: `L = max(len(ids) for ids, _ in items) - 1`. Allocate `x = torch.full((B, L), pad_id)`, `y` the same, `mask = torch.zeros(B, L)`. For row `r` with `n = len(ids) - 1`: `x[r, :n] = t[:-1]`, `y[r, :n] = t[1:]`, and `mask[r, plen - 1:n] = 1.0` (target position `t` is a completion token when `t + 1 >= plen`).
+---
+`masked_loss`: `nll = F.cross_entropy(logits.reshape(-1, V), targets.reshape(-1), reduction="none").reshape(targets.shape)`, then `(nll * mask).sum() / mask.sum()`. Check `mask.sum() == 0` first. To see the gradient yourself: `logits.retain_grad()` before `backward()`, then look at `logits.grad.abs().sum(-1)` where `mask == 0`.
+---
+`train_sft` is the loop of lesson 02 with new batches: draw `ix = torch.randint(0, len(items), (batch_size,), generator=g).tolist()`, `x, y, mask = make_batch([items[i] for i in ix], pad_id)`, `loss = masked_loss(model(x)[0], y, mask)`, then zero_grad, backward, step. If the model learns the format but not the answers, give it more steps; if exact match stays at zero, print one decoded prediction with your harness `complete` and compare with the answer.

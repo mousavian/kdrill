@@ -1,0 +1,6 @@
+title: DPO from scratch
+goal: >
+  Write the Direct Preference Optimization loss from its formula, precompute the frozen reference model's log-probabilities,
+  train the policy on chosen and rejected pairs, and measure the win rate on held-out pairs and the share of chatty answers.
+concepts: [DPO, implicit reward, reference model, beta, log-sigmoid loss, win rate, preference optimisation without a reward model]
+timeout: 150s

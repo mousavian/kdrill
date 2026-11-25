@@ -1,0 +1,6 @@
+title: Preference data - chosen and rejected
+goal: >
+  Validate and clean a file of preference pairs (no leakage into the evaluation prompts), encode the pairs, and write
+  the batched completion log-probability that DPO is built on.
+concepts: [preference pairs, chosen and rejected, pair validation, leakage, sequence log-probability, length bias, reference model]
+timeout: 150s

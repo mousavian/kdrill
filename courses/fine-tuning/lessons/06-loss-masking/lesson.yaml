@@ -1,0 +1,6 @@
+title: Loss masking - learn the answer, not the question
+goal: >
+  Batch variable-length examples with padding, compute the loss on the answer tokens only, prove with the
+  gradients that prompt positions contribute nothing, and fine-tune the base model into answering in the format.
+concepts: [loss masking, padding, per-token cross-entropy, gradient check, SFT training loop, format accuracy, exact match]
+timeout: 150s

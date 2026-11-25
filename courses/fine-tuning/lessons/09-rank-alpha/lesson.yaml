@@ -1,0 +1,6 @@
+title: Rank and alpha - a small sweep
+goal: >
+  Run a repeatable LoRA experiment function, sweep the rank and the alpha, and write the rule that picks the smallest
+  rank reaching most of the gain of full fine-tuning.
+concepts: [LoRA rank, alpha scaling, hyperparameter sweep, experiment function, independent runs, selection rule, diminishing returns]
+timeout: 150s

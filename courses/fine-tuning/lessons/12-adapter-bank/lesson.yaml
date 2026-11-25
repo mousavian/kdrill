@@ -1,0 +1,6 @@
+title: Several adapters on one base
+goal: >
+  Keep one copy of the base model in memory with several named adapters (style, question answering) that can be
+  switched per request, prove that switching is exact and that adapters do not interfere, and compare the tasks.
+concepts: [multi-adapter serving, adapter switching, state isolation, memory accounting, task interference, per-request routing]
+timeout: 150s

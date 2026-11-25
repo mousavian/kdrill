@@ -1,0 +1,6 @@
+title: Data quality versus quantity
+goal: >
+  Write a rule-based validator that checks every training answer against a trusted fact table, then train
+  with the same step budget on the noisy file and on the validated subset, and compare.
+concepts: [label noise, validation rules, data quality, precision and recall of a filter, fixed compute budget, memorisation of wrong labels]
+timeout: 150s

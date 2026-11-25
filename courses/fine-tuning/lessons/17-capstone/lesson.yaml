@@ -1,0 +1,7 @@
+title: Capstone - a task of your own, evaluated honestly
+goal: >
+  Chain the course into one pipeline for a question-answer task of your choice: clean the data, remove contamination,
+  measure the base, fine-tune with LoRA or fully over several seeds, evaluate on held-out questions, save the artifact and
+  write a model card whose numbers come from the run.
+concepts: [end-to-end fine-tuning pipeline, full versus LoRA, contamination check, seeds, results file, model card, honest reporting]
+timeout: 180s

@@ -1,0 +1,6 @@
+title: Quantisation basics and the idea of QLoRA
+goal: >
+  Store the frozen base weights as int8 (and simulated 4-bit) with a scale per row, measure the memory saved and the
+  quality lost, and train a LoRA adapter on top of the quantised base.
+concepts: [quantisation, absmax scaling, per-row versus per-tensor scales, outliers, int8 weights, memory footprint, QLoRA]
+timeout: 150s

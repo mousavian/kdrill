@@ -1,0 +1,6 @@
+title: Freezing - train only part of the model
+goal: >
+  Freeze most of the parameters, train the last block and the final norm, count the trainable parameters, and
+  compare the style gain and the forgetting with full fine-tuning.
+concepts: [requires_grad, freezing, trainable parameters, parameter names, tied weights, partial fine-tuning]
+timeout: 120s

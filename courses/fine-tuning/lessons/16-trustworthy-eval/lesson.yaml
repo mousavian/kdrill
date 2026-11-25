@@ -1,0 +1,7 @@
+title: Evaluation you can trust
+goal: >
+  Detect contamination between fine-tuning data and evaluation data with n-gram overlap, and put error bars on
+  comparisons: run several seeds, compute means, standard deviations and paired confidence intervals, and say when a
+  difference is larger than the noise.
+concepts: [contamination, n-gram overlap, decontamination, seeds, variance, confidence interval, paired comparison, binomial standard error]
+timeout: 150s

@@ -1,0 +1,5 @@
+`clean_text` is `" ".join(s.split())`. `format_example` returns `("Q: " + question + "\nA:", " " + answer + EOS)`. In `clean_examples` loop over the rows with a `seen` set of kept questions: check the marker and newlines on the raw strings first (cleaning would hide a newline), then clean, then skip empties, then the word count, then the duplicate test, then append a new dict.
+---
+`split_examples`: validate first (fraction, then duplicate questions with `len(set(qs)) != len(qs)`). `idx = list(range(len(examples)))`, `random.Random(seed).shuffle(idx)`, `ev = set(idx[:n_eval])`, then two list comprehensions with `enumerate` keep the original order on each side. `n_eval = max(1, round(len(examples) * eval_fraction))`.
+---
+`encode_example`: `prompt, completion = format_example(...)`; `p = tok.encode(prompt)`; return `p + tok.encode(completion), len(p)`. `tok.encode` knows the end-of-text marker as a special token, so it becomes one id. `dataset_stats`: `answer_share = sum(len(ids) - pl) / sum(len(ids))`.

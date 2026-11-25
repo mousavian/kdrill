@@ -1,0 +1,5 @@
+`is_valid_pair`: get the three fields in a `try`/`except (KeyError, TypeError)`, check `isinstance(x, str) and x.strip()` for each, strip chosen and rejected, then `c != r and not is_chatty(c) and is_chatty(r) and c in r`. `clean_pairs`: run `is_valid_pair` on the *raw* row, then compare the stripped prompt with a `seen` set and with the stripped `exclude_prompts`; append a new dict with stripped fields.
+---
+`encode_pair`: `tok.encode("Q: " + prompt + "\nA:")` for the prompt and `tok.encode(" " + answer + EOS)` for each completion. `length_gap` encodes every pair with it and compares `len(chosen_ids)` with `len(rejected_ids)`.
+---
+`completion_logprobs`: for each item `seq = prompt + completion`; the inputs are `seq[:-1]`, the targets `seq[1:]`; a position counts when its target is a completion token, i.e. from index `len(prompt) - 1` up to `len(seq) - 2`. Build `x`, `y`, `mask` rectangles like lesson 06, then `logp = F.log_softmax(model(x)[0], dim=-1).gather(-1, y[..., None])[..., 0]` and return `(logp * mask).sum(dim=1)`. Do not use `no_grad` inside: DPO needs the gradient.

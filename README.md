@@ -7,7 +7,7 @@ Runs on one small k3d cluster (fake KWOK nodes for scheduling and scale
 topics, real containers and traffic for the gateway and service-mesh courses,
 real tiny models for the inference and training-platform courses, and a
 no-cluster Python course, llm-from-zero, where you build a language model
-yourself), sized for an 8 GB laptop. No cloud account, no cloud bill, no GPU.
+yourself, and its sequel fine-tuning), sized for an 8 GB laptop. No cloud account, no cloud bill, no GPU.
 
 Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/). How it is built:
 [DESIGN.md](DESIGN.md). What is done and what is next: [STATUS.md](STATUS.md).
@@ -25,8 +25,9 @@ Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/). How it is built:
 | `inference` | 26 | real model | Serve an LLM: probes, KEDA on queue depth, endpoint picking, GPU capacity. |
 | `training-platform` | 20 | real model | Real PyTorch runs as Jobs: checkpoints, preemption, JobSet, Kueue. |
 | `llm-from-zero` | 27 | Python, no cluster | Build a language model yourself: data, tokenizers, hand-written backprop, a GPT, training, evaluation. |
+| `fine-tuning` | 17 | Python, no cluster | Fine-tune that model by hand: forgetting, instruction data, loss masking, LoRA from scratch, merging, int8 and QLoRA, DPO, honest evaluation. |
 
-168 lessons in all. More courses are planned; see [courses/QUEUE.md](courses/QUEUE.md).
+185 lessons in all. More courses are planned; see [courses/QUEUE.md](courses/QUEUE.md).
 
 ## Prerequisites
 
@@ -44,11 +45,11 @@ Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/). How it is built:
   PyTorch, about 250 MB download, 1-3 minutes) for your machine's architecture
   and imports it into the cluster; behind a TLS-inspecting proxy, point
   `KDRILL_BUILD_CA` at the proxy's CA bundle
-- the llm-from-zero course needs **only Docker** (no k3d, no cluster; stop the cluster to free
-  memory): its first lesson builds `kdrill.local/ml-dev` (CPU-only PyTorch, about 300 MB
-  download, 2-5 minutes) with a plain `docker build`, and lesson 01 downloads 4 MB of
+- the llm-from-zero and fine-tuning courses need **only Docker** (no k3d, no cluster; stop the cluster to free
+  memory): the first lesson of either builds `kdrill.local/ml-dev` (CPU-only PyTorch, about 300 MB
+  download, 2-5 minutes) with a plain `docker build`; llm-from-zero's lesson 01 downloads 4 MB of
   public-domain books from Project Gutenberg mirrors (checksum-verified; offline it falls back
-  to a small bundled corpus)
+  to a small bundled corpus); fine-tuning ships its data and needs no download
 
 ## Quick start
 
@@ -81,18 +82,19 @@ context `k3d-kdrill` gets its default namespace set to the lesson's namespace.
 
 ### Local courses (no cluster)
 
-A course with `kind: local` (llm-from-zero) runs your own Python in a container. Your files live in
+Courses with `kind: local` (llm-from-zero, fine-tuning) run your own Python in a container. Your files live in
 `~/kdrill-work/<course>/` (set `KDRILL_WORK` to move it); starting a lesson copies its starter
 files there without overwriting your work, and `kdrill reset` saves your versions of that lesson's
 files in `.backup/` before restoring the starter.
 
 ```sh
-kdrill start llm-from-zero/01    # works with the cluster stopped or absent; builds the image the first time
+kdrill start llm-from-zero/01    # (or fine-tuning/01) works with the cluster stopped or absent; builds the image the first time
 kdrill py fetcher.py             # run a file from your workspace in the course container (/work)
 kdrill py                        # an interactive Python shell in the same container
 kdrill verify                    # hidden pytest tests against your workspace
 ```
 
+`kdrill py` uses the course of the active lesson (pass `--course <course>` when none is active).
 `make py F=file.py` does the same from a lesson folder. `kdrill doctor` only requires Docker
 while a local lesson is active.
 

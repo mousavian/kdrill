@@ -1,0 +1,5 @@
+`ngrams`: `w = words(text)`; no words gives `set()`; fewer than `n` words gives `{tuple(w)}`; otherwise `{tuple(w[i:i + n]) for i in range(len(w) - n + 1)}`. `contaminated`: build the training index once with `build_index`, then `[bool(ngrams(t, n) & index) for t in eval_texts]`. `overlap_rate` counts every n-gram occurrence in the eval texts (a list, not a set): `hits / total`, and `0.0` when `total == 0`.
+---
+`decontaminate`: index the eval rows' `field` texts, then split the training rows by `ngrams(row[field], n) & index`. `mean_std`: the sample deviation divides by `n - 1`; return `0.0` for a single value. `ci95`: `df = n - 1`; for `df > 30` use `1.96`; otherwise `T95[max(k for k in T95 if k <= df)]`; half-width `t * std / math.sqrt(n)`; one value gives `float("inf")`.
+---
+`paired_summary`: `diffs = [b - a for a, b in zip(scores_a, scores_b)]`; `diff, ci = ci95(diffs)`; `b_better = diff - ci > 0`. Check the lengths first. If the real-seed test fails on `len(set(low)) == 3`, your `lora_run` is not passing the seed to both `add_lora` and `finetune`.

@@ -1,0 +1,6 @@
+title: Baseline - measure before you change anything
+goal: >
+  Load the base model and write the evaluation harness every later lesson uses: held-out loss on text,
+  greedy completion, format accuracy and exact match on question-answer prompts. Record the baseline numbers.
+concepts: [baseline, held-out loss, sliding windows, greedy decoding, format accuracy, exact match, evaluation harness]
+timeout: 120s

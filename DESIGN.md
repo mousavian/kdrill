@@ -62,7 +62,7 @@ One cluster, mixed nodes. Each lesson declares which kind it needs; setup arrang
 | **sim** | KWOK fake nodes (incl. fake GPU nodes) | GPU scheduling, Karpenter, scale/capacity, GPU-scale inference |
 | **real-light** | Real k3s node(s), real containers + traffic | Istio, Envoy, Kyverno |
 | **real-compute** | Real k3s node, CPU+memory budget | Training platform, fine-tuning, real (tiny) inference |
-| **local** | none: code runs in a container on the learner's machine, no cluster | llm-from-zero |
+| **local** | none: code runs in a container on the learner's machine, no cluster | llm-from-zero, fine-tuning |
 
 **`kind: local`** (course or lesson) needs no cluster at all: `start`, `verify`, `reset`,
 `cleanup`, `next`, `hint`, `status` work with k3d stopped or not installed; there are no
@@ -248,9 +248,12 @@ PyTorch: port, training loop, attention, transformer block, GPT, real training r
 regularisation, generation, scaling experiment, evaluation, capstone with model card and a checkpoint contract
 that `fine-tuning` starts from.
 
-**fine-tuning** (real-compute, tiny)
-LoRA fine-tune of the model trained in the llm-from-zero capstone (no big downloads) ·
-datasets from MinIO · artifacts & versioning · serve the fine-tuned model · compare base vs tuned
+**fine-tuning** (local: Python in a container, no cluster, 17 lessons; was planned as a Kubernetes workflow course)
+fine-tune the llm-from-zero model by hand, measuring every change on a tiny GPT: evaluation harness and baseline,
+full fine-tuning, forgetting and replay, freezing · instruction data (template, cleaning, split), loss masking,
+noisy vs validated data · LoRA from scratch, rank and alpha, which layers, merging, several adapters on one base,
+int8/4-bit quantisation and QLoRA · preference data, DPO from the formula, contamination and seed variance,
+capstone with a model card. No peft/trl; a reference base model ships with the course for learners who skipped the capstone.
 
 ---
 
