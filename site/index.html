@@ -186,6 +186,8 @@ code{font-family:var(--f-mono);font-size:.86em;font-stretch:87.5%}
 .sc-list li{padding:3px 0}
 .sc-list li::marker{content:counter(list-item,decimal-leading-zero) "  ";font:600 12px var(--f-mono)}
 .sc-cmd{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;background:#E7E8E2;border-radius:4px}
+.sc-share{margin-top:10px}
+.sc-share .net{font-size:15px}
 .sc-cmd code{font-size:13.5px;overflow-wrap:anywhere}
 
 /* specifications */
@@ -635,15 +637,20 @@ let said=false;
 function show(id){
  const c=COURSES.find(x=>x[0]===id),n=c[5];
  const needs=c[3].length?'Needs '+c[3].map(r=>`<code>${r}</code>`).join(' and ')+'.':'Needs nothing else.';
- card.innerHTML=`<p class="sc-kind">${KIND[c[2]]}</p><h3 class="sc-title">${esc(c[1])}</h3><p class="sc-meta"><code>${c[0]}</code>, ${n} lessons. ${needs}</p><p class="sc-line">${esc(c[4])}</p><ol class="sc-list" tabindex="0" aria-label="All ${n} lessons in ${c[0]}">${c[6].map(t=>`<li>${esc(t)}</li>`).join('')}</ol><div class="sc-cmd"><code>kdrill start ${c[0]}/01</code><button class="btn btn-small" type="button" data-copy="kdrill start ${c[0]}/01">Copy the command</button></div>`;
+ card.innerHTML=`<p class="sc-kind">${KIND[c[2]]}</p><h3 class="sc-title">${esc(c[1])}</h3><p class="sc-meta"><code>${c[0]}</code>, ${n} lessons. ${needs}</p><p class="sc-line">${esc(c[4])}</p><ol class="sc-list" tabindex="0" aria-label="All ${n} lessons in ${c[0]}">${c[6].map(t=>`<li>${esc(t)}</li>`).join('')}</ol><div class="sc-cmd"><code>kdrill start ${c[0]}/01</code><button class="btn btn-small" type="button" data-copy="kdrill start ${c[0]}/01">Copy the command</button></div><p class="sc-share"><button class="net" type="button" data-copy="https://kdrill.5xx.tech/#${c[0]}">Copy a link to this course</button></p>`;
  $$('.bit[data-id]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.id===id)));
  if(said)$('#bit-live').textContent=`${c[0]}: ${n} lessons. The list is below the case.`;said=true;
 }
+/* each course has its own link: kdrill.5xx.tech/#<course-id> */
+const fromHash=()=>{const id=decodeURIComponent(location.hash.slice(1));return COURSES.some(c=>c[0]===id)?id:null};
 tray.addEventListener('click',e=>{
  const b=e.target.closest('.bit[data-id]');if(!b)return;show(b.dataset.id);
+ history.replaceState(null,'','#'+b.dataset.id);
  if(innerWidth<900&&card.getBoundingClientRect().top>innerHeight*.7)card.scrollIntoView({block:'center',behavior:RM?'auto':'smooth'});
 });
-show('k8s-scheduling');
+function openFromHash(){const id=fromHash();if(!id)return false;show(id);const go=()=>$('#bits').scrollIntoView({block:'start'});go();document.fonts&&document.fonts.ready.then(go);return true}
+addEventListener('hashchange',openFromHash);
+if(!openFromHash())show('k8s-scheduling');
 
 /* parts diagram: point at a part */
 const parts=$('.parts');
