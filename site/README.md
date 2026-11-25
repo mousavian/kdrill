@@ -5,7 +5,7 @@ retail box, courses as drill bits). Plain static files, no build step.
 
 | File | What it is |
 |---|---|
-| `index.html` | The whole page: inline CSS and JS, fonts from Google Fonts. |
+| `index.html` | The whole page: inline CSS and JS, fonts from Google Fonts, page-view stats from `l.5xx.tech`. |
 | `404.html` | "Bit not found". |
 | `og.png` | 1200×630 share image (Open Graph and X cards). |
 | `CNAME` | `kdrill.5xx.tech` for GitHub Pages. |
