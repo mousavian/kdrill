@@ -1,0 +1,15 @@
+title: Kubeflow Trainer - TrainJobs and training runtimes
+description: >
+  Kubeflow Trainer v2 on one small cluster. A TrainJob says what to train
+  (image, arguments, number of nodes, resources); a (Cluster)TrainingRuntime
+  says how the platform runs it (the JobSet template, the PyTorch policy, the
+  scheduling). The controller turns the pair into a JobSet and its Jobs. The
+  lessons run the tiny character-level GPT of the training-platform course
+  through Trainer: your first TrainJob, runtimes owned by a platform team,
+  overriding the trainer, real two-node PyTorch DDP and the environment the
+  controller injects, dataset initializers, checkpoints and restarts,
+  suspend and failure, Kueue queueing, gang behaviour on fake GPU nodes,
+  migrating a legacy PyTorchJob, and a capstone with a planted fault.
+kind: real-compute
+components: [ml-tiny-image, jobset, kueue, kubeflow-trainer, kwok-job-runtime]
+requires: [training-platform]

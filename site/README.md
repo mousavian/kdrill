@@ -30,5 +30,5 @@ from the Actions tab.
 ## Before launch
 
 - Lesson titles are embedded in the `COURSES` array in `index.html` (from
-  `notes/courses.json`). Update both when courses change; the 168 total also
+  `notes/courses.json`). Update both when courses change; the 179 total also
   appears in the copy, the share text and `og.png`.

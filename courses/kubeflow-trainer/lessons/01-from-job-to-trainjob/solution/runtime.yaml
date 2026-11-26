@@ -1,0 +1,33 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: ClusterTrainingRuntime
+metadata:
+  name: tiny-gpt
+  labels:
+    trainer.kubeflow.org/framework: torch     # the Kubeflow SDK uses this label to find runtimes
+spec:
+  mlPolicy:
+    numNodes: 1
+    torch: {}                                 # PyTorch policy; with one node it only injects PET_* variables
+  template:                                   # a JobSet spec: the controller creates it for every TrainJob
+    spec:
+      replicatedJobs:
+      - name: node
+        template:
+          metadata:
+            labels:
+              trainer.kubeflow.org/trainjob-ancestor-step: trainer   # "this is where spec.trainer applies"
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                - name: node                  # the trainer container must be called node
+                  image: kdrill.local/ml-tiny:0.1.0
+                  command: [train]
+                  args: [--steps, "200", --seed, "3", --log-every, "50"]
+                  env:
+                  - {name: OMP_NUM_THREADS, value: "1"}
+                  resources:
+                    requests: {cpu: 250m, memory: 450Mi}
+                    limits: {memory: 768Mi}

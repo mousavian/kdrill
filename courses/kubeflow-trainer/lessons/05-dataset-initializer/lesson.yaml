@@ -1,0 +1,10 @@
+title: Fetch the data first - the dataset initializer
+goal: >
+  The platform's runtime `tiny-data` has a dataset-initializer step, but a
+  TrainJob that asks for a dataset is refused. Fix the runtime so that the
+  initializer writes the dataset to a volume shared with the trainer, then run
+  the TrainJob `withdata`: the trainer must read its data from /workspace/dataset
+  only after the initializer has finished.
+namespaces: [train]
+timeout: 240s
+concepts: [initializer, dataset-initializer, STORAGE_URI, volumeClaimPolicies, dependsOn, shared volume, ancestor labels, admission validation]

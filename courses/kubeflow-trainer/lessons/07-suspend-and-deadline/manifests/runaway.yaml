@@ -1,0 +1,10 @@
+# Never finishes in a reasonable time, and nothing stops it.
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: runaway
+spec:
+  runtimeRef:
+    name: tiny-gpt
+  trainer:
+    args: [--steps, "1000000", --seed, "5", --log-every, "1000"]

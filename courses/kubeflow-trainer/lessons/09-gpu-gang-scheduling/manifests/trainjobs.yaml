@@ -1,0 +1,23 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: llama
+spec:
+  suspend: true      # created suspended so that setup can start both at the same moment
+  runtimeRef:
+    name: gpu-ddp
+  trainer:
+    numNodes: 2
+    args: [--steps, "1000"]
+---
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: mistral
+spec:
+  suspend: true
+  runtimeRef:
+    name: gpu-ddp
+  trainer:
+    numNodes: 2
+    args: [--steps, "1000"]

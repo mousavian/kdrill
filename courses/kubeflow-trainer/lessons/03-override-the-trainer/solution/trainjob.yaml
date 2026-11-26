@@ -1,0 +1,14 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: tuned
+spec:
+  runtimeRef:
+    name: tiny-gpt
+  trainer:
+    args: [--steps, "300", --seed, "11", --batch-size, "16", --log-every, "50"]   # replaces the runtime's args
+    env:                                                                          # merged with the runtime's env
+    - {name: RUN_LABEL, value: lesson3}
+    resourcesPerNode:                                                             # merged over the runtime's resources
+      requests: {cpu: 500m, memory: 450Mi}
+      limits: {memory: 1Gi}

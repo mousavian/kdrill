@@ -1,0 +1,25 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: exp-a
+  labels:
+    kueue.x-k8s.io/queue-name: training     # submit through the LocalQueue
+spec:
+  runtimeRef:
+    name: tiny-ddp
+  trainer:
+    numNodes: 2
+    args: [--steps, "400", --seed, "1", --batch-size, "16", --log-every, "100"]
+---
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: exp-b
+  labels:
+    kueue.x-k8s.io/queue-name: training
+spec:
+  runtimeRef:
+    name: tiny-ddp
+  trainer:
+    numNodes: 2
+    args: [--steps, "400", --seed, "2", --batch-size, "16", --log-every, "100"]

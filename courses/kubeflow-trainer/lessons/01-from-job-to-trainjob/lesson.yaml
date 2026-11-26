@@ -1,0 +1,9 @@
+title: From a Job to a TrainJob
+goal: >
+  The tiny GPT trains as a plain Job today. Move it to Kubeflow Trainer:
+  write the ClusterTrainingRuntime `tiny-gpt` from the Job's pod template and
+  run the prepared TrainJob `tiny` through it, so that the Trainer controller
+  builds the JobSet and the Job and the run finishes with the same result.
+namespaces: [train]
+timeout: 180s
+concepts: [TrainJob, ClusterTrainingRuntime, runtimeRef, JobSet, ancestor label, trainer controller, admission webhook]

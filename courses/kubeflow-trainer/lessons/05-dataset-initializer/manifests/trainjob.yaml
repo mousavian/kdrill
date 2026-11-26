@@ -1,0 +1,11 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: withdata
+spec:
+  runtimeRef:
+    name: tiny-data
+  initializer:
+    dataset:
+      # the lab's initializer understands file:// paths inside the image; the real one: hf://, s3://
+      storageUri: file:///opt/ml-tiny/datasets/tinyshakespeare.txt.gz

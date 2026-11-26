@@ -4,6 +4,10 @@
 there that still has a `BUILD.md`. If that is not this one, stop reading this
 file and open that course's brief instead.
 
+**Progress:** Course 1 (`kubeflow-trainer`) is **built** (11 lessons, Trainer v2.4.0; see STATUS.md and
+"Notes from building Course 1" at the end of this file). Continue with Course 2 (`kubeflow-kserve`);
+do not rebuild Course 1. Keep this file until the last Kubeflow course is built.
+
 You are building kdrill course material in a fresh session. Read, in this
 order, before writing anything:
 
@@ -34,7 +38,7 @@ per session"; you may also stop after any of them and leave the rest):
 
 | Order | Course dir | Project | Fit on this machine |
 |---|---|---|---|
-| 1 | `courses/kubeflow-trainer` | Kubeflow Trainer (v2: `TrainJob`, runtimes) | expected to fit easily |
+| 1 | `courses/kubeflow-trainer` | Kubeflow Trainer (v2: `TrainJob`, runtimes) | **BUILT** (fits: controller about 60 MB) |
 | 2 | `courses/kubeflow-kserve` | KServe (`InferenceService`) in its no-Knative deployment mode | expected to fit; check cert-manager need |
 | 3 | `courses/kubeflow-katib` | Katib (`Experiment`, `Suggestion`, `Trial`) | uncertain: needs a database; measure |
 | 4 | `courses/kubeflow-pipelines` | Kubeflow Pipelines | probably too heavy (API server, DB, object store, workflow controller); measure before committing to it |
@@ -181,3 +185,24 @@ For each course built: every lesson passes the full test cycle in
 `hack/COURSE_AUTHORING.md`; stop/start is clean; footprint measured and written
 in STATUS.md; committed to `main` before starting the next. At the end this
 file is deleted (or replaced by the overview README described above).
+
+## Notes from building Course 1 (`kubeflow-trainer`)
+
+Facts a later Kubeflow course can reuse (details in STATUS.md, decisions 53 onwards):
+
+- **Component pattern for a CRD-heavy project without a helm repo:** `base/components/kubeflow-trainer` vendors the small
+  non-CRD part of the upstream kustomize output (`controller.yaml`, image pinned by index digest) and downloads the
+  four huge CRDs (2.5 MB) from the pinned tag at install time into `$KDRILL_STATE_DIR/cache/`, checking sha256
+  (`crds.sha256`). Rendering used `kubectl kustomize` on a local clone of the tag, minus the bundled JobSet.
+- Trainer v2.4.0 needs only a JobSet controller (built against **JobSet v0.13.0**, the version the repo's `jobset`
+  component installs) and **no cert-manager**: the controller generates its own webhook certificate
+  (`certManagement.enable: true`). Kubernetes >= 1.31.
+- Webhooks are `failurePolicy: Fail`, scoped to `trainer.kubeflow.org` resources only. Kueue (v0.20.4, TrainJob
+  integration on by default) also registers TrainJob webhooks, and it starts the TrainJob controller by itself
+  when the CRD appears later: no Kueue restart or config change is needed whichever is installed first.
+- The upstream stock runtimes pull multi-GB images and are not installed; lessons write their own runtimes.
+- Engine stops components in `course.yaml` order, so `teardown.sh` removes TrainJobs/runtimes first.
+- v2.4.0 ships an experimental `OptimizationJob` CRD (`trainer.kubeflow.org`: random-search hyperparameter
+  optimization over TrainJob trials, behind the controller feature gates `OptimizationJob` and `TrainJobStatus`, which the
+  `kubeflow-trainer` component does not enable). The CRD is installed, the feature is not taught; look at it again
+  when designing the Katib course (docs: `docs/user-guides/optimizationjob.md` in the Trainer repository).

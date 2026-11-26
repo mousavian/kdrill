@@ -1,0 +1,26 @@
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ResourceFlavor
+metadata:
+  name: default
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: ClusterQueue
+metadata:
+  name: training-cq
+spec:
+  namespaceSelector: {}
+  resourceGroups:
+  - coveredResources: [cpu, memory]
+    flavors:
+    - name: default
+      resources:
+      - {name: cpu, nominalQuota: 1}          # one TrainJob (2 nodes x 500m) at a time
+      - {name: memory, nominalQuota: 2Gi}
+---
+apiVersion: kueue.x-k8s.io/v1beta2
+kind: LocalQueue
+metadata:
+  name: training
+  namespace: train
+spec:
+  clusterQueue: training-cq

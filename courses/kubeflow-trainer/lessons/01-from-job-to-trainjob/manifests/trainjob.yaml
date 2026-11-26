@@ -1,0 +1,8 @@
+# What the learner of this lesson submits: a TrainJob only names a runtime.
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: tiny
+spec:
+  runtimeRef:
+    name: tiny-gpt            # kind defaults to ClusterTrainingRuntime

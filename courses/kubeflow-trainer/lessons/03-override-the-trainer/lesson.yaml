@@ -1,0 +1,9 @@
+title: Overriding the trainer - args, env and resources
+goal: >
+  The TrainJob `tuned` should train 300 steps with seed 11 and batch size 16,
+  labelled RUN_LABEL=lesson3, with 500m CPU and 450Mi requested per node. It
+  sets STEPS=300 and trains 1200 steps anyway. Recreate it so that the pod
+  really does what was asked, without changing the platform's runtime.
+namespaces: [train]
+timeout: 180s
+concepts: [spec.trainer, args replace, env merge, resourcesPerNode, immutable TrainJob, flag vs environment variable, reserved PET_ variables]

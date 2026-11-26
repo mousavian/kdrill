@@ -1,0 +1,9 @@
+title: Queue TrainJobs with Kueue
+goal: >
+  Two 2-node TrainJobs, exp-a and exp-b, run side by side and squeeze a quota
+  that is sized for one of them. Submit both through the Kueue LocalQueue
+  `training`: one is admitted and runs, the other waits suspended, and starts
+  by itself when the first has finished. The quota stays as it is.
+namespaces: [train]
+timeout: 300s
+concepts: [Kueue, ClusterQueue, LocalQueue, Workload, queue-name label, TrainJob suspend, admission, podSets, quota per node]

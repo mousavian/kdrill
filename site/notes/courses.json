@@ -794,6 +794,72 @@
   ]
  },
  {
+  "id": "kubeflow-trainer",
+  "title": "Kubeflow Trainer: TrainJobs and runtimes",
+  "kind": "real-compute",
+  "requires": [
+   "training-platform"
+  ],
+  "line": "Kubeflow Trainer v2: TrainJobs and runtimes, PyTorch DDP, initializers, restarts, Kueue, gang scheduling.",
+  "lessons": [
+   {
+    "id": "01-from-job-to-trainjob",
+    "n": "01",
+    "title": "From a Job to a TrainJob"
+   },
+   {
+    "id": "02-runtime-or-trainjob",
+    "n": "02",
+    "title": "Who owns what - a team runtime and a small TrainJob"
+   },
+   {
+    "id": "03-override-the-trainer",
+    "n": "03",
+    "title": "Overriding the trainer - args, env and resources"
+   },
+   {
+    "id": "04-distributed-pytorch",
+    "n": "04",
+    "title": "Two nodes, one model - the PyTorch policy"
+   },
+   {
+    "id": "05-dataset-initializer",
+    "n": "05",
+    "title": "Fetch the data first - the dataset initializer"
+   },
+   {
+    "id": "06-checkpoint-and-restart",
+    "n": "06",
+    "title": "A crash at step 300 - checkpoints and JobSet restarts"
+   },
+   {
+    "id": "07-suspend-and-deadline",
+    "n": "07",
+    "title": "Suspend, resume and a deadline"
+   },
+   {
+    "id": "08-queue-the-trainjobs",
+    "n": "08",
+    "title": "Queue TrainJobs with Kueue"
+   },
+   {
+    "id": "09-gpu-gang-scheduling",
+    "n": "09",
+    "title": "Gang scheduling multi-node TrainJobs on GPU nodes"
+   },
+   {
+    "id": "10-migrate-pytorchjob",
+    "n": "10",
+    "title": "Migrating a PyTorchJob (Training Operator v1) to a TrainJob"
+   },
+   {
+    "id": "11-capstone",
+    "n": "11",
+    "title": "Capstone - a queued, resumable 2-node run with a planted fault"
+   }
+  ]
+ },
+ {
   "id": "llm-from-zero",
   "title": "Build a language model from zero",
   "kind": "local",

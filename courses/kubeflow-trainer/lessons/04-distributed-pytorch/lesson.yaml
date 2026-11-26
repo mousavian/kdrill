@@ -1,0 +1,9 @@
+title: Two nodes, one model - the PyTorch policy
+goal: >
+  The TrainJob `ddp` asks for two nodes, and gets two pods that each train a
+  separate copy of the model. Fix the platform's runtime `tiny-ddp` so that the
+  two nodes join one PyTorch DDP run, with the rank, world size and master
+  address injected by the controller, and run the TrainJob again.
+namespaces: [train]
+timeout: 240s
+concepts: [numNodes, mlPolicy.torch, PET_ environment variables, torchrun, rendezvous, DNS names of JobSet pods, runtime snapshot, DDP]

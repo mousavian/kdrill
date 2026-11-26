@@ -1,0 +1,12 @@
+title: Capstone - a queued, resumable 2-node run with a planted fault
+goal: >
+  Ship the final run. The runtime `capstone-ddp` and the TrainJob `final-run`
+  were written in a hurry: the two nodes do not train as one group, nothing
+  restarts a crashed worker, the run has no checkpoints, is not queued and
+  asks for more CPU than the team's quota. Rank 1 crashes once at step 300 (a
+  planted fault that stays). Fix the runtime and recreate the TrainJob so that
+  it is admitted by Kueue, survives the crash by restarting from its
+  checkpoint, and completes as one 2-node DDP run.
+namespaces: [train]
+timeout: 300s
+concepts: [runtime, TrainJob, mlPolicy.torch, torchrun, failurePolicy, runtimePatches, checkpoint and resume, Kueue, resourcesPerNode, planted fault]

@@ -1,0 +1,10 @@
+title: Gang scheduling multi-node TrainJobs on GPU nodes
+goal: >
+  Two 2-node TrainJobs, each node needing 2 GPUs, were started together on a
+  cluster with exactly 4 GPUs. Each got one node and both wait for the other
+  half forever, holding the GPUs. Resubmit them through the Kueue queue
+  `training` so that one runs with both nodes and the other waits as a whole,
+  holding nothing.
+kind: sim
+namespaces: [train]
+concepts: [gang scheduling, partial placement deadlock, resourcesPerNode GPU, PET_NPROC_PER_NODE auto, Kueue admission as a unit, Pending pods, simulated nodes]

@@ -1,0 +1,33 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: ClusterTrainingRuntime
+metadata:
+  name: tiny-ddp
+  labels:
+    trainer.kubeflow.org/framework: torch
+spec:
+  mlPolicy:
+    numNodes: 2
+    torch: {}
+  template:
+    spec:
+      replicatedJobs:
+      - name: node
+        template:
+          metadata:
+            labels:
+              trainer.kubeflow.org/trainjob-ancestor-step: trainer
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                terminationGracePeriodSeconds: 3     # lab: old pods must not linger (same names, same DNS records)
+                restartPolicy: Never
+                containers:
+                - name: node
+                  image: kdrill.local/ml-tiny:0.1.0
+                  command: [torchrun, /opt/ml-tiny/app/train.py]
+                  env:
+                  - {name: OMP_NUM_THREADS, value: "1"}
+                  resources:
+                    requests: {cpu: 500m, memory: 450Mi}
+                    limits: {memory: 768Mi}

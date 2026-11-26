@@ -1,0 +1,39 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: final-run
+  labels:
+    kueue.x-k8s.io/queue-name: team
+spec:
+  runtimeRef:
+    name: capstone-ddp
+  trainer:
+    numNodes: 2
+    args: [--steps, "800", --seed, "1", --batch-size, "16", --log-every, "100"]
+    resourcesPerNode:
+      requests: {cpu: 500m, memory: 450Mi}      # 2 nodes x 500m = 1 CPU, inside the quota of 2
+      limits: {memory: 768Mi}
+    env:
+    - {name: CKPT_DIR, value: /ckpt}
+    - {name: CKPT_EVERY, value: "50"}
+    - {name: FAIL_AT_STEP, value: "300"}     # planted: ...
+    - {name: FAIL_RANK, value: "1"}          # ... rank 1 crashes at step 300 ...
+    - {name: FAIL_ONCE, value: "true"}       # ... once (remembered on the checkpoint volume)
+  runtimePatches:
+  - manager: kdrill.dev/learner
+    trainingRuntimeSpec:
+      template:
+        spec:
+          replicatedJobs:
+          - name: node
+            template:
+              spec:
+                template:
+                  spec:
+                    volumes:
+                    - name: ckpt
+                      persistentVolumeClaim: {claimName: checkpoints}
+                    containers:
+                    - name: node
+                      volumeMounts:
+                      - {name: ckpt, mountPath: /ckpt}

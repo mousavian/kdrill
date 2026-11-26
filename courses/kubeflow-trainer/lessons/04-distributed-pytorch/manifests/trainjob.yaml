@@ -1,0 +1,10 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: ddp
+spec:
+  runtimeRef:
+    name: tiny-ddp
+  trainer:
+    numNodes: 2
+    args: [--steps, "300", --seed, "1", --batch-size, "16", --log-every, "50"]

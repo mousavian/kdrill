@@ -1,0 +1,10 @@
+title: Suspend, resume and a deadline
+goal: >
+  A long exploratory TrainJob `explore` is hogging the node while an urgent
+  one, `urgent`, waits suspended. Free the node by suspending `explore` (its
+  pods go away, the TrainJob stays), let `urgent` run to completion, and stop
+  the runaway TrainJob `runaway` by itself with an active deadline of 20
+  seconds so that it ends Failed with reason DeadlineExceeded.
+namespaces: [train]
+timeout: 240s
+concepts: [spec.suspend, Suspended condition, activeDeadlineSeconds, DeadlineExceeded, TrainJob conditions, JobSet suspend, immutable fields]

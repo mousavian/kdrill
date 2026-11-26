@@ -1,0 +1,10 @@
+# A long exploratory run, running now.
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: explore
+spec:
+  runtimeRef:
+    name: tiny-gpt
+  trainer:
+    args: [--steps, "3000", --seed, "21", --log-every, "100"]

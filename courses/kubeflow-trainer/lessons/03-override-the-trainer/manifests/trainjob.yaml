@@ -1,0 +1,11 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: tuned
+spec:
+  runtimeRef:
+    name: tiny-gpt
+  trainer:
+    env:
+    - {name: STEPS, value: "300"}
+    - {name: SEED, value: "11"}

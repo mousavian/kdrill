@@ -1,0 +1,65 @@
+# The platform's runtime with a dataset initializer step, fixed: a shared volume `initializer`. In the lab the "initializer" is the
+# tiny image's `prepare` tool (the real one is ghcr.io/kubeflow/trainer/dataset-initializer).
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: ClusterTrainingRuntime
+metadata:
+  name: tiny-data
+  labels:
+    trainer.kubeflow.org/framework: torch
+spec:
+  mlPolicy:
+    numNodes: 1
+    torch: {}
+  template:
+    spec:
+      volumeClaimPolicies:               # JobSet creates one PVC per TrainJob: initializer-<trainjob>
+      - templates:
+        - metadata: {name: initializer}
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources: {requests: {storage: 64Mi}}
+      replicatedJobs:
+      - name: dataset-initializer
+        template:
+          metadata:
+            labels:
+              trainer.kubeflow.org/trainjob-ancestor-step: dataset-initializer
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                - name: dataset-initializer
+                  image: kdrill.local/ml-tiny:0.1.0
+                  command: [sh, -c, 'echo "initializer: fetching $STORAGE_URI"; prepare --src "${STORAGE_URI#file://}" --out /workspace/dataset']
+                  resources:
+                    requests: {cpu: 50m, memory: 128Mi}
+                    limits: {memory: 256Mi}
+                  volumeMounts:
+                  - {name: initializer, mountPath: /workspace}   # required name for the initializer containers
+      - name: node
+        dependsOn:
+        - name: dataset-initializer
+          status: Complete
+        template:
+          metadata:
+            labels:
+              trainer.kubeflow.org/trainjob-ancestor-step: trainer
+          spec:
+            backoffLimit: 0
+            template:
+              spec:
+                restartPolicy: Never
+                containers:
+                - name: node
+                  image: kdrill.local/ml-tiny:0.1.0
+                  command: [train]
+                  args: [--steps, "200", --seed, "5", --data, /workspace/dataset, --log-every, "50"]
+                  env:
+                  - {name: OMP_NUM_THREADS, value: "1"}
+                  resources:
+                    requests: {cpu: 250m, memory: 450Mi}
+                    limits: {memory: 768Mi}
+                  volumeMounts:
+                  - {name: initializer, mountPath: /workspace}   # the trainer reads /workspace/dataset

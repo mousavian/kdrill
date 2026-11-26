@@ -1,0 +1,9 @@
+title: Migrating a PyTorchJob (Training Operator v1) to a TrainJob
+goal: >
+  A team still has a v1 PyTorchJob manifest (one Master, one Worker). Write the
+  equivalent TrainJob `tiny-pytorchjob` for the platform's runtime `tiny-ddp`:
+  two nodes, the same arguments, environment and resources, and run it so the
+  two nodes train as one DDP group.
+namespaces: [train]
+timeout: 240s
+concepts: [PyTorchJob, Training Operator v1, replica specs, Master and Worker, env injection, migration, numNodes, resourcesPerNode]

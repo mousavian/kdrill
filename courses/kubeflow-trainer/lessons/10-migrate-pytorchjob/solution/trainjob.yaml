@@ -1,0 +1,15 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: tiny-pytorchjob
+spec:
+  runtimeRef:
+    name: tiny-ddp
+  trainer:
+    numNodes: 2                                  # Master (1) + Worker (1)
+    args: [--steps, "400", --seed, "5", --batch-size, "16", --log-every, "100"]   # what followed `train` in the command
+    env:
+    - {name: RUN_NAME, value: legacy-migration}  # OMP_NUM_THREADS comes from the runtime
+    resourcesPerNode:
+      requests: {cpu: 500m, memory: 450Mi}
+      limits: {memory: 1Gi}

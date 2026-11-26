@@ -20,7 +20,7 @@ is the exam.
 
 ## Numbers (all true as of 25 November 2026)
 
-- 9 courses, 168 lessons live; 2 more courses planned (fine-tuning, Kubeflow).
+- 10 courses, 179 lessons live; 2 more courses planned (fine-tuning, the rest of Kubeflow: KServe, Katib, Pipelines).
 - Runs on one small k3d (k3s) cluster sized for an 8 GB laptop. Give Docker
   about 4 GB.
 - No cloud account, no cloud bill, no GPU needed.
@@ -97,7 +97,7 @@ The GitHub URL is a placeholder until the repository is public; use it as is.
 
 - Plain, dry, a little funny. Engineers talking to engineers. Never salesy.
 - Sentence case everywhere. Buttons say what they do ("Copy the commands",
-  "See all 168 lessons"). No arrows appended to buttons or links.
+  "See all 179 lessons"). No arrows appended to buttons or links.
 - No eyebrow labels in tracked capitals above headings, no "A · B · C" meta
   strings, no "WORD — fragment" labels, unless the design's concept itself
   calls for that typography (for example printed packaging or an exam paper).

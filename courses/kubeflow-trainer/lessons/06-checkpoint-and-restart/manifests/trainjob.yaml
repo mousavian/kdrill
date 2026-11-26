@@ -1,0 +1,13 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: flaky
+spec:
+  runtimeRef:
+    name: tiny-resume
+  trainer:
+    env:
+    - {name: STEPS, value: "800"}
+    - {name: CKPT_EVERY, value: "50"}
+    - {name: FAIL_AT_STEP, value: "300"}     # planted: the process crashes here ...
+    - {name: FAIL_ONCE, value: "true"}       # ... the first time only (remembered next to the checkpoints)

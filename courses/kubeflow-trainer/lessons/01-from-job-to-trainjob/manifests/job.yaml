@@ -1,0 +1,20 @@
+# What runs today: the tiny GPT as a plain Job.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tiny-job
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: train
+        image: kdrill.local/ml-tiny:0.1.0
+        command: [train]
+        args: [--steps, "200", --seed, "3", --log-every, "50"]
+        env:
+        - {name: OMP_NUM_THREADS, value: "1"}
+        resources:
+          requests: {cpu: 250m, memory: 450Mi}
+          limits: {memory: 768Mi}

@@ -1,0 +1,12 @@
+# Owned by the researcher: small. Only the team's own setting is here;
+# image, command, arguments and policy come from the runtime.
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: team-run
+spec:
+  runtimeRef:
+    name: team-tiny
+  trainer:
+    env:
+    - {name: RUN_TEAM, value: research}

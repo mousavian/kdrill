@@ -1,0 +1,35 @@
+# A GPU runtime. On the simulated nodes no container starts: the pods just "run" (a KWOK annotation
+# keeps them Running instead of completing at once).
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: ClusterTrainingRuntime
+metadata:
+  name: gpu-ddp
+  labels:
+    trainer.kubeflow.org/framework: torch
+spec:
+  mlPolicy:
+    numNodes: 2
+    torch: {}
+  template:
+    spec:
+      replicatedJobs:
+      - name: node
+        template:
+          metadata:
+            labels:
+              trainer.kubeflow.org/trainjob-ancestor-step: trainer
+          spec:
+            backoffLimit: 0
+            template:
+              metadata:
+                annotations:
+                  pod-complete.stage.kwok.x-k8s.io/delay: "6h"   # simulation only: how long the fake run lasts
+              spec:
+                restartPolicy: Never
+                containers:
+                - name: node
+                  image: kdrill.local/ml-tiny:0.1.0
+                  command: [torchrun, /opt/ml-tiny/app/train.py]
+                  resources:
+                    requests: {cpu: "4", memory: 16Gi}
+                    limits: {nvidia.com/gpu: 2}

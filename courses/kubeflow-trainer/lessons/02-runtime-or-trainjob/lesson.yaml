@@ -1,0 +1,9 @@
+title: Who owns what - a team runtime and a small TrainJob
+goal: >
+  The research team wants its own training defaults without touching the
+  platform's ClusterTrainingRuntime. Write a namespaced TrainingRuntime
+  `team-tiny` that holds the image, command, arguments and policy, and fix the
+  team's small TrainJob `team-run` so that it uses it and completes.
+namespaces: [train]
+timeout: 180s
+concepts: [TrainingRuntime, ClusterTrainingRuntime, runtimeRef kind, namespace scope, platform vs user ownership, RBAC split]

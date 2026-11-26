@@ -5,7 +5,7 @@ sequence of **lessons**: you get a goal and a prepared cluster, work with your
 own `kubectl`, and `kdrill verify` tells you exactly what is still wrong.
 Runs on one small k3d cluster (fake KWOK nodes for scheduling and scale
 topics, real containers and traffic for the gateway and service-mesh courses,
-real tiny models for the inference and training-platform courses, and a
+real tiny models for the inference, training-platform and kubeflow-trainer courses, and a
 no-cluster Python course, llm-from-zero, where you build a language model
 yourself, and its sequel fine-tuning), sized for an 8 GB laptop. No cloud account, no cloud bill, no GPU.
 
@@ -24,10 +24,11 @@ Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/). How it is built:
 | `istio` | 14 | real traffic | Sidecars, canaries, mTLS, authorization, ambient mode. |
 | `inference` | 26 | real model | Serve an LLM: probes, KEDA on queue depth, endpoint picking, GPU capacity. |
 | `training-platform` | 20 | real model | Real PyTorch runs as Jobs: checkpoints, preemption, JobSet, Kueue. |
+| `kubeflow-trainer` | 11 | real model, simulated GPU nodes | Kubeflow Trainer v2: TrainJobs and runtimes, PyTorch DDP, initializers, restarts, suspend, Kueue, gang scheduling, PyTorchJob migration. |
 | `llm-from-zero` | 27 | Python, no cluster | Build a language model yourself: data, tokenizers, hand-written backprop, a GPT, training, evaluation. |
 | `fine-tuning` | 17 | Python, no cluster | Fine-tune that model by hand: forgetting, instruction data, loss masking, LoRA from scratch, merging, int8 and QLoRA, DPO, honest evaluation. |
 
-185 lessons in all. More courses are planned; see [courses/QUEUE.md](courses/QUEUE.md).
+196 lessons in all. More courses are planned; see [courses/QUEUE.md](courses/QUEUE.md).
 
 ## Prerequisites
 
@@ -45,6 +46,10 @@ Website: [kdrill.5xx.tech](https://kdrill.5xx.tech/). How it is built:
   PyTorch, about 250 MB download, 1-3 minutes) for your machine's architecture
   and imports it into the cluster; behind a TLS-inspecting proxy, point
   `KDRILL_BUILD_CA` at the proxy's CA bundle
+- internet access (once) for the kubeflow-trainer course: its first `course start` downloads the four Trainer
+  CRDs (2.5 MB, checksum-verified, cached in `~/.kdrill/cache`) and pulls the controller image
+  (`ghcr.io/kubeflow/trainer/trainer-controller-manager`, about 40 MB); it also builds `kdrill.local/ml-tiny`
+  like training-platform
 - the llm-from-zero and fine-tuning courses need **only Docker** (no k3d, no cluster; stop the cluster to free
   memory): the first lesson of either builds `kdrill.local/ml-dev` (CPU-only PyTorch, about 300 MB
   download, 2-5 minutes) with a plain `docker build`; llm-from-zero's lesson 01 downloads 4 MB of

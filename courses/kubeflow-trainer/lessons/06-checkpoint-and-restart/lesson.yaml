@@ -1,0 +1,10 @@
+title: A crash at step 300 - checkpoints and JobSet restarts
+goal: >
+  The TrainJob `flaky` hits a planted crash at step 300 (once) and ends
+  Failed. Make it survive: let the runtime restart the group after a failure
+  (JobSet failurePolicy), and give the TrainJob a checkpoint volume through
+  runtimePatches, so the second attempt resumes from step 300 instead of
+  starting over, and the TrainJob completes.
+namespaces: [train]
+timeout: 240s
+concepts: [JobSet failurePolicy, maxRestarts, runtimePatches, manager, PVC volume, checkpoint and resume, TrainJob conditions, exit code]

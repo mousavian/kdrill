@@ -1,0 +1,15 @@
+apiVersion: trainer.kubeflow.org/v1alpha1
+kind: TrainJob
+metadata:
+  name: final-run
+spec:
+  runtimeRef:
+    name: capstone-ddp
+  trainer:
+    numNodes: 2
+    args: [--steps, "800", --seed, "1", --batch-size, "16", --log-every, "100"]
+    env:
+    - {name: CKPT_EVERY, value: "50"}
+    - {name: FAIL_AT_STEP, value: "300"}     # planted: ...
+    - {name: FAIL_RANK, value: "1"}          # ... rank 1 crashes at step 300 ...
+    - {name: FAIL_ONCE, value: "true"}       # ... once (remembered on the checkpoint volume)
